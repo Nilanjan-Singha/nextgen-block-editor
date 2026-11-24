@@ -34,6 +34,7 @@ import {
   PageCoverTool,
   PollTool,
   QuizTool,
+  SettingsTriggerTool,
   SmartCodeTool,
   TableOfContentsTool,
   TaskChecklistTool,
@@ -1393,6 +1394,7 @@ export function getEditorTools(
     nestedlist: NestedList as unknown as ToolConstructable,
     simpleImage: SimpleImage as unknown as ToolConstructable,
     comment: CommentTool as unknown as ToolConstructable,
+    settings: SettingsTriggerTool as unknown as ToolConstructable,
 
     // Inline toolbar tools
     inlineCode: InlineCode as unknown as ToolConstructable,

@@ -22,6 +22,12 @@ export interface BlockEditorProps {
   linkEndpoint?: string;
   enabledTools?: string[];
   showStats?: boolean;
+  showAiBar?: boolean;
+  onAiRequest?: (params: {
+    mode: 'continue' | 'ask';
+    prompt: string;
+    context: string;
+  }) => Promise<string>;
   className?: string;
   onReady?: () => void;
   onChange?: (data: EditorJSData) => void;
