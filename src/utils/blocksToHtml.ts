@@ -685,6 +685,12 @@ export function blocksToHtml(data: EditorJSData | null | undefined): string {
       if (block.type === 'comment') {
         return '';
       }
+      if (block.type === 'scratch') {
+        const text = String(d.text || '').trim();
+        if (!text) return '';
+        const title = d.title ? `<div class="editor-scratch-card-title">${escHtml(d.title)}</div>` : '';
+        return `<aside class="editor-scratch-card">${title}<pre class="editor-scratch-card-body">${escHtml(text)}</pre></aside>`;
+      }
       if (block.type === 'emoji') {
         const em = escHtml(d.emoji || '✨');
         const size = ['sm', 'md', 'lg'].includes(String(d.size))

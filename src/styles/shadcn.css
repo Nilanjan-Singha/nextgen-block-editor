@@ -2389,3 +2389,68 @@
   outline: 2px solid var(--ng-foreground);
   outline-offset: 2px;
 }
+
+/* ── Scratchpad Block (/scratch) ────────────────────────────────── */
+.editor-scratch-tool {
+  margin: 10px 0;
+  padding: 10px 12px;
+  border: 1px dashed var(--ng-border);
+  border-radius: var(--ng-radius);
+  background: var(--ng-card);
+  display: grid;
+  gap: 8px;
+}
+
+.editor-scratch-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.editor-scratch-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 8px;
+}
+
+.editor-scratch-stats {
+  font-size: 11px;
+  color: var(--ng-muted-foreground);
+  white-space: nowrap;
+}
+
+.editor-scratch-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  min-height: 88px;
+  font-size: 13px;
+  line-height: 1.5;
+  padding: 8px 10px;
+}
+
+.editor-scratch-card {
+  margin: 14px 0;
+  padding: 12px 14px;
+  border: 1px dashed var(--ng-border);
+  border-radius: var(--ng-radius);
+  background: var(--ng-card);
+}
+
+.editor-scratch-card-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ng-muted-foreground);
+  margin-bottom: 6px;
+}
+
+.editor-scratch-card-body {
+  margin: 0;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+}

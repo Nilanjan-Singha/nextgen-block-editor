@@ -37,6 +37,7 @@ import {
   PageCoverTool,
   PollTool,
   QuizTool,
+  ScratchTool,
   SettingsTriggerTool,
   SmartCodeTool,
   TableOfContentsTool,
@@ -1424,6 +1425,7 @@ export function getEditorTools(
     callout: CalloutTool as unknown as ToolConstructable,
     hotkey: HotkeyTool as unknown as ToolConstructable,
     emoji: EmojiTool as unknown as ToolConstructable,
+    scratch: ScratchTool as unknown as ToolConstructable,
     alert: AlertTool as unknown as ToolConstructable,
 
     // 2. Common rich media & layout
