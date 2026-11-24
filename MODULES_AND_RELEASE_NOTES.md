@@ -68,6 +68,9 @@ This document is the technical reference for what is inside the `nextgen-block-e
 *(To publish `v0.1.1`: run `npm version patch && npm publish` inside `d:\antigravity-projects\nextgen-editor`.)*
 
 ### `[Next Version — v0.2.0 Planned]`
+- **Added (AI Integration — `Continue Writing` & `Ask AI`)**:
+  - **Top AI Bar & `/` Commands**: `Continue Writing` (auto-completes from current document context) and `Ask AI` (inline prompt to draft, rewrite, or summarize directly into Editor.js).
+  - **Settings Modal AI Tab**: Configure Provider (OpenAI, Anthropic, Gemini, Custom Endpoint), Model, API Key (`localStorage`), and Tone/System Prompt, plus an optional `onAiRequest` callback prop on `BlockEditor` for backend proxying.
 - **Added (`/settings` Command & Modal Dialog)**:
   - Typing `/settings` in the `/` command menu opens a shadcn/ui-styled **Settings Modal** instead of inserting a block.
   - **Themes**: Switch between Light, Dark, and Catppuccin flavors directly from the modal.
