@@ -3227,103 +3227,11 @@ export class EmojiTool {
   }
 }
 
-export interface ScratchData {
-  title?: string;
-  text: string;
-}
-
-export class ScratchTool {
-  private data: ScratchData;
-
-  static get toolbox() {
-    return {
-      title: 'Scratchpad',
-      icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4Z"/></svg>',
-    };
-  }
-
-  constructor({ data }: { data?: Partial<ScratchData> }) {
-    this.data = {
-      title: data?.title ?? 'Scratchpad',
-      text: data?.text ?? '',
-    };
-  }
-
-  render(): HTMLElement {
-    const wrap = document.createElement('div');
-    wrap.className = 'editor-scratch-tool';
-
-    const head = document.createElement('div');
-    head.className = 'editor-scratch-head';
-
-    const titleIn = document.createElement('input');
-    titleIn.type = 'text';
-    titleIn.className = 'cdx-input editor-scratch-title';
-    titleIn.placeholder = 'Scratchpad title...';
-    titleIn.value = this.data.title ?? 'Scratchpad';
-    titleIn.addEventListener('input', () => {
-      this.data.title = titleIn.value;
-    });
-
-    const stats = document.createElement('span');
-    stats.className = 'editor-scratch-stats';
-
-    const updateStats = () => {
-      const len = this.data.text.length;
-      const words = this.data.text.trim() ? this.data.text.trim().split(/\s+/).length : 0;
-      stats.textContent = `${words}w · ${len}c`;
-    };
-
-    const copyBtn = document.createElement('button');
-    copyBtn.type = 'button';
-    copyBtn.className = 'b2';
-    copyBtn.textContent = 'Copy';
-    copyBtn.addEventListener('click', () => {
-      if (!this.data.text) return;
-      void navigator.clipboard?.writeText(this.data.text);
-      copyBtn.textContent = 'Copied';
-      window.setTimeout(() => {
-        copyBtn.textContent = 'Copy';
-      }, 1200);
-    });
-
-    const clearBtn = document.createElement('button');
-    clearBtn.type = 'button';
-    clearBtn.className = 'b2';
-    clearBtn.textContent = 'Clear';
-
-    head.append(titleIn, stats, copyBtn, clearBtn);
-
-    const textarea = document.createElement('textarea');
-    textarea.className = 'cdx-input editor-scratch-textarea';
-    textarea.rows = 4;
-    textarea.placeholder = 'Quick brain dump, rough notes, snippets...';
-    textarea.value = this.data.text || '';
-
-    textarea.addEventListener('input', () => {
-      this.data.text = textarea.value;
-      updateStats();
-    });
-
-    clearBtn.addEventListener('click', () => {
-      this.data.text = '';
-      textarea.value = '';
-      updateStats();
-      textarea.focus();
-    });
-
-    updateStats();
-    wrap.append(head, textarea);
-    return wrap;
-  }
-
-  save(): ScratchData {
-    return {
-      title: this.data.title?.trim() || 'Scratchpad',
-      text: this.data.text,
-    };
-  }
-}
+export const ScratchTool = createActionTriggerTool(
+  'Scratchpad',
+  '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4Z"/></svg>',
+  'nextgen-open-scratch'
+);
 
 export interface DialogueData {
   triggerLabel: string;

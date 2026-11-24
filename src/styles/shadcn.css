@@ -2917,3 +2917,90 @@
 .ng-tool-chip input {
   margin: 0;
 }
+
+/* ── Floating Sticky Note Scratchpad (/scratch) ─────────────────── */
+.ng-scratch-sticky {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 9500;
+  width: 300px;
+  max-width: calc(100vw - 32px);
+  border-radius: 12px;
+  border: 1px solid #facc15;
+  background: #fef9c3;
+  color: #422006;
+  box-shadow: 0 16px 38px rgba(15, 23, 42, 0.24);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.dark .ng-scratch-sticky,
+[data-theme='dark'] .ng-scratch-sticky,
+[data-ng-theme='dark'] .ng-scratch-sticky {
+  border-color: rgba(250, 204, 21, 0.35);
+  background: #272312;
+  color: #fef08a;
+}
+
+.ng-scratch-sticky-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(161, 98, 7, 0.2);
+  cursor: move;
+  user-select: none;
+}
+
+.ng-scratch-sticky-title {
+  font-size: 12px;
+  font-weight: 700;
+  flex: 1;
+}
+
+.ng-scratch-sticky-count {
+  font-size: 11px;
+  opacity: 0.75;
+}
+
+.ng-scratch-sticky-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ng-scratch-sticky-btn {
+  padding: 2px 7px;
+  border-radius: 6px;
+  border: 1px solid rgba(161, 98, 7, 0.25);
+  background: rgba(255, 255, 255, 0.45);
+  color: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dark .ng-scratch-sticky-btn,
+[data-theme='dark'] .ng-scratch-sticky-btn,
+[data-ng-theme='dark'] .ng-scratch-sticky-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(250, 204, 21, 0.25);
+}
+
+.ng-scratch-sticky-body {
+  width: 100%;
+  min-height: 170px;
+  max-height: 360px;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: none;
+  outline: none;
+  resize: vertical;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.55;
+}

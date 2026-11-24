@@ -72,6 +72,16 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
     const [askPrompt, setAskPrompt] = useState('');
     const [aiBusy, setAiBusy] = useState(false);
     const [aiError, setAiError] = useState<string | null>(null);
+    const [scratchOpen, setScratchOpen] = useState(false);
+    const [scratchText, setScratchText] = useState<string>(() => {
+      try {
+        return localStorage.getItem('ng-scratchpad-note') || '';
+      } catch {
+        return '';
+      }
+    });
+    const [scratchCopied, setScratchCopied] = useState(false);
+    const [scratchOffset, setScratchOffset] = useState({ x: 0, y: 0 });
 
     const [stats, setStats] = useState<{ words: number; blocks: number }>(() => {
       const blocks = initialData?.blocks || [];
@@ -93,13 +103,16 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
       const onOpenSettings = () => setSettingsOpen(true);
       const onAiContinue = () => void runAiRef.current?.('continue');
       const onAiAsk = () => setAskOpen(true);
+      const onOpenScratch = () => setScratchOpen(true);
       shell.addEventListener('nextgen-open-settings', onOpenSettings);
       shell.addEventListener('nextgen-ai-continue', onAiContinue);
       shell.addEventListener('nextgen-ai-ask', onAiAsk);
+      shell.addEventListener('nextgen-open-scratch', onOpenScratch);
       return () => {
         shell.removeEventListener('nextgen-open-settings', onOpenSettings);
         shell.removeEventListener('nextgen-ai-continue', onAiContinue);
         shell.removeEventListener('nextgen-ai-ask', onAiAsk);
+        shell.removeEventListener('nextgen-open-scratch', onOpenScratch);
       };
     }, []);
 
@@ -120,7 +133,7 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
         const sanitizedInitial = {
           ...(latestDocRef.current || { blocks: [] }),
           blocks: ((latestDocRef.current?.blocks || []) as EditorJSData['blocks']).filter(
-            (b) => !['settings', 'continueWriting', 'askAi'].includes(b.type)
+            (b) => !['settings', 'continueWriting', 'askAi', 'scratch'].includes(b.type)
           ),
         };
         latestDocRef.current = sanitizedInitial;
@@ -136,7 +149,7 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
             try {
               const saved = await instance.save();
               const filteredBlocks = (saved.blocks || []).filter(
-                (b) => !['settings', 'continueWriting', 'askAi'].includes(b.type)
+                (b) => !['settings', 'continueWriting', 'askAi', 'scratch'].includes(b.type)
               );
               const typed = { ...saved, blocks: filteredBlocks } as unknown as EditorJSData;
               latestDocRef.current = typed;
@@ -204,7 +217,7 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
         await editorRef.current.isReady;
         const saved = await editorRef.current.save();
         const filteredBlocks = (saved.blocks || []).filter(
-          (b) => !['settings', 'continueWriting', 'askAi'].includes(b.type)
+          (b) => !['settings', 'continueWriting', 'askAi', 'scratch'].includes(b.type)
         );
         const typed = { ...saved, blocks: filteredBlocks } as unknown as EditorJSData;
         latestDocRef.current = typed;
@@ -404,6 +417,90 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
           }}
           onClose={() => setSettingsOpen(false)}
         />
+
+        {scratchOpen && (
+          <div
+            className="ng-scratch-sticky"
+            role="dialog"
+            aria-label="Scratchpad sticky note"
+            style={{
+              transform: `translate(${scratchOffset.x}px, ${scratchOffset.y}px)`,
+            }}
+          >
+            <div
+              className="ng-scratch-sticky-head"
+              onMouseDown={(e) => {
+                if ((e.target as HTMLElement).closest('button')) return;
+                const startX = e.clientX - scratchOffset.x;
+                const startY = e.clientY - scratchOffset.y;
+                const onMove = (ev: MouseEvent) => {
+                  setScratchOffset({ x: ev.clientX - startX, y: ev.clientY - startY });
+                };
+                const onUp = () => {
+                  window.removeEventListener('mousemove', onMove);
+                  window.removeEventListener('mouseup', onUp);
+                };
+                window.addEventListener('mousemove', onMove);
+                window.addEventListener('mouseup', onUp);
+              }}
+            >
+              <span className="ng-scratch-sticky-title">📝 Scratchpad</span>
+              <span className="ng-scratch-sticky-count">
+                {scratchText.trim() ? scratchText.trim().split(/\s+/).length : 0}w · {scratchText.length}c
+              </span>
+              <div className="ng-scratch-sticky-actions">
+                <button
+                  type="button"
+                  className="ng-scratch-sticky-btn"
+                  onClick={() => {
+                    if (!scratchText) return;
+                    void navigator.clipboard?.writeText(scratchText);
+                    setScratchCopied(true);
+                    window.setTimeout(() => setScratchCopied(false), 1200);
+                  }}
+                >
+                  {scratchCopied ? 'Copied' : 'Copy'}
+                </button>
+                <button
+                  type="button"
+                  className="ng-scratch-sticky-btn"
+                  onClick={() => {
+                    setScratchText('');
+                    try {
+                      localStorage.setItem('ng-scratchpad-note', '');
+                    } catch {
+                      // ignore
+                    }
+                  }}
+                >
+                  Clear
+                </button>
+                <button
+                  type="button"
+                  className="ng-scratch-sticky-btn"
+                  aria-label="Close scratchpad"
+                  onClick={() => setScratchOpen(false)}
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+            <textarea
+              className="ng-scratch-sticky-body"
+              placeholder="Quick sticky note, rough ideas, snippets..."
+              value={scratchText}
+              onChange={(e) => {
+                const val = e.target.value;
+                setScratchText(val);
+                try {
+                  localStorage.setItem('ng-scratchpad-note', val);
+                } catch {
+                  // ignore
+                }
+              }}
+            />
+          </div>
+        )}
       </div>
     );
   }
