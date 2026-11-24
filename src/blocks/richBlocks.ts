@@ -3011,10 +3011,25 @@ export interface EmojiBlockData {
   size: 'sm' | 'md' | 'lg';
 }
 
-const EMOJI_PRESETS = [
-  '😀', '😎', '🥳', '🤔', '🙌', '👍', '👏', '🔥',
-  '✨', '💡', '🚀', '🎯', '✅', '⚠️', '❤️', '📌',
-  '📝', '📚', '💻', '📊', '⚡', '🧠', '🎨', '🎵',
+const EMOJI_PRESETS: Array<{ em: string; name: string }> = [
+  { em: '😀', name: 'grin smile happy' }, { em: '😂', name: 'joy laugh' },
+  { em: '😎', name: 'cool sunglasses' }, { em: '🥳', name: 'party celebrate' },
+  { em: '🤔', name: 'think hmm' }, { em: '🤩', name: 'star eyes excited' },
+  { em: '🙌', name: 'hands celebrate' }, { em: '👍', name: 'thumbs up like' },
+  { em: '👏', name: 'clap applause' }, { em: '🙏', name: 'thanks pray' },
+  { em: '🔥', name: 'fire hot lit' }, { em: '✨', name: 'sparkles magic' },
+  { em: '💡', name: 'idea bulb light' }, { em: '🚀', name: 'rocket launch' },
+  { em: '🎯', name: 'target goal bullseye' }, { em: '✅', name: 'check done yes' },
+  { em: '⚠️', name: 'warning alert' }, { em: '❌', name: 'cross error no' },
+  { em: '❤️', name: 'heart love' }, { em: '💜', name: 'purple heart' },
+  { em: '📌', name: 'pin note' }, { em: '📝', name: 'memo write note' },
+  { em: '📚', name: 'books docs' }, { em: '💻', name: 'laptop code dev' },
+  { em: '📊', name: 'chart graph data' }, { em: '⚡', name: 'lightning fast zap' },
+  { em: '🧠', name: 'brain smart think' }, { em: '🎨', name: 'art design palette' },
+  { em: '🎵', name: 'music audio note' }, { em: '🌟', name: 'star glow' },
+  { em: '🔍', name: 'search find magnifier' }, { em: '🔒', name: 'lock security' },
+  { em: '☕', name: 'coffee cup' }, { em: '🌍', name: 'earth world globe' },
+  { em: '🏆', name: 'trophy win award' }, { em: '💬', name: 'chat comment bubble' },
 ];
 
 export class EmojiTool {
@@ -3037,10 +3052,14 @@ export class EmojiTool {
 
   render(): HTMLElement {
     const wrap = document.createElement('div');
-    wrap.className = 'editor-form-builder';
+    wrap.className = 'editor-emoji-split';
 
-    const top = document.createElement('div');
-    top.className = 'editor-callout-top';
+    const leftPane = document.createElement('div');
+    leftPane.className = 'editor-emoji-left';
+
+    const previewGlyph = document.createElement('div');
+    previewGlyph.className = `editor-emoji-hero is-${this.data.size}`;
+    previewGlyph.textContent = this.data.emoji;
 
     const emojiIn = document.createElement('input');
     emojiIn.type = 'text';
@@ -3049,15 +3068,7 @@ export class EmojiTool {
     emojiIn.placeholder = '✨';
     emojiIn.addEventListener('input', () => {
       this.data.emoji = emojiIn.value || '✨';
-    });
-
-    const labelIn = document.createElement('input');
-    labelIn.type = 'text';
-    labelIn.className = 'cdx-input editor-form-input';
-    labelIn.placeholder = 'Caption or reaction note (optional)';
-    labelIn.value = this.data.label || '';
-    labelIn.addEventListener('input', () => {
-      this.data.label = labelIn.value;
+      previewGlyph.textContent = this.data.emoji;
     });
 
     const sizeSel = document.createElement('select');
@@ -3071,30 +3082,63 @@ export class EmojiTool {
     });
     sizeSel.addEventListener('change', () => {
       this.data.size = sizeSel.value as EmojiBlockData['size'];
+      previewGlyph.className = `editor-emoji-hero is-${this.data.size}`;
     });
 
-    top.append(emojiIn, labelIn, sizeSel);
+    const row = document.createElement('div');
+    row.className = 'editor-emoji-controls';
+    row.append(emojiIn, sizeSel);
+
+    const labelIn = document.createElement('input');
+    labelIn.type = 'text';
+    labelIn.className = 'cdx-input editor-form-input';
+    labelIn.placeholder = 'Caption or reaction note...';
+    labelIn.value = this.data.label || '';
+    labelIn.addEventListener('input', () => {
+      this.data.label = labelIn.value;
+    });
+
+    leftPane.append(previewGlyph, row, labelIn);
+
+    const rightPane = document.createElement('div');
+    rightPane.className = 'editor-emoji-picker-pane';
+
+    const searchIn = document.createElement('input');
+    searchIn.type = 'search';
+    searchIn.className = 'cdx-input editor-form-input';
+    searchIn.placeholder = 'Search emojis (fire, rocket, heart...)';
 
     const grid = document.createElement('div');
     grid.className = 'editor-emoji-grid';
-    const buttons: HTMLButtonElement[] = [];
 
-    EMOJI_PRESETS.forEach((em) => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = `editor-emoji-btn${em === this.data.emoji ? ' is-active' : ''}`;
-      btn.textContent = em;
-      btn.addEventListener('click', () => {
-        this.data.emoji = em;
-        emojiIn.value = em;
-        buttons.forEach((b) => b.classList.remove('is-active'));
-        btn.classList.add('is-active');
+    const renderGrid = (query = '') => {
+      grid.innerHTML = '';
+      const q = query.trim().toLowerCase();
+      const filtered = q
+        ? EMOJI_PRESETS.filter((p) => p.name.includes(q) || p.em.includes(q))
+        : EMOJI_PRESETS;
+
+      filtered.forEach(({ em, name }) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.title = name;
+        btn.className = `editor-emoji-btn${em === this.data.emoji ? ' is-active' : ''}`;
+        btn.textContent = em;
+        btn.addEventListener('click', () => {
+          this.data.emoji = em;
+          emojiIn.value = em;
+          previewGlyph.textContent = em;
+          renderGrid(searchIn.value);
+        });
+        grid.appendChild(btn);
       });
-      buttons.push(btn);
-      grid.appendChild(btn);
-    });
+    };
 
-    wrap.append(top, grid);
+    searchIn.addEventListener('input', () => renderGrid(searchIn.value));
+    renderGrid();
+
+    rightPane.append(searchIn, grid);
+    wrap.append(leftPane, rightPane);
     return wrap;
   }
 

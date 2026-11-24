@@ -2133,3 +2133,55 @@
   font-size: 14px;
   color: var(--ng-muted-foreground);
 }
+
+.editor-emoji-split {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 12px;
+  padding: 14px;
+  margin: 12px 0;
+  border: 1px solid var(--ng-border);
+  border-radius: var(--ng-radius);
+  background: var(--ng-card);
+}
+
+@media (max-width: 600px) {
+  .editor-emoji-split {
+    grid-template-columns: 1fr;
+  }
+}
+
+.editor-emoji-left {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  padding: 10px;
+  border-radius: calc(var(--ng-radius) - 2px);
+  border: 1px solid var(--ng-border);
+  background: var(--ng-background);
+  text-align: center;
+}
+
+.editor-emoji-hero {
+  line-height: 1.2;
+  padding: 6px 0;
+}
+.editor-emoji-hero.is-sm { font-size: 24px; }
+.editor-emoji-hero.is-md { font-size: 36px; }
+.editor-emoji-hero.is-lg { font-size: 52px; }
+
+.editor-emoji-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.editor-emoji-picker-pane {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  padding: 10px;
+  border-radius: calc(var(--ng-radius) - 2px);
+  border: 1px solid var(--ng-border);
+  background: var(--ng-background);
+}
