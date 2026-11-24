@@ -3172,12 +3172,21 @@ export class EmojiTool {
       anchorRect: rect,
       onSelect: (em) => {
         if (this.isNewInsert && this.api?.blocks) {
-          const idx = this.api.blocks.getCurrentBlockIndex();
-          this.api.blocks.delete(idx);
-          this.api.blocks.insert('paragraph', { text: `${em} ` }, {}, idx, true);
-          queueMicrotask(() => {
-            this.api?.caret?.setToBlock(idx, 'end');
-          });
+          const blockEl = this.anchorEl?.closest('.ce-block');
+          const parent = blockEl?.parentElement;
+          const domIdx =
+            blockEl && parent
+              ? Array.from(parent.children).indexOf(blockEl)
+              : -1;
+          const idx =
+            domIdx >= 0 ? domIdx : this.api.blocks.getCurrentBlockIndex();
+          if (idx >= 0) {
+            this.api.blocks.insert('paragraph', { text: `${em} ` }, {}, idx + 1, true);
+            this.api.blocks.delete(idx);
+            window.requestAnimationFrame(() => {
+              this.api?.caret?.setToBlock(idx, 'end');
+            });
+          }
           return;
         }
         this.data.emoji = em;
@@ -3205,7 +3214,7 @@ export class EmojiTool {
 
   rendered() {
     if (this.isNewInsert) {
-      queueMicrotask(() => this.openPickerAtAnchor());
+      window.requestAnimationFrame(() => this.openPickerAtAnchor());
     }
   }
 

@@ -131,25 +131,30 @@ export function attachEmojiSidePicker(container: HTMLElement): () => void {
     const triggerRange = document.createRange();
     triggerRange.setStart(textNode, triggerStart);
     triggerRange.setEnd(textNode, offset);
-    const rect = triggerRange.getBoundingClientRect();
+    const rawRect = triggerRange.getBoundingClientRect();
+    const rect =
+      rawRect.width > 0 || rawRect.height > 0
+        ? rawRect
+        : target.getBoundingClientRect();
 
     openEmojiSideMenu({
       anchorRect: rect,
       onSelect: (emoji) => {
-        if (!textNode.isConnected) return;
-        const current = textNode.data;
-        const nextText =
-          current.slice(0, triggerStart) + emoji + current.slice(offset);
-        textNode.data = nextText;
-
-        const nextCaret = triggerStart + emoji.length;
-        const newRange = document.createRange();
-        newRange.setStart(textNode, nextCaret);
-        newRange.setEnd(textNode, nextCaret);
-        const s = window.getSelection();
-        if (s) {
-          s.removeAllRanges();
-          s.addRange(newRange);
+        if (textNode.isConnected) {
+          const current = textNode.data;
+          textNode.data =
+            current.slice(0, triggerStart) + emoji + current.slice(offset);
+          const nextCaret = triggerStart + emoji.length;
+          const newRange = document.createRange();
+          newRange.setStart(textNode, nextCaret);
+          newRange.setEnd(textNode, nextCaret);
+          const s = window.getSelection();
+          if (s) {
+            s.removeAllRanges();
+            s.addRange(newRange);
+          }
+        } else if (target.isConnected) {
+          target.innerHTML = target.innerHTML.replace(/\/emoji/i, emoji);
         }
         target.focus();
         target.dispatchEvent(new Event('input', { bubbles: true }));
