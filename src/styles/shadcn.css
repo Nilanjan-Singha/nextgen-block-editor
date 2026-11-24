@@ -1789,14 +1789,26 @@
 
 /* ── Tighter Toolbar & Plus/Settings Positioning ────────────────── */
 .nextgen-editor-shell #editorjs {
-  padding-left: 46px;
+  padding-left: 56px;
+}
+
+.nextgen-editor-shell .ce-block__content,
+.nextgen-editor-shell .ce-toolbar__content {
+  max-width: none;
+  margin-left: 0;
+  margin-right: 0;
 }
 
 .nextgen-editor-shell .ce-toolbar__actions {
-  right: calc(100% + 4px);
+  right: calc(100% + 6px);
   display: inline-flex;
   align-items: center;
   gap: 2px;
+}
+
+.nextgen-editor-shell .ce-toolbar .ce-popover {
+  left: 0;
+  right: auto;
 }
 
 .nextgen-editor-shell .ce-toolbar__plus,
