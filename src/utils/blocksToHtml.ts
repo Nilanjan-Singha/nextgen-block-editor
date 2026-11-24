@@ -665,6 +665,17 @@ export function blocksToHtml(data: EditorJSData | null | undefined): string {
       if (block.type === 'comment') {
         return '';
       }
+      if (block.type === 'callout') {
+        const tone = ['neutral', 'info', 'success', 'warning', 'danger'].includes(
+          String(d.tone)
+        )
+          ? String(d.tone)
+          : 'neutral';
+        const icon = escHtml(d.icon || '💡');
+        const title = d.title ? `<strong class="editor-callout-title">${escHtml(d.title)}</strong>` : '';
+        const text = d.text ? `<p class="editor-callout-text">${sanitizeInlineHtml(d.text)}</p>` : '';
+        return `<aside class="editor-callout-card is-${tone}"><span class="editor-callout-icon" aria-hidden="true">${icon}</span><div class="editor-callout-body">${title}${text}</div></aside>`;
+      }
       if (block.type === 'upload') {
         const url = String(d.url || '').trim();
         if (!url) return '';

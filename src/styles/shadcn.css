@@ -1950,3 +1950,81 @@
   font-weight: 600;
   color: var(--ng-primary);
 }
+
+/* ── Callout Block (/callout) ───────────────────────────────────── */
+.editor-callout-builder,
+.editor-callout-card {
+  border: 1px solid var(--ng-border);
+  border-radius: var(--ng-radius);
+  padding: 14px;
+  margin: 12px 0;
+  background: var(--ng-muted);
+  color: var(--ng-foreground);
+}
+
+.editor-callout-builder {
+  display: grid;
+  gap: 8px;
+}
+
+.editor-callout-top {
+  display: grid;
+  grid-template-columns: 48px 1fr 110px;
+  gap: 8px;
+  align-items: center;
+}
+
+.editor-callout-icon-in {
+  text-align: center;
+  padding: 6px !important;
+}
+
+.editor-callout-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.editor-callout-icon {
+  font-size: 18px;
+  line-height: 1.3;
+  flex-shrink: 0;
+}
+
+.editor-callout-body {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.editor-callout-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.editor-callout-text {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ng-muted-foreground);
+}
+
+.editor-callout-builder.is-info,
+.editor-callout-card.is-info {
+  border-left: 3px solid #3b82f6;
+}
+
+.editor-callout-builder.is-success,
+.editor-callout-card.is-success {
+  border-left: 3px solid #22c55e;
+}
+
+.editor-callout-builder.is-warning,
+.editor-callout-card.is-warning {
+  border-left: 3px solid #eab308;
+}
+
+.editor-callout-builder.is-danger,
+.editor-callout-card.is-danger {
+  border-left: 3px solid #ef4444;
+}

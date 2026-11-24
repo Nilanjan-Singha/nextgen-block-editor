@@ -20,6 +20,7 @@ import {
 } from './blocks/mediaBlocks';
 import {
   AudioPlayerTool,
+  CalloutTool,
   ChartTool,
   EisenhowerMatrixTool,
   ExcalidrawTool,
@@ -1375,6 +1376,7 @@ export function getEditorTools(
     delimiter: DelimiterTool as unknown as ToolConstructable,
     checklist: Checklist as unknown as ToolConstructable,
     table: Table as unknown as ToolConstructable,
+    callout: CalloutTool as unknown as ToolConstructable,
     alert: AlertTool as unknown as ToolConstructable,
 
     // 2. Common rich media & layout

@@ -15,6 +15,7 @@ export const TOOL_CATEGORIES: ToolCategoryGroup[] = [
       'quote',
       'pullquote',
       'delimiter',
+      'callout',
       'alert',
       'badges',
       'tags',

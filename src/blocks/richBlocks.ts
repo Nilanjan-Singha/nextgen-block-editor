@@ -2793,3 +2793,95 @@ export class UploadTool {
     };
   }
 }
+
+export type CalloutTone = 'neutral' | 'info' | 'success' | 'warning' | 'danger';
+
+export interface CalloutData {
+  icon: string;
+  title?: string;
+  text: string;
+  tone: CalloutTone;
+}
+
+export class CalloutTool {
+  private data: CalloutData;
+
+  static get toolbox() {
+    return {
+      title: 'Callout',
+      icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1.2 2.3h5.6c.2-1.1.6-1.8 1.2-2.3A7 7 0 0 0 12 2z"/></svg>',
+    };
+  }
+
+  constructor({ data }: { data?: Partial<CalloutData> }) {
+    this.data = {
+      icon: data?.icon ?? '💡',
+      title: data?.title ?? '',
+      text: data?.text ?? '',
+      tone: (data?.tone as CalloutTone) || 'neutral',
+    };
+  }
+
+  render(): HTMLElement {
+    const wrap = document.createElement('div');
+    wrap.className = `editor-callout-builder is-${this.data.tone}`;
+
+    const top = document.createElement('div');
+    top.className = 'editor-callout-top';
+
+    const iconIn = document.createElement('input');
+    iconIn.type = 'text';
+    iconIn.className = 'cdx-input editor-callout-icon-in';
+    iconIn.value = this.data.icon;
+    iconIn.placeholder = '💡';
+    iconIn.addEventListener('input', () => {
+      this.data.icon = iconIn.value || '💡';
+    });
+
+    const titleIn = document.createElement('input');
+    titleIn.type = 'text';
+    titleIn.className = 'cdx-input editor-form-input';
+    titleIn.placeholder = 'Callout title (optional)...';
+    titleIn.value = this.data.title || '';
+    titleIn.addEventListener('input', () => {
+      this.data.title = titleIn.value;
+    });
+
+    const toneSel = document.createElement('select');
+    toneSel.className = 'cdx-input editor-form-select';
+    (['neutral', 'info', 'success', 'warning', 'danger'] as CalloutTone[]).forEach((t) => {
+      const o = document.createElement('option');
+      o.value = t;
+      o.textContent = t;
+      if (this.data.tone === t) o.selected = true;
+      toneSel.appendChild(o);
+    });
+    toneSel.addEventListener('change', () => {
+      this.data.tone = toneSel.value as CalloutTone;
+      wrap.className = `editor-callout-builder is-${this.data.tone}`;
+    });
+
+    top.append(iconIn, titleIn, toneSel);
+
+    const bodyIn = document.createElement('textarea');
+    bodyIn.className = 'cdx-input editor-form-input';
+    bodyIn.rows = 2;
+    bodyIn.placeholder = 'Write a highlighted callout note...';
+    bodyIn.value = this.data.text;
+    bodyIn.addEventListener('input', () => {
+      this.data.text = bodyIn.value;
+    });
+
+    wrap.append(top, bodyIn);
+    return wrap;
+  }
+
+  save(): CalloutData {
+    return {
+      icon: this.data.icon.trim() || '💡',
+      title: this.data.title?.trim() || '',
+      text: this.data.text.trim(),
+      tone: this.data.tone,
+    };
+  }
+}
