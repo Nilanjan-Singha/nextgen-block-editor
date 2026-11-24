@@ -68,7 +68,11 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
     });
     const [statsVisible, setStatsVisible] = useState(showStats);
     const [aiConfig, setAiConfig] = useState<AiConfig>(loadAiConfig);
-    const [askOpen, setAskOpen] = useState(false);
+    const [aiPopover, setAiPopover] = useState<{
+      mode: 'ask' | 'continue';
+      top: number;
+      left: number;
+    } | null>(null);
     const [askPrompt, setAskPrompt] = useState('');
     const [aiBusy, setAiBusy] = useState(false);
     const [aiError, setAiError] = useState<string | null>(null);
@@ -100,9 +104,21 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
     useEffect(() => {
       const shell = shellRef.current;
       if (!shell) return;
+      const openAiNearRect = (mode: 'ask' | 'continue', e: Event) => {
+        const rect = (e as CustomEvent<{ rect?: DOMRect }>).detail?.rect;
+        const popW = 320;
+        const popH = 140;
+        const rawLeft = rect ? rect.left + 12 : window.innerWidth / 2 - popW / 2;
+        const rawTop = rect ? rect.top + 8 : 120;
+        const left = Math.max(12, Math.min(rawLeft, window.innerWidth - popW - 12));
+        const top = Math.max(12, Math.min(rawTop, window.innerHeight - popH - 12));
+        setAiError(null);
+        setAskPrompt('');
+        setAiPopover({ mode, top, left });
+      };
       const onOpenSettings = () => setSettingsOpen(true);
-      const onAiContinue = () => void runAiRef.current?.('continue');
-      const onAiAsk = () => setAskOpen(true);
+      const onAiContinue = (e: Event) => openAiNearRect('continue', e);
+      const onAiAsk = (e: Event) => openAiNearRect('ask', e);
       const onOpenScratch = () => setScratchOpen(true);
       shell.addEventListener('nextgen-open-settings', onOpenSettings);
       shell.addEventListener('nextgen-ai-continue', onAiContinue);
@@ -280,7 +296,7 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
 
         if (mode === 'ask') {
           setAskPrompt('');
-          setAskOpen(false);
+          setAiPopover(null);
         }
       } catch (err) {
         setAiError(err instanceof Error ? err.message : 'AI request failed.');
@@ -327,9 +343,13 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
               </button>
               <button
                 type="button"
-                className={`excalidraw-btn${askOpen ? ' is-active' : ''}`}
+                className={`excalidraw-btn${aiPopover?.mode === 'ask' ? ' is-active' : ''}`}
                 disabled={aiBusy}
-                onClick={() => setAskOpen((o) => !o)}
+                onClick={() =>
+                  setAiPopover((p) =>
+                    p ? null : { mode: 'ask', top: 120, left: 120 }
+                  )
+                }
               >
                 Ask AI
               </button>
@@ -344,29 +364,6 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
             </button>
           </div>
         )}
-
-        {askOpen && (
-          <form
-            className="ng-ask-form"
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (askPrompt.trim()) void runAi('ask', askPrompt.trim());
-            }}
-          >
-            <input
-              type="text"
-              className="cdx-input editor-form-input"
-              placeholder="Ask AI to draft, summarize, or expand..."
-              value={askPrompt}
-              onChange={(e) => setAskPrompt(e.target.value)}
-            />
-            <button type="submit" className="editor-form-submit" disabled={aiBusy}>
-              {aiBusy ? 'Running…' : 'Generate'}
-            </button>
-          </form>
-        )}
-
-        {aiError && <div className="ng-ai-error">{aiError}</div>}
 
         {editorMode === 'simple' && (
           <ClassicToolbar
@@ -417,6 +414,66 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
           }}
           onClose={() => setSettingsOpen(false)}
         />
+
+        {aiPopover && (
+          <form
+            className="ng-ai-inline-popover"
+            style={{ top: `${aiPopover.top}px`, left: `${aiPopover.left}px` }}
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (aiPopover.mode === 'continue') {
+                void runAi('continue', askPrompt.trim());
+              } else if (askPrompt.trim()) {
+                void runAi('ask', askPrompt.trim());
+              }
+            }}
+          >
+            <div className="ng-ai-inline-head">
+              <span>
+                {aiPopover.mode === 'continue'
+                  ? '✦ Continue Writing'
+                  : 'Ask AI'}
+              </span>
+              <button
+                type="button"
+                className="b2"
+                aria-label="Close AI prompt"
+                onClick={() => setAiPopover(null)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="ng-ai-inline-row">
+              <input
+                type="text"
+                autoFocus
+                className="cdx-input editor-form-input"
+                placeholder={
+                  aiPopover.mode === 'continue'
+                    ? 'How should AI continue? (optional)'
+                    : 'What do you want AI to write?'
+                }
+                value={askPrompt}
+                onChange={(e) => setAskPrompt(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') setAiPopover(null);
+                }}
+              />
+              <button
+                type="submit"
+                className="editor-form-submit"
+                disabled={aiBusy || (aiPopover.mode === 'ask' && !askPrompt.trim())}
+              >
+                {aiBusy
+                  ? 'Running…'
+                  : aiPopover.mode === 'continue'
+                  ? 'Continue'
+                  : 'Generate'}
+              </button>
+            </div>
+            {aiError && <div className="ng-ai-error">{aiError}</div>}
+          </form>
+        )}
 
         {scratchOpen && (
           <div

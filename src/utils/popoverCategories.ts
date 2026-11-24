@@ -5,6 +5,10 @@ export interface ToolCategoryGroup {
 
 export const TOOL_CATEGORIES: ToolCategoryGroup[] = [
   {
+    label: 'AI',
+    tools: ['continueWriting', 'askAi'],
+  },
+  {
     label: 'Text & Style',
     tools: [
       'h1',
@@ -85,10 +89,6 @@ export const TOOL_CATEGORIES: ToolCategoryGroup[] = [
       'dialogue',
       'slides',
     ],
-  },
-  {
-    label: 'AI',
-    tools: ['continueWriting', 'askAi'],
   },
   {
     label: 'Settings',

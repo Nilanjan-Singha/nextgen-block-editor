@@ -2682,7 +2682,15 @@ function createActionTriggerTool(
     rendered() {
       if (this.fired || !this.el) return;
       this.fired = true;
-      this.el.dispatchEvent(new CustomEvent(eventName, { bubbles: true }));
+      const blockRect =
+        this.el.closest('.ce-block')?.getBoundingClientRect() ||
+        this.el.getBoundingClientRect();
+      this.el.dispatchEvent(
+        new CustomEvent(eventName, {
+          bubbles: true,
+          detail: { rect: blockRect },
+        })
+      );
       window.setTimeout(() => {
         try {
           const idx = this.api.blocks.getCurrentBlockIndex();
