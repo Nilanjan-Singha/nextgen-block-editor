@@ -106,12 +106,13 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
       if (!shell) return;
       const openAiNearRect = (mode: 'ask' | 'continue', e: Event) => {
         const rect = (e as CustomEvent<{ rect?: DOMRect }>).detail?.rect;
+        const shellRect = shell.getBoundingClientRect();
         const popW = 320;
-        const popH = 140;
-        const rawLeft = rect ? rect.left + 12 : window.innerWidth / 2 - popW / 2;
-        const rawTop = rect ? rect.top + 8 : 120;
-        const left = Math.max(12, Math.min(rawLeft, window.innerWidth - popW - 12));
-        const top = Math.max(12, Math.min(rawTop, window.innerHeight - popH - 12));
+        const rawLeft = rect ? rect.left - shellRect.left : 60;
+        const rawTop = rect ? rect.top - shellRect.top + 4 : 60;
+        const maxLeft = Math.max(12, shellRect.width - popW - 12);
+        const left = Math.max(12, Math.min(rawLeft, maxLeft));
+        const top = Math.max(12, rawTop);
         setAiError(null);
         setAskPrompt('');
         setAiPopover({ mode, top, left });

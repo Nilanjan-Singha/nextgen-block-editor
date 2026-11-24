@@ -2674,7 +2674,9 @@ function createActionTriggerTool(
 
     render(): HTMLElement {
       const el = document.createElement('div');
-      el.style.display = 'none';
+      el.style.height = '1px';
+      el.style.opacity = '0';
+      el.style.pointerEvents = 'none';
       this.el = el;
       return el;
     }
@@ -2682,9 +2684,11 @@ function createActionTriggerTool(
     rendered() {
       if (this.fired || !this.el) return;
       this.fired = true;
-      const blockRect =
-        this.el.closest('.ce-block')?.getBoundingClientRect() ||
-        this.el.getBoundingClientRect();
+      const contentEl =
+        this.el.closest('.ce-block__content') ||
+        this.el.closest('.ce-block') ||
+        this.el;
+      const blockRect = contentEl.getBoundingClientRect();
       this.el.dispatchEvent(
         new CustomEvent(eventName, {
           bubbles: true,
