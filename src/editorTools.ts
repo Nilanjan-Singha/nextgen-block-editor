@@ -1348,7 +1348,7 @@ export class HyperlinkInline {
 
 function makeHeadingTool(level: 1 | 2 | 3) {
   return class extends (Header as unknown as {
-    new (opts: Record<string, unknown>): unknown;
+    new (opts: Record<string, unknown>): object;
   }) {
     static get toolbox() {
       return {
