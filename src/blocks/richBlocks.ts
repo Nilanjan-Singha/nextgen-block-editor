@@ -1,3 +1,6 @@
+import React from 'react';
+import { createRoot, type Root } from 'react-dom/client';
+import { Excalidraw, exportToCanvas } from '@excalidraw/excalidraw';
 import katex from 'katex';
 
 export interface LatexData {
@@ -91,36 +94,30 @@ export class LatexTool {
   }
 }
 
-export type WhiteboardShapeType = 'pen' | 'rect' | 'circle' | 'arrow';
-
-export interface WhiteboardElement {
-  type: WhiteboardShapeType;
-  color: string;
-  strokeWidth: number;
-  points: Array<{ x: number; y: number }>;
-}
-
 export interface ExcalidrawData {
-  elements: WhiteboardElement[];
+  elements: unknown[];
+  appState?: Record<string, unknown>;
+  files?: Record<string, unknown>;
   dataUrl: string;
   caption?: string;
 }
 
-const BOARD_COLORS = ['#cdd6f4', '#89b4fa', '#a6e3a1', '#f9e2af', '#f38ba8', '#cba6f7'];
+const EXPAND_ICON =
+  '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>';
+
+const COLLAPSE_ICON =
+  '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg>';
 
 export class ExcalidrawTool {
   private data: ExcalidrawData;
-  private activeTool: WhiteboardShapeType = 'pen';
-  private activeColor = BOARD_COLORS[0];
-  private strokeWidth = 2.5;
-  private isDrawing = false;
-  private currentElement: WhiteboardElement | null = null;
-  private canvas: HTMLCanvasElement | null = null;
-  private ctx: CanvasRenderingContext2D | null = null;
+  private root: Root | null = null;
+  private isFullscreen = false;
+  private exportTimer: number | null = null;
+  private keyHandler: ((e: KeyboardEvent) => void) | null = null;
 
   static get toolbox() {
     return {
-      title: 'Whiteboard',
+      title: 'Excalidraw',
       icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="8" height="8" rx="1"/><circle cx="17.5" cy="17.5" r="3.5"/><path d="M14 4l6 6M20 4l-6 6"/></svg>',
     };
   }
@@ -128,223 +125,156 @@ export class ExcalidrawTool {
   constructor({ data }: { data?: Partial<ExcalidrawData> }) {
     this.data = {
       elements: Array.isArray(data?.elements) ? data.elements : [],
+      appState: data?.appState && typeof data.appState === 'object' ? data.appState : {},
+      files: data?.files && typeof data.files === 'object' ? data.files : {},
       dataUrl: data?.dataUrl ?? '',
       caption: data?.caption ?? '',
     };
   }
 
-  private redraw() {
-    const canvas = this.canvas;
-    const ctx = this.ctx;
-    if (!canvas || !ctx) return;
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    const all = this.currentElement
-      ? [...this.data.elements, this.currentElement]
-      : this.data.elements;
-
-    for (const el of all) {
-      if (!el.points.length) continue;
-      ctx.strokeStyle = el.color;
-      ctx.lineWidth = el.strokeWidth;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-
-      const start = el.points[0];
-      const end = el.points[el.points.length - 1];
-
-      ctx.beginPath();
-      if (el.type === 'pen') {
-        ctx.moveTo(start.x, start.y);
-        for (let i = 1; i < el.points.length; i++) {
-          ctx.lineTo(el.points[i].x, el.points[i].y);
-        }
-        ctx.stroke();
-      } else if (el.type === 'rect') {
-        ctx.strokeRect(start.x, start.y, end.x - start.x, end.y - start.y);
-      } else if (el.type === 'circle') {
-        const rx = Math.abs(end.x - start.x) / 2;
-        const ry = Math.abs(end.y - start.y) / 2;
-        const cx = (start.x + end.x) / 2;
-        const cy = (start.y + end.y) / 2;
-        ctx.ellipse(cx, cy, Math.max(1, rx), Math.max(1, ry), 0, 0, Math.PI * 2);
-        ctx.stroke();
-      } else if (el.type === 'arrow') {
-        ctx.moveTo(start.x, start.y);
-        ctx.lineTo(end.x, end.y);
-        ctx.stroke();
-
-        const angle = Math.atan2(end.y - start.y, end.x - start.x);
-        const head = 10 + el.strokeWidth;
-        ctx.beginPath();
-        ctx.moveTo(end.x, end.y);
-        ctx.lineTo(
-          end.x - head * Math.cos(angle - Math.PI / 6),
-          end.y - head * Math.sin(angle - Math.PI / 6)
-        );
-        ctx.moveTo(end.x, end.y);
-        ctx.lineTo(
-          end.x - head * Math.cos(angle + Math.PI / 6),
-          end.y - head * Math.sin(angle + Math.PI / 6)
-        );
-        ctx.stroke();
-      }
+  private scheduleExport(
+    elements: readonly unknown[],
+    appState: Record<string, unknown>,
+    files: Record<string, unknown>
+  ) {
+    if (this.exportTimer !== null) {
+      window.clearTimeout(this.exportTimer);
     }
-  }
-
-  private getPoint(e: PointerEvent): { x: number; y: number } {
-    const canvas = this.canvas!;
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    return {
-      x: (e.clientX - rect.left) * scaleX,
-      y: (e.clientY - rect.top) * scaleY,
-    };
+    this.exportTimer = window.setTimeout(async () => {
+      try {
+        if (!elements.length) {
+          this.data.dataUrl = '';
+          return;
+        }
+        const canvas = await exportToCanvas({
+          elements: elements as never,
+          appState: {
+            exportBackground: true,
+            viewBackgroundColor:
+              (appState.viewBackgroundColor as string) || '#ffffff',
+          } as never,
+          files: files as never,
+          getDimensions: (w: number, h: number) => ({
+            width: Math.max(w, 400),
+            height: Math.max(h, 240),
+            scale: 1,
+          }),
+        });
+        this.data.dataUrl = canvas.toDataURL('image/png');
+      } catch {
+        // Ignore transient export errors while editing
+      }
+    }, 350);
   }
 
   render(): HTMLElement {
     const wrap = document.createElement('div');
     wrap.className = 'excalidraw-tool';
 
-    const toolbar = document.createElement('div');
-    toolbar.className = 'excalidraw-toolbar';
+    const stage = document.createElement('div');
+    stage.className = 'excalidraw-stage';
 
-    const tools: Array<{ id: WhiteboardShapeType; label: string }> = [
-      { id: 'pen', label: 'Pen' },
-      { id: 'rect', label: 'Rect' },
-      { id: 'circle', label: 'Circle' },
-      { id: 'arrow', label: 'Arrow' },
-    ];
+    const mountNode = document.createElement('div');
+    mountNode.className = 'excalidraw-mount';
 
-    const toolButtons: HTMLButtonElement[] = [];
-    for (const t of tools) {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = `excalidraw-btn${t.id === this.activeTool ? ' is-active' : ''}`;
-      btn.textContent = t.label;
-      btn.addEventListener('click', () => {
-        this.activeTool = t.id;
-        toolButtons.forEach((b) => b.classList.remove('is-active'));
-        btn.classList.add('is-active');
-      });
-      toolButtons.push(btn);
-      toolbar.appendChild(btn);
-    }
+    const fsBtn = document.createElement('button');
+    fsBtn.type = 'button';
+    fsBtn.className = 'excalidraw-fullscreen-btn';
+    fsBtn.title = 'Full screen canvas';
+    fsBtn.setAttribute('aria-label', 'Full screen canvas');
+    fsBtn.innerHTML = EXPAND_ICON;
 
-    const divider = document.createElement('span');
-    divider.className = 'excalidraw-divider';
-    toolbar.appendChild(divider);
-
-    const swatches: HTMLButtonElement[] = [];
-    for (const color of BOARD_COLORS) {
-      const sw = document.createElement('button');
-      sw.type = 'button';
-      sw.className = `excalidraw-swatch${color === this.activeColor ? ' is-active' : ''}`;
-      sw.style.background = color;
-      sw.title = color;
-      sw.addEventListener('click', () => {
-        this.activeColor = color;
-        swatches.forEach((s) => s.classList.remove('is-active'));
-        sw.classList.add('is-active');
-      });
-      swatches.push(sw);
-      toolbar.appendChild(sw);
-    }
-
-    const spacer = document.createElement('span');
-    spacer.style.flex = '1';
-    toolbar.appendChild(spacer);
-
-    const undoBtn = document.createElement('button');
-    undoBtn.type = 'button';
-    undoBtn.className = 'excalidraw-btn';
-    undoBtn.textContent = 'Undo';
-    undoBtn.addEventListener('click', () => {
-      this.data.elements.pop();
-      this.redraw();
-    });
-
-    const clearBtn = document.createElement('button');
-    clearBtn.type = 'button';
-    clearBtn.className = 'excalidraw-btn';
-    clearBtn.textContent = 'Clear';
-    clearBtn.addEventListener('click', () => {
-      this.data.elements = [];
-      this.data.dataUrl = '';
-      this.redraw();
-    });
-
-    toolbar.append(undoBtn, clearBtn);
-
-    const canvas = document.createElement('canvas');
-    canvas.className = 'excalidraw-canvas';
-    canvas.width = 760;
-    canvas.height = 360;
-    this.canvas = canvas;
-    this.ctx = canvas.getContext('2d');
-
-    if (this.data.elements.length > 0) {
-      this.redraw();
-    } else if (this.data.dataUrl && this.ctx) {
-      const img = new Image();
-      img.onload = () => this.ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
-      img.src = this.data.dataUrl;
-    }
-
-    canvas.addEventListener('pointerdown', (e) => {
-      canvas.setPointerCapture(e.pointerId);
-      this.isDrawing = true;
-      const pt = this.getPoint(e);
-      this.currentElement = {
-        type: this.activeTool,
-        color: this.activeColor,
-        strokeWidth: this.strokeWidth,
-        points: [pt, pt],
-      };
-      this.redraw();
-    });
-
-    canvas.addEventListener('pointermove', (e) => {
-      if (!this.isDrawing || !this.currentElement) return;
-      const pt = this.getPoint(e);
-      if (this.currentElement.type === 'pen') {
-        this.currentElement.points.push(pt);
-      } else {
-        this.currentElement.points[1] = pt;
-      }
-      this.redraw();
-    });
-
-    const finishStroke = () => {
-      if (!this.isDrawing || !this.currentElement) return;
-      this.isDrawing = false;
-      this.data.elements.push(this.currentElement);
-      this.currentElement = null;
-      this.redraw();
+    const setFullscreen = (next: boolean) => {
+      this.isFullscreen = next;
+      wrap.classList.toggle('is-fullscreen', next);
+      fsBtn.innerHTML = next ? COLLAPSE_ICON : EXPAND_ICON;
+      fsBtn.title = next ? 'Exit full screen (Esc)' : 'Full screen canvas';
+      fsBtn.setAttribute(
+        'aria-label',
+        next ? 'Exit full screen' : 'Full screen canvas'
+      );
+      window.dispatchEvent(new Event('resize'));
     };
 
-    canvas.addEventListener('pointerup', finishStroke);
-    canvas.addEventListener('pointercancel', finishStroke);
+    fsBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setFullscreen(!this.isFullscreen);
+    });
+
+    this.keyHandler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && this.isFullscreen) {
+        setFullscreen(false);
+      }
+    };
+    document.addEventListener('keydown', this.keyHandler);
+
+    stage.append(mountNode, fsBtn);
+
+    this.root = createRoot(mountNode);
+    const initialAppState: Record<string, unknown> = {
+      ...(this.data.appState || {}),
+    };
+    delete initialAppState.collaborators;
+
+    this.root.render(
+      React.createElement(Excalidraw, {
+        initialData: {
+          elements: (this.data.elements || []) as never,
+          appState: initialAppState as never,
+          files: (this.data.files || {}) as never,
+        },
+        onChange: (elements, appState, files) => {
+          this.data.elements = Array.from(elements as readonly unknown[]);
+          this.data.appState = {
+            viewBackgroundColor: appState.viewBackgroundColor,
+            theme: appState.theme,
+            gridSize: appState.gridSize,
+          };
+          this.data.files = (files || {}) as Record<string, unknown>;
+          this.scheduleExport(
+            elements as readonly unknown[],
+            this.data.appState,
+            this.data.files
+          );
+        },
+      })
+    );
 
     const captionInput = document.createElement('input');
     captionInput.type = 'text';
     captionInput.className = 'excalidraw-caption';
-    captionInput.placeholder = 'Whiteboard diagram caption (optional)...';
+    captionInput.placeholder = 'Excalidraw diagram caption (optional)...';
     captionInput.value = this.data.caption || '';
     captionInput.addEventListener('input', () => {
       this.data.caption = captionInput.value;
     });
 
-    wrap.append(toolbar, canvas, captionInput);
+    wrap.append(stage, captionInput);
     return wrap;
+  }
+
+  destroy() {
+    if (this.exportTimer !== null) {
+      window.clearTimeout(this.exportTimer);
+      this.exportTimer = null;
+    }
+    if (this.keyHandler) {
+      document.removeEventListener('keydown', this.keyHandler);
+      this.keyHandler = null;
+    }
+    if (this.root) {
+      const r = this.root;
+      this.root = null;
+      queueMicrotask(() => r.unmount());
+    }
   }
 
   save(): ExcalidrawData {
     return {
       elements: this.data.elements,
-      dataUrl: this.canvas ? this.canvas.toDataURL('image/png') : this.data.dataUrl,
+      appState: this.data.appState,
+      files: this.data.files,
+      dataUrl: this.data.dataUrl,
       caption: this.data.caption,
     };
   }

@@ -58,7 +58,6 @@ export const TOOL_CATEGORIES: ToolCategoryGroup[] = [
       'musicCarousel',
       'embed',
       'attaches',
-      'drawing',
       'excalidraw',
     ],
   },

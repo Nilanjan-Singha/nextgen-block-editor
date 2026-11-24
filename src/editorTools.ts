@@ -1473,7 +1473,6 @@ export function getEditorTools(
     spoiler: SpoilerTool as unknown as ToolConstructable,
     collapsible: CollapsibleTool as unknown as ToolConstructable,
     attaches: AttachTool as unknown as ToolConstructable,
-    drawing: DrawingTool as unknown as ToolConstructable,
     nestedlist: NestedList as unknown as ToolConstructable,
     simpleImage: SimpleImage as unknown as ToolConstructable,
     comment: CommentTool as unknown as ToolConstructable,

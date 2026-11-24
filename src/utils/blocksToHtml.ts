@@ -1008,8 +1008,16 @@ export function blocksToHtml(data: EditorJSData | null | undefined): string {
         const img = `<img src="${escHtml(mediaUrl)}" alt="${escHtml(
           d.caption || block.type
         )}">`;
+        const captionHtml = d.caption
+          ? `<figcaption>${escHtml(d.caption)}</figcaption>`
+          : '';
+        if (block.type === 'excalidraw' || block.type === 'drawing') {
+          return `<figure class="editor-whiteboard-figure editor-excalidraw-preview" data-excalidraw-src="${escHtml(
+            mediaUrl
+          )}"><button type="button" class="editor-excalidraw-preview-fs" aria-label="Full screen" title="Full screen"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg></button>${img}${captionHtml}</figure>`;
+        }
         return d.caption
-          ? `<figure class="editor-whiteboard-figure">${img}<figcaption>${escHtml(d.caption)}</figcaption></figure>`
+          ? `<figure class="editor-whiteboard-figure">${img}${captionHtml}</figure>`
           : img;
       }
       return d.text ? `<p>${sanitizeInlineHtml(d.text)}</p>` : '';

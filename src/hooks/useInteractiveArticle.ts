@@ -156,6 +156,49 @@ export function useInteractiveArticle(
       });
     });
 
+    // 3b. Excalidraw preview full-screen
+    root
+      .querySelectorAll<HTMLElement>('.editor-excalidraw-preview')
+      .forEach((fig) => {
+        const src = fig.dataset.excalidrawSrc || '';
+        if (!src) return;
+        const fsBtn = fig.querySelector<HTMLButtonElement>(
+          '.editor-excalidraw-preview-fs'
+        );
+        const imgEl = fig.querySelector<HTMLImageElement>('img');
+
+        const openFullscreen = () => {
+          const overlay = document.createElement('div');
+          overlay.className = 'editor-lightbox';
+          overlay.innerHTML = `
+            <button type="button" class="editor-lightbox-close" aria-label="Close">×</button>
+            <img class="editor-lightbox-img" src="${src}" alt="">
+          `;
+          const close = () => {
+            document.removeEventListener('keydown', onKey);
+            overlay.remove();
+          };
+          const onKey = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') close();
+          };
+          overlay
+            .querySelector('.editor-lightbox-close')
+            ?.addEventListener('click', close);
+          overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) close();
+          });
+          document.addEventListener('keydown', onKey);
+          document.body.appendChild(overlay);
+        };
+
+        fsBtn?.addEventListener('click', openFullscreen);
+        imgEl?.addEventListener('click', openFullscreen);
+        cleanups.push(() => {
+          fsBtn?.removeEventListener('click', openFullscreen);
+          imgEl?.removeEventListener('click', openFullscreen);
+        });
+      });
+
     // 4. Slide deck / Presentation blocks
     root.querySelectorAll<HTMLElement>('[data-slides]').forEach((deck) => {
       const panels = Array.from(deck.querySelectorAll<HTMLElement>('.editor-slide-panel'));
