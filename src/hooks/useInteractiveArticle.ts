@@ -722,6 +722,17 @@ export function useInteractiveArticle(
       }
     });
 
+    // 15. Telegram-style spoilers (inline & block)
+    root
+      .querySelectorAll<HTMLElement>('.editor-inline-spoiler, [data-spoiler]')
+      .forEach((el) => {
+        const onToggle = () => {
+          el.classList.toggle('is-revealed');
+        };
+        el.addEventListener('click', onToggle);
+        cleanups.push(() => el.removeEventListener('click', onToggle));
+      });
+
     return () => {
       cleanups.forEach((fn) => fn());
     };

@@ -799,21 +799,89 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
-.editor-preview-document .editor-spoiler {
-  margin: 18px 0;
-  padding: 12px 16px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--tint);
-}
-.editor-preview-document .editor-spoiler summary {
+.editor-inline-spoiler {
+  display: inline;
+  padding: 0 4px;
+  border-radius: 4px;
+  background: rgba(148, 163, 184, 0.24);
+  filter: blur(5.5px);
   cursor: pointer;
-  font-weight: 600;
-  color: var(--soft);
+  user-select: none;
+  transition: filter 0.22s ease, background 0.22s ease;
 }
-.editor-preview-document .editor-spoiler-text {
-  margin-top: 10px;
+.editor-inline-spoiler.is-revealed {
+  filter: blur(0);
+  background: rgba(148, 163, 184, 0.14);
+  user-select: text;
+}
+.ce-block .editor-inline-spoiler {
+  filter: blur(2px);
+  border-bottom: 1px dashed rgba(100, 116, 139, 0.6);
+  user-select: text;
+}
+.ce-block .editor-inline-spoiler:hover,
+.ce-block .editor-inline-spoiler:focus-within {
+  filter: blur(0);
+}
+.editor-spoiler-card {
+  position: relative;
+  margin: 18px 0;
+  border-radius: 12px;
+  border: 1px solid var(--line, #e2e8f0);
+  background: var(--tint, #f8fafc);
+  overflow: hidden;
+  cursor: pointer;
+}
+.editor-spoiler-card.is-text {
+  padding: 16px 18px;
+}
+.editor-spoiler-content {
+  transition: filter 0.28s ease, transform 0.28s ease;
+}
+.editor-spoiler-card.is-text .editor-spoiler-content {
+  filter: blur(8px);
+  user-select: none;
+}
+.editor-spoiler-card.is-image .editor-spoiler-content {
+  filter: blur(20px);
+  transform: scale(1.03);
+}
+.editor-spoiler-card.is-image img {
+  width: 100%;
+  max-height: 360px;
+  object-fit: cover;
+  display: block;
+}
+.editor-spoiler-text-body {
   white-space: pre-wrap;
+  line-height: 1.6;
+}
+.editor-spoiler-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.12);
+  transition: opacity 0.22s ease;
+}
+.editor-spoiler-pill {
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(15, 23, 42, 0.78);
+  color: #fff;
+  backdrop-filter: blur(8px);
+}
+.editor-spoiler-card.is-revealed .editor-spoiler-content {
+  filter: blur(0);
+  transform: scale(1);
+  user-select: text;
+}
+.editor-spoiler-card.is-revealed .editor-spoiler-overlay {
+  opacity: 0;
+  pointer-events: none;
 }
 .editor-preview-document .editor-alert {
   margin: 20px 0;

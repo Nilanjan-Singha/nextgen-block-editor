@@ -943,12 +943,28 @@ export class ToggleH3Tool extends BaseToggleHeadingTool {
   }
 }
 
-export class SpoilerTool {
-  private data: { label?: string; text?: string };
-  private elements?: { label: HTMLInputElement; text: HTMLTextAreaElement };
+export type SpoilerKind = 'text' | 'image';
 
-  constructor(options: ToolConstructorOptions<{ label?: string; text?: string }>) {
-    this.data = options.data || {};
+export interface SpoilerData {
+  kind?: SpoilerKind;
+  label?: string;
+  text?: string;
+  url?: string;
+}
+
+export class SpoilerTool {
+  private data: SpoilerData;
+  private sidebarOpen = true;
+  private previewRevealed = false;
+
+  constructor(options: ToolConstructorOptions<SpoilerData>) {
+    const raw = options.data || {};
+    this.data = {
+      kind: raw.kind === 'image' ? 'image' : 'text',
+      label: raw.label ?? 'Spoiler',
+      text: raw.text ?? '',
+      url: raw.url ?? '',
+    };
   }
 
   static get toolbox() {
@@ -960,27 +976,202 @@ export class SpoilerTool {
 
   render() {
     const root = document.createElement('div');
-    root.className = 'custom-media-fields';
+    root.className = 'editor-spoiler-shell';
 
-    const label = document.createElement('input');
-    label.type = 'text';
-    label.placeholder = 'Spoiler warning / label (e.g. Plot spoiler)';
-    label.value = this.data.label || 'Spoiler';
+    const header = document.createElement('div');
+    header.className = 'editor-bento-header';
 
-    const text = document.createElement('textarea');
-    text.rows = 3;
-    text.placeholder = 'Hidden spoiler text...';
-    text.value = this.data.text || '';
+    const titleEl = document.createElement('div');
+    titleEl.className = 'editor-bento-header-title';
+    titleEl.textContent = 'Spoiler';
 
-    root.append(label, text);
-    this.elements = { label, text };
+    const headerActions = document.createElement('div');
+    headerActions.className = 'editor-bento-header-actions';
+
+    const peekBtn = document.createElement('button');
+    peekBtn.type = 'button';
+    peekBtn.className = 'b2';
+    peekBtn.textContent = 'Reveal';
+
+    const toggleSidebarBtn = document.createElement('button');
+    toggleSidebarBtn.type = 'button';
+    toggleSidebarBtn.className = 'b2 p';
+    toggleSidebarBtn.textContent = 'Mini Sidebar';
+
+    headerActions.append(peekBtn, toggleSidebarBtn);
+    header.append(titleEl, headerActions);
+
+    const workspace = document.createElement('div');
+    workspace.className = 'editor-spoiler-workspace';
+
+    const canvas = document.createElement('div');
+    canvas.className = 'editor-spoiler-canvas';
+
+    const sidebar = document.createElement('aside');
+    sidebar.className = 'editor-spoiler-sidebar';
+
+    const drawCanvas = () => {
+      canvas.innerHTML = '';
+      const card = document.createElement('div');
+      card.className = `editor-spoiler-card is-${this.data.kind || 'text'}${
+        this.previewRevealed ? ' is-revealed' : ''
+      }`;
+      card.onclick = () => {
+        this.previewRevealed = !this.previewRevealed;
+        peekBtn.textContent = this.previewRevealed ? 'Hide Blur' : 'Reveal';
+        drawCanvas();
+      };
+
+      const content = document.createElement('div');
+      content.className = 'editor-spoiler-content';
+
+      if (this.data.kind === 'image') {
+        if (this.data.url) {
+          const img = document.createElement('img');
+          img.src = this.data.url;
+          img.alt = this.data.label || 'Spoiler image';
+          content.appendChild(img);
+        } else {
+          const empty = document.createElement('div');
+          empty.className = 'editor-spoiler-empty';
+          empty.textContent = 'Add a spoiler image in the mini sidebar...';
+          content.appendChild(empty);
+        }
+      } else {
+        const p = document.createElement('div');
+        p.className = 'editor-spoiler-text-body';
+        p.textContent =
+          this.data.text || 'Hidden spoiler text (type in the mini sidebar)...';
+        content.appendChild(p);
+      }
+
+      const overlay = document.createElement('div');
+      overlay.className = 'editor-spoiler-overlay';
+      overlay.innerHTML = `<span class="editor-spoiler-pill">${escHtml(
+        this.data.label || 'Spoiler'
+      )} · Click to reveal</span>`;
+
+      card.append(content, overlay);
+      canvas.appendChild(card);
+    };
+
+    const drawSidebar = () => {
+      sidebar.innerHTML = '';
+
+      const modeSec = document.createElement('div');
+      modeSec.className = 'editor-bento-sb-section';
+      const modeLbl = document.createElement('div');
+      modeLbl.className = 'editor-bento-sb-label';
+      modeLbl.textContent = 'Spoiler Type';
+
+      const modeRow = document.createElement('div');
+      modeRow.className = 'editor-spoiler-mode-row';
+      (['text', 'image'] as SpoilerKind[]).forEach((k) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `b2${this.data.kind === k ? ' p' : ''}`;
+        btn.textContent = k === 'text' ? 'Text' : 'Image';
+        btn.onclick = () => {
+          this.data.kind = k;
+          drawCanvas();
+          drawSidebar();
+        };
+        modeRow.appendChild(btn);
+      });
+      modeSec.append(modeLbl, modeRow);
+
+      const contentSec = document.createElement('div');
+      contentSec.className = 'editor-bento-sb-section';
+      const contentLbl = document.createElement('div');
+      contentLbl.className = 'editor-bento-sb-label';
+      contentLbl.textContent =
+        this.data.kind === 'image' ? 'Hidden Image' : 'Hidden Text';
+
+      const labelIn = document.createElement('input');
+      labelIn.type = 'text';
+      labelIn.className = 'cdx-input editor-form-input';
+      labelIn.placeholder = 'Warning label (e.g. Plot spoiler)';
+      labelIn.value = this.data.label || '';
+      labelIn.oninput = () => {
+        this.data.label = labelIn.value;
+        drawCanvas();
+      };
+
+      contentSec.append(contentLbl, labelIn);
+
+      if (this.data.kind === 'image') {
+        const urlIn = document.createElement('input');
+        urlIn.type = 'url';
+        urlIn.className = 'cdx-input editor-form-input';
+        urlIn.placeholder = 'Image URL';
+        urlIn.value = this.data.url || '';
+        urlIn.oninput = () => {
+          this.data.url = urlIn.value.trim();
+          drawCanvas();
+        };
+
+        const fileIn = document.createElement('input');
+        fileIn.type = 'file';
+        fileIn.accept = 'image/*';
+        fileIn.className = 'editor-bento-file-in';
+        fileIn.onchange = async () => {
+          const file = fileIn.files?.[0];
+          if (!file) return;
+          const uploaded = await uploadFileToBucket(file, 'writing');
+          if (uploaded) {
+            this.data.url = uploaded;
+            urlIn.value = uploaded;
+            drawCanvas();
+          }
+        };
+        contentSec.append(urlIn, fileIn);
+      } else {
+        const textIn = document.createElement('textarea');
+        textIn.rows = 4;
+        textIn.className = 'cdx-input editor-form-input';
+        textIn.placeholder = 'Hidden spoiler text...';
+        textIn.value = this.data.text || '';
+        textIn.oninput = () => {
+          this.data.text = textIn.value;
+          drawCanvas();
+        };
+        contentSec.appendChild(textIn);
+      }
+
+      sidebar.append(modeSec, contentSec);
+    };
+
+    const syncSidebar = () => {
+      workspace.classList.toggle('is-sidebar-collapsed', !this.sidebarOpen);
+      toggleSidebarBtn.className = `b2${this.sidebarOpen ? ' p' : ''}`;
+    };
+
+    peekBtn.onclick = () => {
+      this.previewRevealed = !this.previewRevealed;
+      peekBtn.textContent = this.previewRevealed ? 'Hide Blur' : 'Reveal';
+      drawCanvas();
+    };
+
+    toggleSidebarBtn.onclick = () => {
+      this.sidebarOpen = !this.sidebarOpen;
+      syncSidebar();
+    };
+
+    drawCanvas();
+    drawSidebar();
+    syncSidebar();
+
+    workspace.append(canvas, sidebar);
+    root.append(header, workspace);
     return root;
   }
 
-  save() {
+  save(): SpoilerData {
     return {
-      label: this.elements?.label.value.trim() || 'Spoiler',
-      text: this.elements?.text.value || '',
+      kind: this.data.kind === 'image' ? 'image' : 'text',
+      label: this.data.label?.trim() || 'Spoiler',
+      text: this.data.text || '',
+      url: this.data.url?.trim() || '',
     };
   }
 }
@@ -1275,6 +1466,70 @@ export class MarkerInline {
   }
 }
 
+export class SpoilerInline {
+  private button: HTMLButtonElement | null = null;
+
+  static get isInline() {
+    return true;
+  }
+  static get title() {
+    return 'Spoiler';
+  }
+  static get sanitize() {
+    return {
+      span: {
+        class: true,
+      },
+    };
+  }
+  render() {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'ce-inline-tool';
+    button.title = 'Hide as Telegram-style spoiler';
+    button.innerHTML =
+      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+    this.button = button;
+    return button;
+  }
+  surround(range: Range) {
+    if (!range) return;
+    const existing = (
+      range.commonAncestorContainer.nodeType === Node.ELEMENT_NODE
+        ? (range.commonAncestorContainer as HTMLElement)
+        : range.commonAncestorContainer.parentElement
+    )?.closest('span.editor-inline-spoiler');
+
+    if (existing) {
+      const parent = existing.parentNode;
+      if (parent) {
+        while (existing.firstChild) {
+          parent.insertBefore(existing.firstChild, existing);
+        }
+        parent.removeChild(existing);
+      }
+      return;
+    }
+
+    const span = document.createElement('span');
+    span.className = 'editor-inline-spoiler';
+    const frag = range.extractContents();
+    span.appendChild(frag);
+    range.insertNode(span);
+  }
+  checkState() {
+    const sel = window.getSelection();
+    const node = sel?.anchorNode;
+    const el =
+      node?.nodeType === Node.ELEMENT_NODE
+        ? (node as HTMLElement)
+        : node?.parentElement;
+    const active = Boolean(el?.closest('span.editor-inline-spoiler'));
+    this.button?.classList.toggle('ce-inline-tool--active', active);
+    return active;
+  }
+}
+
 export class MentionInline {
   static get isInline() {
     return true;
@@ -1483,6 +1738,7 @@ export function getEditorTools(
     // Inline toolbar tools
     inlineCode: InlineCode as unknown as ToolConstructable,
     marker: MarkerInline as unknown as ToolConstructable,
+    spoilerInline: SpoilerInline as unknown as ToolConstructable,
     underline: Underline as unknown as ToolConstructable,
     strikethrough: Strikethrough as unknown as ToolConstructable,
     hyperlink: HyperlinkInline as unknown as ToolConstructable,

@@ -49,9 +49,16 @@ export function sanitizeInlineHtml(value: unknown): string {
   }
   const template = document.createElement('template');
   template.innerHTML = String(value == null ? '' : value);
-  const allowed = ['A', 'MARK', 'U', 'S', 'STRIKE', 'CODE', 'B', 'STRONG', 'I', 'EM'];
+  const allowed = ['A', 'MARK', 'SPAN', 'U', 'S', 'STRIKE', 'CODE', 'B', 'STRONG', 'I', 'EM'];
   template.content.querySelectorAll('*').forEach((element) => {
     if (!allowed.includes(element.tagName)) {
+      element.replaceWith(document.createTextNode(element.textContent || ''));
+      return;
+    }
+    if (
+      element.tagName === 'SPAN' &&
+      !element.classList.contains('editor-inline-spoiler')
+    ) {
       element.replaceWith(document.createTextNode(element.textContent || ''));
       return;
     }
@@ -61,6 +68,13 @@ export function sanitizeInlineHtml(value: unknown): string {
         element.tagName === 'A' &&
         attribute.name === 'class' &&
         attribute.value === 'editor-mention'
+      ) {
+        return;
+      }
+      if (
+        element.tagName === 'SPAN' &&
+        attribute.name === 'class' &&
+        attribute.value === 'editor-inline-spoiler'
       ) {
         return;
       }
@@ -631,12 +645,17 @@ export function blocksToHtml(data: EditorJSData | null | undefined): string {
         )}</h${level}></summary><div class="editor-toggle-body">${innerHtml}</div></details>`;
       }
       if (block.type === 'spoiler') {
-        const label = d.label || 'Spoiler';
-        return `<details class="editor-spoiler"><summary>${escHtml(
-          label
-        )}</summary><div class="editor-spoiler-text">${escHtml(
+        const label = escHtml(d.label || 'Spoiler');
+        const kind = d.kind === 'image' ? 'image' : 'text';
+        const overlay = `<div class="editor-spoiler-overlay"><span class="editor-spoiler-pill">${label} · Click to reveal</span></div>`;
+        if (kind === 'image' && d.url) {
+          return `<figure class="editor-spoiler-card is-image" data-spoiler><div class="editor-spoiler-content"><img src="${escHtml(
+            d.url
+          )}" alt="${label}" loading="lazy"></div>${overlay}</figure>`;
+        }
+        return `<div class="editor-spoiler-card is-text" data-spoiler><div class="editor-spoiler-content"><div class="editor-spoiler-text-body">${escHtml(
           d.text || ''
-        )}</div></details>`;
+        )}</div></div>${overlay}</div>`;
       }
       if (block.type === 'alert') {
         const variant = ['info', 'tip', 'warning', 'danger'].includes(d.variant)

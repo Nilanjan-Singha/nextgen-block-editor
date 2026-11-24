@@ -2465,3 +2465,68 @@
   white-space: pre-wrap;
   word-break: break-word;
 }
+
+/* ── Spoiler Block + Mini Sidebar (/spoiler) ────────────────────── */
+.editor-spoiler-shell {
+  margin: 12px 0;
+  border: 1px solid var(--ng-border);
+  border-radius: var(--ng-radius);
+  background: var(--ng-card);
+  overflow: hidden;
+}
+
+.editor-spoiler-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 236px;
+  align-items: start;
+}
+
+.editor-spoiler-workspace.is-sidebar-collapsed {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.editor-spoiler-workspace.is-sidebar-collapsed .editor-spoiler-sidebar {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  .editor-spoiler-workspace {
+    grid-template-columns: 1fr;
+  }
+  .editor-spoiler-sidebar {
+    border-left: none !important;
+    border-top: 1px solid var(--ng-border);
+  }
+}
+
+.editor-spoiler-canvas {
+  padding: 14px;
+}
+
+.editor-spoiler-canvas .editor-spoiler-card {
+  margin: 0;
+}
+
+.editor-spoiler-empty {
+  min-height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--ng-muted-foreground);
+}
+
+.editor-spoiler-sidebar {
+  border-left: 1px solid var(--ng-border);
+  background: var(--ng-background);
+  padding: 12px;
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+.editor-spoiler-mode-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
