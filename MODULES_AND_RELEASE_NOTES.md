@@ -67,7 +67,12 @@ This document is the technical reference for what is inside the `nextgen-block-e
 
 *(To publish `v0.1.1`: run `npm version patch && npm publish` inside `d:\antigravity-projects\nextgen-editor`.)*
 
-### `[Next Version]` — Template
-- **Added**:
-- **Changed**:
+### `[Next Version — v0.2.0 Planned]`
+- **Added (`/settings` Command & Modal Dialog)**:
+  - Typing `/settings` in the `/` command menu opens a shadcn/ui-styled **Settings Modal** instead of inserting a block.
+  - **Themes**: Switch between Light, Dark, and Catppuccin flavors directly from the modal.
+  - **Editor Mode**: Toggle between **Simple Mode** (core text, headings, lists, quotes, images, code) and **Block Editor Mode** (full 30+ block suite).
+  - **Live Stats Toggle**: Show/hide the bottom word & reading-time bar.
+- **Changed (Categorized `/` Command Menu with Subheadings)**:
+  - Group all commands into distinct category buckets with section subheadings inside the `/` popover UI: **Text & Style**, **Layout**, **Media**, **Interactive & Data**, and **Settings**.
 - **Fixed**:
