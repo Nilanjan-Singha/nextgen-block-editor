@@ -11,7 +11,7 @@ import {
   type AiConfig,
 } from '../utils/aiClient';
 import {
-  SIMPLE_MODE_TOOLS,
+  ALL_TOOL_NAMES,
   attachPopoverCategoryHeaders,
 } from '../utils/popoverCategories';
 import { attachEmojiSidePicker } from '../utils/emojiSidePicker';
@@ -53,6 +53,19 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
     const [theme, setTheme] = useState<EditorThemePreset>('inherit');
     const [editorMode, setEditorMode] = useState<EditorMode>('block');
     const [simpleFont, setSimpleFont] = useState<'sans' | 'serif' | 'mono'>('sans');
+    const [selectedTools, setSelectedTools] = useState<string[]>(() => {
+      if (enabledTools && enabledTools.length > 0) return enabledTools;
+      try {
+        const raw = localStorage.getItem('ng-enabled-tools');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch {
+        // ignore
+      }
+      return ALL_TOOL_NAMES;
+    });
     const [statsVisible, setStatsVisible] = useState(showStats);
     const [aiConfig, setAiConfig] = useState<AiConfig>(loadAiConfig);
     const [askOpen, setAskOpen] = useState(false);
@@ -98,12 +111,7 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
       const detachCategories = attachPopoverCategoryHeaders(holder);
       const detachEmoji = attachEmojiSidePicker(holder);
 
-      const effectiveTools =
-        editorMode === 'simple'
-          ? enabledTools && enabledTools.length > 0
-            ? enabledTools.filter((t) => SIMPLE_MODE_TOOLS.includes(t))
-            : SIMPLE_MODE_TOOLS
-          : enabledTools;
+      const effectiveTools = Array.from(new Set([...selectedTools, 'settings']));
 
       const mount = async () => {
         await lifecycleRef.current;
@@ -123,10 +131,7 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
           data: sanitizedInitial as OutputData,
           placeholder:
             placeholder || 'Write your story, or press / to insert blocks...',
-          tools: getEditorTools(
-            true,
-            editorMode === 'simple' ? enabledTools : effectiveTools
-          ),
+          tools: getEditorTools(true, effectiveTools),
           onChange: async () => {
             try {
               const saved = await instance.save();
@@ -191,7 +196,7 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
         }
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [editorMode]);
+    }, [editorMode, selectedTools]);
 
     useImperativeHandle(ref, () => ({
       save: async () => {
@@ -357,6 +362,7 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
             onRedo={() => undoRef.current?.redo?.()}
             fontFamily={simpleFont}
             onChangeFontFamily={setSimpleFont}
+            enabledTools={selectedTools}
             onOpenSettings={() => setSettingsOpen(true)}
           />
         )}
@@ -379,6 +385,7 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
           mode={editorMode}
           showStats={statsVisible}
           aiConfig={aiConfig}
+          selectedTools={selectedTools}
           onChangeTheme={setTheme}
           onChangeMode={(m) => void handleModeSwitch(m)}
           onChangeShowStats={setStatsVisible}
@@ -386,6 +393,14 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
             setAiConfig(cfg);
             saveAiConfig(cfg);
             setAiError(null);
+          }}
+          onChangeSelectedTools={(tools) => {
+            setSelectedTools(tools);
+            try {
+              localStorage.setItem('ng-enabled-tools', JSON.stringify(tools));
+            } catch {
+              // ignore
+            }
           }}
           onClose={() => setSettingsOpen(false)}
         />

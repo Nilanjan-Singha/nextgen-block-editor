@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
 import {
+  ALL_TOOL_NAMES,
+  SIMPLE_MODE_TOOLS,
+  TOOL_CATEGORIES,
+  TOOL_LABELS,
+} from '../utils/popoverCategories';
+import {
   AI_PROVIDER_PRESETS,
   type AiConfig,
   type AiProviderId,
@@ -22,10 +28,12 @@ interface SettingsModalProps {
   mode: EditorMode;
   showStats: boolean;
   aiConfig: AiConfig;
+  selectedTools: string[];
   onChangeTheme: (theme: EditorThemePreset) => void;
   onChangeMode: (mode: EditorMode) => void;
   onChangeShowStats: (show: boolean) => void;
   onChangeAiConfig: (config: AiConfig) => void;
+  onChangeSelectedTools: (tools: string[]) => void;
   onClose: () => void;
 }
 
@@ -35,15 +43,27 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   mode,
   showStats,
   aiConfig,
+  selectedTools,
   onChangeTheme,
   onChangeMode,
   onChangeShowStats,
   onChangeAiConfig,
+  onChangeSelectedTools,
   onClose,
 }) => {
   const [showKey, setShowKey] = useState(false);
+  const [toolFilter, setToolFilter] = useState('');
 
   if (!open) return null;
+
+  const selectedSet = new Set(selectedTools);
+  const toggleTool = (tool: string) => {
+    const next = new Set(selectedTools);
+    if (next.has(tool)) next.delete(tool);
+    else next.add(tool);
+    next.add('settings');
+    onChangeSelectedTools(Array.from(next));
+  };
 
   const handleProviderChange = (providerId: AiProviderId) => {
     const preset = AI_PROVIDER_PRESETS.find((p) => p.id === providerId);
@@ -179,6 +199,74 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 onChangeAiConfig({ ...aiConfig, endpoint: e.target.value })
               }
             />
+          </div>
+
+          <hr className="ng-divider" />
+
+          <div className="ng-tools-manager">
+            <div className="ng-tools-header">
+              <div>
+                <label>Registered Components ({selectedSet.size}/{ALL_TOOL_NAMES.length})</label>
+              </div>
+              <div className="ng-tools-actions">
+                <button
+                  type="button"
+                  className="excalidraw-btn"
+                  onClick={() => onChangeSelectedTools([...ALL_TOOL_NAMES])}
+                >
+                  All
+                </button>
+                <button
+                  type="button"
+                  className="excalidraw-btn"
+                  onClick={() => onChangeSelectedTools([...SIMPLE_MODE_TOOLS])}
+                >
+                  Minimal
+                </button>
+              </div>
+            </div>
+
+            <input
+              type="search"
+              className="cdx-input editor-form-input"
+              placeholder="Filter components (e.g. bento, chart, spoiler...)"
+              value={toolFilter}
+              onChange={(e) => setToolFilter(e.target.value)}
+            />
+
+            <div className="ng-tools-groups">
+              {TOOL_CATEGORIES.filter((g) => g.label !== 'Settings').map((group) => {
+                const q = toolFilter.trim().toLowerCase();
+                const visible = group.tools.filter((t) => {
+                  const label = (TOOL_LABELS[t] || t).toLowerCase();
+                  return !q || label.includes(q) || t.toLowerCase().includes(q);
+                });
+                if (!visible.length) return null;
+                return (
+                  <div key={group.label} className="ng-tools-group">
+                    <div className="ng-tools-group-title">{group.label}</div>
+                    <div className="ng-tools-grid">
+                      {visible.map((tool) => {
+                        const checked = selectedSet.has(tool);
+                        return (
+                          <label
+                            key={tool}
+                            className={`ng-tool-chip${checked ? ' is-checked' : ''}`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              onChange={() => toggleTool(tool)}
+                            />
+                            <span>{TOOL_LABELS[tool] || tool}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>

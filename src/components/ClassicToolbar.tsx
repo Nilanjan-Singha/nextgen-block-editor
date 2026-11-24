@@ -7,6 +7,7 @@ export interface ClassicToolbarProps {
   onRedo: () => void;
   fontFamily: 'sans' | 'serif' | 'mono';
   onChangeFontFamily: (font: 'sans' | 'serif' | 'mono') => void;
+  enabledTools?: string[];
   onOpenSettings: () => void;
 }
 
@@ -39,8 +40,13 @@ export const ClassicToolbar: React.FC<ClassicToolbarProps> = ({
   onRedo,
   fontFamily,
   onChangeFontFamily,
+  enabledTools,
   onOpenSettings,
 }) => {
+  const allowedTools = enabledTools ? new Set(enabledTools) : null;
+  const visibleInsertItems = allowedTools
+    ? INSERT_ITEMS.filter((item) => item.tool === 'settings' || allowedTools.has(item.tool))
+    : INSERT_ITEMS;
   const [insertOpen, setInsertOpen] = useState(false);
   const [alignOpen, setAlignOpen] = useState(false);
   const [blockType, setBlockType] = useState('paragraph');
@@ -244,7 +250,7 @@ export const ClassicToolbar: React.FC<ClassicToolbarProps> = ({
         </button>
         {insertOpen && (
           <div className="ng-ct-menu ng-ct-insert-menu">
-            {INSERT_ITEMS.map((item) => (
+            {visibleInsertItems.map((item) => (
               <button
                 key={item.tool}
                 type="button"

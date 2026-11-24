@@ -2826,3 +2826,75 @@
   font-size: 11px;
   color: var(--ng-muted-foreground);
 }
+
+/* ── Settings Registered Components Manager ─────────────────────── */
+.ng-tools-manager {
+  display: grid;
+  gap: 10px;
+}
+
+.ng-tools-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ng-tools-header label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.ng-tools-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.ng-tools-groups {
+  display: grid;
+  gap: 10px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.ng-tools-group {
+  display: grid;
+  gap: 6px;
+}
+
+.ng-tools-group-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ng-muted-foreground);
+}
+
+.ng-tools-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ng-tool-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--ng-border);
+  background: var(--ng-background);
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.ng-tool-chip.is-checked {
+  border-color: var(--ng-primary, #6366f1);
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.ng-tool-chip input {
+  margin: 0;
+}
