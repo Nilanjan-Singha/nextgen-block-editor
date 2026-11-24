@@ -14,6 +14,7 @@ import {
   SIMPLE_MODE_TOOLS,
   attachPopoverCategoryHeaders,
 } from '../utils/popoverCategories';
+import { attachEmojiSidePicker } from '../utils/emojiSidePicker';
 import {
   SettingsModal,
   type EditorMode,
@@ -82,6 +83,7 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
 
       let cancelled = false;
       const detachCategories = attachPopoverCategoryHeaders(holder);
+      const detachEmoji = attachEmojiSidePicker(holder);
 
       const effectiveTools =
         editorMode === 'simple'
@@ -148,6 +150,7 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
       return () => {
         cancelled = true;
         detachCategories();
+        detachEmoji();
         const toDestroy = editorRef.current;
         editorRef.current = null;
         undoRef.current = null;

@@ -3,6 +3,7 @@ import { createRoot, type Root } from 'react-dom/client';
 import { Excalidraw, exportToCanvas } from '@excalidraw/excalidraw';
 import Chart, { type ChartConfiguration } from 'chart.js/auto';
 import katex from 'katex';
+import { openEmojiSideMenu } from '../utils/emojiSidePicker';
 
 export interface LatexData {
   tex: string;
@@ -3063,7 +3064,7 @@ export interface EmojiBlockData {
   size: 'sm' | 'md' | 'lg';
 }
 
-const EMOJI_PRESETS: Array<{ em: string; name: string }> = [
+export const EMOJI_PRESETS: Array<{ em: string; name: string }> = [
   { em: '😀', name: 'grin smile happy' }, { em: '😂', name: 'joy laugh' },
   { em: '😎', name: 'cool sunglasses' }, { em: '🥳', name: 'party celebrate' },
   { em: '🤔', name: 'think hmm' }, { em: '🤩', name: 'star eyes excited' },
@@ -3086,6 +3087,24 @@ const EMOJI_PRESETS: Array<{ em: string; name: string }> = [
 
 export class EmojiTool {
   private data: EmojiBlockData;
+  private api?: {
+    blocks?: {
+      getCurrentBlockIndex: () => number;
+      delete: (index?: number) => void;
+      insert: (
+        type?: string,
+        data?: Record<string, unknown>,
+        config?: Record<string, unknown>,
+        index?: number,
+        needToFocus?: boolean
+      ) => void;
+    };
+    caret?: {
+      setToBlock: (index: number, position?: 'start' | 'end' | 'default') => void;
+    };
+  };
+  private isNewInsert: boolean;
+  private anchorEl: HTMLElement | null = null;
 
   static get toolbox() {
     return {
@@ -3094,7 +3113,15 @@ export class EmojiTool {
     };
   }
 
-  constructor({ data }: { data?: Partial<EmojiBlockData> }) {
+  constructor({
+    data,
+    api,
+  }: {
+    data?: Partial<EmojiBlockData>;
+    api?: EmojiTool['api'];
+  }) {
+    this.isNewInsert = !data?.emoji;
+    this.api = api;
     this.data = {
       emoji: data?.emoji ?? '✨',
       label: data?.label ?? '',
@@ -3102,96 +3129,48 @@ export class EmojiTool {
     };
   }
 
+  private openPickerAtAnchor() {
+    if (!this.anchorEl) return;
+    const rect = this.anchorEl.getBoundingClientRect();
+    openEmojiSideMenu({
+      anchorRect: rect,
+      onSelect: (em) => {
+        if (this.isNewInsert && this.api?.blocks) {
+          const idx = this.api.blocks.getCurrentBlockIndex();
+          this.api.blocks.delete(idx);
+          this.api.blocks.insert('paragraph', { text: `${em} ` }, {}, idx, true);
+          queueMicrotask(() => {
+            this.api?.caret?.setToBlock(idx, 'end');
+          });
+          return;
+        }
+        this.data.emoji = em;
+        if (this.anchorEl) {
+          this.anchorEl.textContent = `${em} Pick emoji`;
+        }
+      },
+    });
+  }
+
   render(): HTMLElement {
     const wrap = document.createElement('div');
-    wrap.className = 'editor-emoji-split';
+    wrap.className = 'editor-emoji-inline-wrap';
 
-    const leftPane = document.createElement('div');
-    leftPane.className = 'editor-emoji-left';
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'b2 editor-emoji-inline-anchor';
+    btn.textContent = `${this.data.emoji} Pick emoji`;
+    btn.addEventListener('click', () => this.openPickerAtAnchor());
+    this.anchorEl = btn;
 
-    const previewGlyph = document.createElement('div');
-    previewGlyph.className = `editor-emoji-hero is-${this.data.size}`;
-    previewGlyph.textContent = this.data.emoji;
-
-    const emojiIn = document.createElement('input');
-    emojiIn.type = 'text';
-    emojiIn.className = 'cdx-input editor-callout-icon-in';
-    emojiIn.value = this.data.emoji;
-    emojiIn.placeholder = '✨';
-    emojiIn.addEventListener('input', () => {
-      this.data.emoji = emojiIn.value || '✨';
-      previewGlyph.textContent = this.data.emoji;
-    });
-
-    const sizeSel = document.createElement('select');
-    sizeSel.className = 'cdx-input editor-form-select';
-    (['sm', 'md', 'lg'] as const).forEach((s) => {
-      const o = document.createElement('option');
-      o.value = s;
-      o.textContent = s.toUpperCase();
-      if (this.data.size === s) o.selected = true;
-      sizeSel.appendChild(o);
-    });
-    sizeSel.addEventListener('change', () => {
-      this.data.size = sizeSel.value as EmojiBlockData['size'];
-      previewGlyph.className = `editor-emoji-hero is-${this.data.size}`;
-    });
-
-    const row = document.createElement('div');
-    row.className = 'editor-emoji-controls';
-    row.append(emojiIn, sizeSel);
-
-    const labelIn = document.createElement('input');
-    labelIn.type = 'text';
-    labelIn.className = 'cdx-input editor-form-input';
-    labelIn.placeholder = 'Caption or reaction note...';
-    labelIn.value = this.data.label || '';
-    labelIn.addEventListener('input', () => {
-      this.data.label = labelIn.value;
-    });
-
-    leftPane.append(previewGlyph, row, labelIn);
-
-    const rightPane = document.createElement('div');
-    rightPane.className = 'editor-emoji-picker-pane';
-
-    const searchIn = document.createElement('input');
-    searchIn.type = 'search';
-    searchIn.className = 'cdx-input editor-form-input';
-    searchIn.placeholder = 'Search emojis (fire, rocket, heart...)';
-
-    const grid = document.createElement('div');
-    grid.className = 'editor-emoji-grid';
-
-    const renderGrid = (query = '') => {
-      grid.innerHTML = '';
-      const q = query.trim().toLowerCase();
-      const filtered = q
-        ? EMOJI_PRESETS.filter((p) => p.name.includes(q) || p.em.includes(q))
-        : EMOJI_PRESETS;
-
-      filtered.forEach(({ em, name }) => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.title = name;
-        btn.className = `editor-emoji-btn${em === this.data.emoji ? ' is-active' : ''}`;
-        btn.textContent = em;
-        btn.addEventListener('click', () => {
-          this.data.emoji = em;
-          emojiIn.value = em;
-          previewGlyph.textContent = em;
-          renderGrid(searchIn.value);
-        });
-        grid.appendChild(btn);
-      });
-    };
-
-    searchIn.addEventListener('input', () => renderGrid(searchIn.value));
-    renderGrid();
-
-    rightPane.append(searchIn, grid);
-    wrap.append(leftPane, rightPane);
+    wrap.appendChild(btn);
     return wrap;
+  }
+
+  rendered() {
+    if (this.isNewInsert) {
+      queueMicrotask(() => this.openPickerAtAnchor());
+    }
   }
 
   save(): EmojiBlockData {
