@@ -1346,6 +1346,36 @@ export class HyperlinkInline {
   }
 }
 
+function makeHeadingTool(level: 1 | 2 | 3) {
+  return class extends (Header as unknown as {
+    new (opts: Record<string, unknown>): unknown;
+  }) {
+    static get toolbox() {
+      return {
+        title: `Heading ${level}`,
+        icon: `<span style="font-weight:700;font-size:12px;">H${level}</span>`,
+      };
+    }
+    constructor(opts: Record<string, unknown>) {
+      const existingConfig =
+        (opts?.config as Record<string, unknown> | undefined) || {};
+      super({
+        ...opts,
+        config: {
+          ...existingConfig,
+          placeholder: `Heading ${level}`,
+          levels: [level],
+          defaultLevel: level,
+        },
+      });
+    }
+  };
+}
+
+const Heading1Tool = makeHeadingTool(1);
+const Heading2Tool = makeHeadingTool(2);
+const Heading3Tool = makeHeadingTool(3);
+
 export function getEditorTools(
   includeLayout = true,
   enabledTools?: string[]
@@ -1353,10 +1383,23 @@ export function getEditorTools(
   const tools: Record<string, ToolConstructable | ToolSettings> = {
     // 1. Most frequently used core blocks
     cover: PageCoverTool as unknown as ToolConstructable,
+    h1: {
+      class: Heading1Tool as unknown as ToolConstructable,
+      inlineToolbar: true,
+    },
+    h2: {
+      class: Heading2Tool as unknown as ToolConstructable,
+      inlineToolbar: true,
+    },
+    h3: {
+      class: Heading3Tool as unknown as ToolConstructable,
+      inlineToolbar: true,
+    },
     header: {
       class: Header as unknown as ToolConstructable,
+      toolbox: false,
       config: { placeholder: 'Heading', levels: [1, 2, 3], defaultLevel: 2 },
-    },
+    } as unknown as ToolSettings,
     list: List as unknown as ToolConstructable,
     image: CustomMediaTool as unknown as ToolConstructable,
     quote: {

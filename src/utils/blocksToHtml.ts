@@ -157,8 +157,15 @@ export function blocksToHtml(data: EditorJSData | null | undefined): string {
   return data.blocks
     .map((block) => {
       const d = (block.data || {}) as Record<string, any>;
-      if (block.type === 'header') {
-        const level = Math.min(6, Math.max(1, Number(d.level) || 2));
+      if (
+        block.type === 'header' ||
+        block.type === 'h1' ||
+        block.type === 'h2' ||
+        block.type === 'h3'
+      ) {
+        const fallback =
+          block.type === 'h1' ? 1 : block.type === 'h3' ? 3 : 2;
+        const level = Math.min(6, Math.max(1, Number(d.level) || fallback));
         return `<h${level}>${sanitizeInlineHtml(d.text)}</h${level}>`;
       }
       if (block.type === 'paragraph') {

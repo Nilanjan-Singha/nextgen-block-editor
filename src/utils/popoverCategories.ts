@@ -7,8 +7,10 @@ export const TOOL_CATEGORIES: ToolCategoryGroup[] = [
   {
     label: 'Text & Style',
     tools: [
+      'h1',
+      'h2',
+      'h3',
       'paragraph',
-      'header',
       'list',
       'nestedlist',
       'checklist',
@@ -89,8 +91,10 @@ export const TOOL_CATEGORIES: ToolCategoryGroup[] = [
 ];
 
 export const SIMPLE_MODE_TOOLS = [
+  'h1',
+  'h2',
+  'h3',
   'paragraph',
-  'header',
   'list',
   'quote',
   'code',
@@ -123,6 +127,12 @@ export function attachPopoverCategoryHeaders(container: HTMLElement): () => void
 
       itemEls.forEach((el) => {
         const name = el.dataset.itemName || '';
+        if (name === 'paragraph') {
+          const titleEl = el.querySelector<HTMLElement>('.ce-popover-item__title');
+          if (titleEl && titleEl.textContent?.trim() === 'Text') {
+            titleEl.textContent = 'Paragraph';
+          }
+        }
         if (name) byName.set(name, el);
         else uncategorized.push(el);
       });
