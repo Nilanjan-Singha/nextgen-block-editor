@@ -17,6 +17,7 @@ export const TOOL_CATEGORIES: ToolCategoryGroup[] = [
       'delimiter',
       'callout',
       'hotkey',
+      'emoji',
       'alert',
       'badges',
       'tags',

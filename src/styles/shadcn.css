@@ -2085,3 +2085,51 @@
   font-size: 13.5px;
   color: var(--ng-muted-foreground);
 }
+
+/* ── Emoji Block (/emoji) ───────────────────────────────────────── */
+.editor-emoji-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 10px;
+}
+
+.editor-emoji-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid var(--ng-border);
+  background: var(--ng-background);
+  font-size: 16px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.editor-emoji-btn:hover,
+.editor-emoji-btn.is-active {
+  background: var(--ng-accent);
+  border-color: var(--ng-ring);
+}
+
+.editor-emoji-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  margin: 10px 0;
+  border: 1px solid var(--ng-border);
+  border-radius: var(--ng-radius);
+  background: var(--ng-card);
+  color: var(--ng-card-foreground);
+}
+
+.editor-emoji-card.is-sm .editor-emoji-glyph { font-size: 20px; }
+.editor-emoji-card.is-md .editor-emoji-glyph { font-size: 32px; }
+.editor-emoji-card.is-lg .editor-emoji-glyph { font-size: 48px; }
+
+.editor-emoji-label {
+  font-size: 14px;
+  color: var(--ng-muted-foreground);
+}

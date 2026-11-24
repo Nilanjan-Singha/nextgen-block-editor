@@ -665,6 +665,16 @@ export function blocksToHtml(data: EditorJSData | null | undefined): string {
       if (block.type === 'comment') {
         return '';
       }
+      if (block.type === 'emoji') {
+        const em = escHtml(d.emoji || '✨');
+        const size = ['sm', 'md', 'lg'].includes(String(d.size))
+          ? String(d.size)
+          : 'md';
+        const label = d.label
+          ? `<span class="editor-emoji-label">${escHtml(d.label)}</span>`
+          : '';
+        return `<div class="editor-emoji-card is-${size}"><span class="editor-emoji-glyph">${em}</span>${label}</div>`;
+      }
       if (block.type === 'hotkey') {
         const parts = String(d.keys || '')
           .split('+')

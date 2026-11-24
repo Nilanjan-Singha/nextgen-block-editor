@@ -3004,3 +3004,105 @@ export class HotkeyTool {
     };
   }
 }
+
+export interface EmojiBlockData {
+  emoji: string;
+  label?: string;
+  size: 'sm' | 'md' | 'lg';
+}
+
+const EMOJI_PRESETS = [
+  '😀', '😎', '🥳', '🤔', '🙌', '👍', '👏', '🔥',
+  '✨', '💡', '🚀', '🎯', '✅', '⚠️', '❤️', '📌',
+  '📝', '📚', '💻', '📊', '⚡', '🧠', '🎨', '🎵',
+];
+
+export class EmojiTool {
+  private data: EmojiBlockData;
+
+  static get toolbox() {
+    return {
+      title: 'Emoji',
+      icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>',
+    };
+  }
+
+  constructor({ data }: { data?: Partial<EmojiBlockData> }) {
+    this.data = {
+      emoji: data?.emoji ?? '✨',
+      label: data?.label ?? '',
+      size: (data?.size as EmojiBlockData['size']) || 'md',
+    };
+  }
+
+  render(): HTMLElement {
+    const wrap = document.createElement('div');
+    wrap.className = 'editor-form-builder';
+
+    const top = document.createElement('div');
+    top.className = 'editor-callout-top';
+
+    const emojiIn = document.createElement('input');
+    emojiIn.type = 'text';
+    emojiIn.className = 'cdx-input editor-callout-icon-in';
+    emojiIn.value = this.data.emoji;
+    emojiIn.placeholder = '✨';
+    emojiIn.addEventListener('input', () => {
+      this.data.emoji = emojiIn.value || '✨';
+    });
+
+    const labelIn = document.createElement('input');
+    labelIn.type = 'text';
+    labelIn.className = 'cdx-input editor-form-input';
+    labelIn.placeholder = 'Caption or reaction note (optional)';
+    labelIn.value = this.data.label || '';
+    labelIn.addEventListener('input', () => {
+      this.data.label = labelIn.value;
+    });
+
+    const sizeSel = document.createElement('select');
+    sizeSel.className = 'cdx-input editor-form-select';
+    (['sm', 'md', 'lg'] as const).forEach((s) => {
+      const o = document.createElement('option');
+      o.value = s;
+      o.textContent = s.toUpperCase();
+      if (this.data.size === s) o.selected = true;
+      sizeSel.appendChild(o);
+    });
+    sizeSel.addEventListener('change', () => {
+      this.data.size = sizeSel.value as EmojiBlockData['size'];
+    });
+
+    top.append(emojiIn, labelIn, sizeSel);
+
+    const grid = document.createElement('div');
+    grid.className = 'editor-emoji-grid';
+    const buttons: HTMLButtonElement[] = [];
+
+    EMOJI_PRESETS.forEach((em) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `editor-emoji-btn${em === this.data.emoji ? ' is-active' : ''}`;
+      btn.textContent = em;
+      btn.addEventListener('click', () => {
+        this.data.emoji = em;
+        emojiIn.value = em;
+        buttons.forEach((b) => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+      });
+      buttons.push(btn);
+      grid.appendChild(btn);
+    });
+
+    wrap.append(top, grid);
+    return wrap;
+  }
+
+  save(): EmojiBlockData {
+    return {
+      emoji: this.data.emoji.trim() || '✨',
+      label: this.data.label?.trim() || '',
+      size: this.data.size,
+    };
+  }
+}
