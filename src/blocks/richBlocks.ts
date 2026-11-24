@@ -3300,3 +3300,150 @@ export class ScratchTool {
     };
   }
 }
+
+export interface DialogueData {
+  triggerLabel: string;
+  title: string;
+  body: string;
+  confirmLabel?: string;
+}
+
+export class DialogueTool {
+  private data: DialogueData;
+
+  static get toolbox() {
+    return {
+      title: 'Dialogue',
+      icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M7 9h10"/><path d="M7 13h6"/></svg>',
+    };
+  }
+
+  constructor({ data }: { data?: Partial<DialogueData> }) {
+    this.data = {
+      triggerLabel: data?.triggerLabel ?? 'Open Dialog',
+      title: data?.title ?? 'Dialog Title',
+      body: data?.body ?? 'Write the dialog box content here...',
+      confirmLabel: data?.confirmLabel ?? 'Got it',
+    };
+  }
+
+  private openPreviewModal() {
+    const backdrop = document.createElement('div');
+    backdrop.className = 'editor-dialogue-modal-backdrop';
+
+    const modal = document.createElement('div');
+    modal.className = 'editor-dialogue-modal';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+
+    const head = document.createElement('div');
+    head.className = 'editor-dialogue-modal-head';
+
+    const titleEl = document.createElement('h3');
+    titleEl.textContent = this.data.title || 'Dialog';
+
+    const closeX = document.createElement('button');
+    closeX.type = 'button';
+    closeX.className = 'b2';
+    closeX.textContent = '×';
+    closeX.setAttribute('aria-label', 'Close dialog');
+
+    head.append(titleEl, closeX);
+
+    const bodyEl = document.createElement('div');
+    bodyEl.className = 'editor-dialogue-modal-body';
+    bodyEl.textContent = this.data.body || '';
+
+    const foot = document.createElement('div');
+    foot.className = 'editor-dialogue-modal-foot';
+
+    const okBtn = document.createElement('button');
+    okBtn.type = 'button';
+    okBtn.className = 'b2 p';
+    okBtn.textContent = this.data.confirmLabel || 'Close';
+
+    foot.appendChild(okBtn);
+    modal.append(head, bodyEl, foot);
+    backdrop.appendChild(modal);
+
+    const close = () => {
+      document.removeEventListener('keydown', onKey);
+      backdrop.remove();
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') close();
+    };
+    closeX.addEventListener('click', close);
+    okBtn.addEventListener('click', close);
+    backdrop.addEventListener('click', (e) => {
+      if (e.target === backdrop) close();
+    });
+    document.addEventListener('keydown', onKey);
+    document.body.appendChild(backdrop);
+  }
+
+  render(): HTMLElement {
+    const wrap = document.createElement('div');
+    wrap.className = 'editor-dialogue-tool';
+
+    const top = document.createElement('div');
+    top.className = 'editor-dialogue-top';
+
+    const triggerIn = document.createElement('input');
+    triggerIn.type = 'text';
+    triggerIn.className = 'cdx-input editor-form-input';
+    triggerIn.placeholder = 'Button label (e.g. Open Dialog)';
+    triggerIn.value = this.data.triggerLabel;
+    triggerIn.oninput = () => {
+      this.data.triggerLabel = triggerIn.value;
+      previewBtn.textContent = triggerIn.value || 'Open Dialog';
+    };
+
+    const previewBtn = document.createElement('button');
+    previewBtn.type = 'button';
+    previewBtn.className = 'b2 p';
+    previewBtn.textContent = this.data.triggerLabel || 'Open Dialog';
+    previewBtn.onclick = () => this.openPreviewModal();
+
+    top.append(triggerIn, previewBtn);
+
+    const titleIn = document.createElement('input');
+    titleIn.type = 'text';
+    titleIn.className = 'cdx-input editor-form-input';
+    titleIn.placeholder = 'Dialog title...';
+    titleIn.value = this.data.title;
+    titleIn.oninput = () => {
+      this.data.title = titleIn.value;
+    };
+
+    const bodyIn = document.createElement('textarea');
+    bodyIn.rows = 3;
+    bodyIn.className = 'cdx-input editor-form-input';
+    bodyIn.placeholder = 'Dialog message / content...';
+    bodyIn.value = this.data.body;
+    bodyIn.oninput = () => {
+      this.data.body = bodyIn.value;
+    };
+
+    const confirmIn = document.createElement('input');
+    confirmIn.type = 'text';
+    confirmIn.className = 'cdx-input editor-form-input';
+    confirmIn.placeholder = 'Confirm button text (e.g. Got it)';
+    confirmIn.value = this.data.confirmLabel || 'Got it';
+    confirmIn.oninput = () => {
+      this.data.confirmLabel = confirmIn.value;
+    };
+
+    wrap.append(top, titleIn, bodyIn, confirmIn);
+    return wrap;
+  }
+
+  save(): DialogueData {
+    return {
+      triggerLabel: this.data.triggerLabel?.trim() || 'Open Dialog',
+      title: this.data.title?.trim() || 'Dialog',
+      body: this.data.body || '',
+      confirmLabel: this.data.confirmLabel?.trim() || 'Got it',
+    };
+  }
+}

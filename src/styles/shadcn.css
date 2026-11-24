@@ -2530,3 +2530,94 @@
   grid-template-columns: 1fr 1fr;
   gap: 6px;
 }
+
+/* ── Dialogue Block + Modal (/dialogue) ─────────────────────────── */
+.editor-dialogue-tool {
+  margin: 10px 0;
+  padding: 12px;
+  border: 1px solid var(--ng-border);
+  border-radius: var(--ng-radius);
+  background: var(--ng-card);
+  display: grid;
+  gap: 8px;
+}
+
+.editor-dialogue-top {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.editor-dialogue-preview {
+  margin: 14px 0;
+}
+
+.editor-dialogue-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--ng-radius);
+  border: 1px solid var(--ng-border);
+  background: var(--ng-primary, #0f172a);
+  color: var(--ng-primary-foreground, #ffffff);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.editor-dialogue-trigger:hover {
+  opacity: 0.92;
+}
+
+.editor-dialogue-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.editor-dialogue-modal {
+  width: min(440px, 100%);
+  border-radius: 14px;
+  border: 1px solid var(--ng-border, #e2e8f0);
+  background: var(--ng-card, #ffffff);
+  color: var(--ng-foreground, #0f172a);
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25);
+  overflow: hidden;
+}
+
+.editor-dialogue-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--ng-border, #e2e8f0);
+}
+
+.editor-dialogue-modal-head h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.editor-dialogue-modal-body {
+  padding: 16px;
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.editor-dialogue-modal-foot {
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px 16px;
+  border-top: 1px solid var(--ng-border, #e2e8f0);
+}

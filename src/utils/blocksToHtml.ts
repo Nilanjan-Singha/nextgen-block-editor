@@ -709,6 +709,39 @@ export function blocksToHtml(data: EditorJSData | null | undefined): string {
         const title = d.title ? `<div class="editor-scratch-card-title">${escHtml(d.title)}</div>` : '';
         return `<aside class="editor-scratch-card">${title}<pre class="editor-scratch-card-body">${escHtml(text)}</pre></aside>`;
       }
+      if (block.type === 'dialogue') {
+        const triggerLabel = escHtml(d.triggerLabel || 'Open Dialog');
+        const payload = escHtml(
+          JSON.stringify({
+            title: d.title || 'Dialog',
+            body: d.body || '',
+            confirmLabel: d.confirmLabel || 'Got it',
+          })
+        );
+        return `<div class="editor-dialogue-preview"><button type="button" class="editor-dialogue-trigger" data-dialogue="${payload}">${triggerLabel}</button></div>`;
+      }
+      if (block.type === 'masonry') {
+        const cols = [2, 3, 4].includes(Number(d.columns)) ? Number(d.columns) : 3;
+        const items = (d.items || []) as Array<{ url?: string; caption?: string }>;
+        const valid = items.filter((it) => it.url);
+        if (!valid.length) return '';
+        return (
+          `<div class="editor-masonry cols-${cols}">` +
+          valid
+            .map(
+              (it) =>
+                `<figure class="editor-masonry-item"><img src="${escHtml(
+                  it.url
+                )}" alt="${escHtml(it.caption || '')}" loading="lazy">${
+                  it.caption
+                    ? `<figcaption>${escHtml(it.caption)}</figcaption>`
+                    : ''
+                }</figure>`
+            )
+            .join('') +
+          '</div>'
+        );
+      }
       if (block.type === 'emoji') {
         const em = escHtml(d.emoji || '✨');
         const size = ['sm', 'md', 'lg'].includes(String(d.size))

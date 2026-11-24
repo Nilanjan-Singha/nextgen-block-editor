@@ -733,6 +733,75 @@ export function useInteractiveArticle(
         cleanups.push(() => el.removeEventListener('click', onToggle));
       });
 
+    // 16. Dialogue modal triggers (/dialogue)
+    root
+      .querySelectorAll<HTMLButtonElement>('[data-dialogue]')
+      .forEach((btn) => {
+        const raw = btn.dataset.dialogue;
+        if (!raw) return;
+        const onOpen = () => {
+          try {
+            const parsed = JSON.parse(raw) as {
+              title?: string;
+              body?: string;
+              confirmLabel?: string;
+            };
+            const backdrop = document.createElement('div');
+            backdrop.className = 'editor-dialogue-modal-backdrop';
+
+            const modal = document.createElement('div');
+            modal.className = 'editor-dialogue-modal';
+            modal.setAttribute('role', 'dialog');
+            modal.setAttribute('aria-modal', 'true');
+
+            const head = document.createElement('div');
+            head.className = 'editor-dialogue-modal-head';
+            const h3 = document.createElement('h3');
+            h3.textContent = parsed.title || 'Dialog';
+            const closeBtn = document.createElement('button');
+            closeBtn.type = 'button';
+            closeBtn.className = 'b2';
+            closeBtn.textContent = '×';
+            closeBtn.setAttribute('aria-label', 'Close dialog');
+            head.append(h3, closeBtn);
+
+            const body = document.createElement('div');
+            body.className = 'editor-dialogue-modal-body';
+            body.textContent = parsed.body || '';
+
+            const foot = document.createElement('div');
+            foot.className = 'editor-dialogue-modal-foot';
+            const okBtn = document.createElement('button');
+            okBtn.type = 'button';
+            okBtn.className = 'b2 p';
+            okBtn.textContent = parsed.confirmLabel || 'Got it';
+            foot.appendChild(okBtn);
+
+            modal.append(head, body, foot);
+            backdrop.appendChild(modal);
+
+            const close = () => {
+              document.removeEventListener('keydown', onKey);
+              backdrop.remove();
+            };
+            const onKey = (e: KeyboardEvent) => {
+              if (e.key === 'Escape') close();
+            };
+            closeBtn.addEventListener('click', close);
+            okBtn.addEventListener('click', close);
+            backdrop.addEventListener('click', (e) => {
+              if (e.target === backdrop) close();
+            });
+            document.addEventListener('keydown', onKey);
+            document.body.appendChild(backdrop);
+          } catch {
+            // Ignore malformed dialogue payload
+          }
+        };
+        btn.addEventListener('click', onOpen);
+        cleanups.push(() => btn.removeEventListener('click', onOpen));
+      });
+
     return () => {
       cleanups.forEach((fn) => fn());
     };

@@ -707,3 +707,170 @@ export class LightboxGalleryTool {
     return { items: this.items };
   }
 }
+
+export interface MasonryItem {
+  url: string;
+  caption?: string;
+}
+
+export interface MasonryData {
+  columns: 2 | 3 | 4;
+  items: MasonryItem[];
+}
+
+export class MasonryTool {
+  private columns: 2 | 3 | 4;
+  private items: MasonryItem[];
+
+  constructor(options: ToolOptions<Partial<MasonryData>>) {
+    const rawCols = Number(options.data?.columns);
+    this.columns = rawCols === 2 || rawCols === 4 ? rawCols : 3;
+    this.items =
+      Array.isArray(options.data?.items) && options.data!.items.length > 0
+        ? options.data!.items.map((it) => ({
+            url: it.url || '',
+            caption: it.caption || '',
+          }))
+        : [{ url: '', caption: '' }, { url: '', caption: '' }, { url: '', caption: '' }];
+  }
+
+  static get toolbox() {
+    return {
+      title: 'Masonry',
+      icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="10" rx="1.5"/><rect x="13" y="3" width="8" height="6" rx="1.5"/><rect x="3" y="15" width="8" height="6" rx="1.5"/><rect x="13" y="11" width="8" height="10" rx="1.5"/></svg>',
+    };
+  }
+
+  render() {
+    const root = document.createElement('div');
+    root.className = 'block-card';
+
+    const bar = document.createElement('div');
+    bar.className = 'block-toolbar';
+
+    ([2, 3, 4] as const).forEach((c) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `b2${this.columns === c ? ' p' : ''}`;
+      btn.textContent = `${c} Cols`;
+      btn.onclick = () => {
+        this.columns = c;
+        Array.from(bar.querySelectorAll('button[data-col]')).forEach((el) => {
+          const val = Number((el as HTMLElement).dataset.col);
+          el.className = `b2${val === c ? ' p' : ''}`;
+        });
+        drawPreview();
+      };
+      btn.dataset.col = String(c);
+      bar.appendChild(btn);
+    });
+
+    const addBtn = document.createElement('button');
+    addBtn.type = 'button';
+    addBtn.className = 'b2';
+    addBtn.textContent = '+ Add image';
+
+    bar.appendChild(addBtn);
+
+    const preview = document.createElement('div');
+    const rows = document.createElement('div');
+    rows.className = 'block-rows';
+
+    const drawPreview = () => {
+      const valid = this.items.filter((it) => it.url.trim().length > 0);
+      if (!valid.length) {
+        preview.className = '';
+        preview.innerHTML = '';
+        return;
+      }
+      preview.className = `editor-masonry cols-${this.columns}`;
+      preview.innerHTML = valid
+        .map(
+          (it) =>
+            `<figure class="editor-masonry-item"><img src="${escHtml(
+              it.url
+            )}" alt="${escHtml(it.caption || '')}">${
+              it.caption
+                ? `<figcaption>${escHtml(it.caption)}</figcaption>`
+                : ''
+            }</figure>`
+        )
+        .join('');
+    };
+
+    const drawRows = () => {
+      rows.innerHTML = '';
+      this.items.forEach((item, idx) => {
+        const row = document.createElement('div');
+        row.className = 'block-subrow';
+
+        const top = document.createElement('div');
+        top.className = 'block-subrow-head';
+
+        const urlIn = document.createElement('input');
+        urlIn.type = 'url';
+        urlIn.placeholder = `Image #${idx + 1} URL`;
+        urlIn.value = item.url;
+        urlIn.oninput = () => {
+          item.url = urlIn.value.trim();
+          drawPreview();
+        };
+
+        const capIn = document.createElement('input');
+        capIn.type = 'text';
+        capIn.placeholder = 'Caption (optional)';
+        capIn.value = item.caption || '';
+        capIn.oninput = () => {
+          item.caption = capIn.value;
+          drawPreview();
+        };
+
+        const rmBtn = document.createElement('button');
+        rmBtn.type = 'button';
+        rmBtn.className = 'b2';
+        rmBtn.textContent = '×';
+        rmBtn.onclick = () => {
+          this.items.splice(idx, 1);
+          drawRows();
+          drawPreview();
+        };
+
+        top.append(urlIn, capIn, rmBtn);
+
+        const fileIn = document.createElement('input');
+        fileIn.type = 'file';
+        fileIn.accept = 'image/*';
+        attachUpload(fileIn, 'writing', (url) => {
+          item.url = url;
+          urlIn.value = url;
+          drawPreview();
+        });
+
+        row.append(top, fileIn);
+        rows.appendChild(row);
+      });
+    };
+
+    addBtn.onclick = () => {
+      this.items.push({ url: '', caption: '' });
+      drawRows();
+    };
+
+    drawRows();
+    drawPreview();
+    root.append(bar, rows, preview);
+    return root;
+  }
+
+  save(): MasonryData {
+    return {
+      columns: this.columns,
+      items: this.items
+        .map((it) => ({
+          url: it.url.trim(),
+          caption: it.caption?.trim() || '',
+        }))
+        .filter((it) => it.url.length > 0),
+    };
+  }
+}

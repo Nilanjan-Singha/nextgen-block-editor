@@ -17,11 +17,13 @@ import {
   CarouselTool as FilmstripCarouselTool,
   CompareTool,
   LightboxGalleryTool,
+  MasonryTool,
 } from './blocks/mediaBlocks';
 import {
   AudioPlayerTool,
   CalloutTool,
   ChartTool,
+  DialogueTool,
   EisenhowerMatrixTool,
   EmojiTool,
   ExcalidrawTool,
@@ -1689,6 +1691,7 @@ export function getEditorTools(
     musicCarousel: MusicCarouselTool as unknown as ToolConstructable,
     embed: CustomEmbedTool as unknown as ToolConstructable,
     gallery: LightboxGalleryTool as unknown as ToolConstructable,
+    masonry: MasonryTool as unknown as ToolConstructable,
     carousel: FilmstripCarouselTool as unknown as ToolConstructable,
     bento: BentoTool as unknown as ToolConstructable,
     ...(includeLayout
@@ -1722,6 +1725,7 @@ export function getEditorTools(
     badges: BadgesTool as unknown as ToolConstructable,
     tags: TagsTool as unknown as ToolConstructable,
     button: ButtonTool as unknown as ToolConstructable,
+    dialogue: DialogueTool as unknown as ToolConstructable,
 
     // 4. Specialized / least frequent blocks
     gif: GifTool as unknown as ToolConstructable,
