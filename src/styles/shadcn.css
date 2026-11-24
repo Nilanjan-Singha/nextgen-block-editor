@@ -1,0 +1,1524 @@
+/* ── shadcn/ui Design Tokens (Zinc Light & Dark) ────────────────── */
+:root,
+.nextgen-editor-shell,
+.nextgen-editor-article {
+  --ng-background: #ffffff;
+  --ng-foreground: #09090b;
+  --ng-card: #ffffff;
+  --ng-card-foreground: #09090b;
+  --ng-popover: #ffffff;
+  --ng-popover-foreground: #09090b;
+  --ng-primary: #18181b;
+  --ng-primary-foreground: #fafafa;
+  --ng-secondary: #f4f4f5;
+  --ng-secondary-foreground: #18181b;
+  --ng-muted: #f4f4f5;
+  --ng-muted-foreground: #71717a;
+  --ng-accent: #f4f4f5;
+  --ng-accent-foreground: #18181b;
+  --ng-border: #e4e4e7;
+  --ng-input: #e4e4e7;
+  --ng-ring: #18181b;
+  --ng-radius: 0.5rem;
+
+  /* Map internal editor tokens to shadcn/ui tokens */
+  --bg: var(--ng-background);
+  --surface: var(--ng-card);
+  --tint: var(--ng-muted);
+  --line: var(--ng-border);
+  --ink: var(--ng-foreground);
+  --soft: var(--ng-secondary-foreground);
+  --mute: var(--ng-muted-foreground);
+  --accent: var(--ng-primary);
+  --base: var(--ng-background);
+  --mantle: var(--ng-card);
+  --surface0: var(--ng-border);
+  --surface1: var(--ng-input);
+  --text: var(--ng-foreground);
+  --subtext0: var(--ng-muted-foreground);
+  --overlay0: var(--ng-muted-foreground);
+  --blue: var(--ng-primary);
+  --crust: var(--ng-primary-foreground);
+}
+
+.dark,
+[data-theme='dark'],
+.dark .nextgen-editor-shell,
+.dark .nextgen-editor-article,
+[data-theme='dark'] .nextgen-editor-shell,
+[data-theme='dark'] .nextgen-editor-article {
+  --ng-background: #09090b;
+  --ng-foreground: #fafafa;
+  --ng-card: #09090b;
+  --ng-card-foreground: #fafafa;
+  --ng-popover: #09090b;
+  --ng-popover-foreground: #fafafa;
+  --ng-primary: #fafafa;
+  --ng-primary-foreground: #18181b;
+  --ng-secondary: #27272a;
+  --ng-secondary-foreground: #fafafa;
+  --ng-muted: #27272a;
+  --ng-muted-foreground: #a1a1aa;
+  --ng-accent: #27272a;
+  --ng-accent-foreground: #fafafa;
+  --ng-border: #27272a;
+  --ng-input: #27272a;
+  --ng-ring: #d4d4d8;
+
+  --bg: var(--ng-background);
+  --surface: var(--ng-card);
+  --tint: var(--ng-muted);
+  --line: var(--ng-border);
+  --ink: var(--ng-foreground);
+  --soft: var(--ng-secondary-foreground);
+  --mute: var(--ng-muted-foreground);
+  --accent: var(--ng-primary);
+  --base: var(--ng-background);
+  --mantle: #111113;
+  --surface0: var(--ng-border);
+  --surface1: #3f3f46;
+  --text: var(--ng-foreground);
+  --subtext0: var(--ng-muted-foreground);
+  --overlay0: var(--ng-muted-foreground);
+  --blue: var(--ng-primary);
+  --crust: var(--ng-primary-foreground);
+}
+
+/* ── Editor Surface & Typography ────────────────────────────────── */
+.nextgen-editor-shell,
+.nextgen-editor-article {
+  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--ng-foreground);
+  background: var(--ng-background);
+  -webkit-font-smoothing: antialiased;
+}
+
+.nextgen-editor-shell {
+  border: 1px solid var(--ng-border);
+  border-radius: calc(var(--ng-radius) + 2px);
+  padding: 20px 24px;
+  background: var(--ng-card);
+}
+
+.nextgen-editor-shell #editorjs {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--ng-foreground);
+}
+
+.nextgen-editor-shell .ce-header,
+.nextgen-editor-article h1,
+.nextgen-editor-article h2,
+.nextgen-editor-article h3 {
+  letter-spacing: -0.025em;
+  font-weight: 600;
+  color: var(--ng-foreground);
+}
+
+/* ── Editor.js Popover, Command Menu & Inline Toolbar (shadcn) ──── */
+.nextgen-editor-shell .ce-popover__container {
+  background: var(--ng-popover);
+  color: var(--ng-popover-foreground);
+  border: 1px solid var(--ng-border);
+  border-radius: var(--ng-radius);
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  padding: 4px;
+}
+
+.nextgen-editor-shell .ce-popover__search {
+  background: var(--ng-background);
+  border: 1px solid var(--ng-input);
+  border-radius: calc(var(--ng-radius) - 2px);
+  margin-bottom: 4px;
+}
+
+.nextgen-editor-shell .ce-popover__search input {
+  color: var(--ng-foreground);
+  font-size: 13px;
+}
+
+.nextgen-editor-shell .ce-popover-item {
+  border-radius: calc(var(--ng-radius) - 2px);
+  color: var(--ng-popover-foreground);
+  font-size: 13px;
+  font-weight: 500;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.nextgen-editor-shell .ce-popover-item:hover,
+.nextgen-editor-shell .ce-popover-item--focused {
+  background: var(--ng-accent);
+  color: var(--ng-accent-foreground);
+}
+
+.nextgen-editor-shell .ce-popover-item__icon {
+  background: var(--ng-muted);
+  color: var(--ng-foreground);
+  border: 1px solid var(--ng-border);
+  border-radius: calc(var(--ng-radius) - 2px);
+  box-shadow: none;
+}
+
+.nextgen-editor-shell .ce-inline-toolbar,
+.nextgen-editor-shell .ce-conversion-toolbar {
+  background: var(--ng-popover);
+  color: var(--ng-popover-foreground);
+  border: 1px solid var(--ng-border);
+  border-radius: var(--ng-radius);
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+
+.nextgen-editor-shell .ce-inline-tool,
+.nextgen-editor-shell .ce-conversion-tool,
+.nextgen-editor-shell .ce-toolbar__plus,
+.nextgen-editor-shell .ce-toolbar__settings-btn {
+  color: var(--ng-muted-foreground);
+  border-radius: calc(var(--ng-radius) - 2px);
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.nextgen-editor-shell .ce-inline-tool:hover,
+.nextgen-editor-shell .ce-conversion-tool:hover,
+.nextgen-editor-shell .ce-toolbar__plus:hover,
+.nextgen-editor-shell .ce-toolbar__settings-btn:hover {
+  background: var(--ng-accent);
+  color: var(--ng-accent-foreground);
+}
+
+.nextgen-editor-shell .ce-inline-tool--active {
+  background: var(--ng-primary);
+  color: var(--ng-primary-foreground);
+}
+
+.nextgen-editor-shell .ce-block--selected .ce-block__content {
+  background: var(--ng-accent);
+  border-radius: calc(var(--ng-radius) - 2px);
+}
+
+/* ── Inputs, Buttons & Custom Block Surfaces (shadcn) ───────────── */
+.nextgen-editor-shell .cdx-input,
+.nextgen-editor-shell .editor-latex-input,
+.nextgen-editor-shell .excalidraw-caption {
+  background: var(--ng-background);
+  color: var(--ng-foreground);
+  border: 1px solid var(--ng-input);
+  border-radius: calc(var(--ng-radius) - 2px);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  font-size: 13.5px;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.nextgen-editor-shell .cdx-input:focus,
+.nextgen-editor-shell .editor-latex-input:focus,
+.nextgen-editor-shell .excalidraw-caption:focus {
+  outline: none;
+  border-color: var(--ng-ring);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--ng-ring) 20%, transparent);
+}
+
+.nextgen-editor-shell .cdx-button,
+.nextgen-editor-shell .editor-latex-mode-btn,
+.nextgen-editor-shell .excalidraw-btn {
+  background: var(--ng-secondary);
+  color: var(--ng-secondary-foreground);
+  border: 1px solid var(--ng-border);
+  border-radius: calc(var(--ng-radius) - 2px);
+  font-size: 12.5px;
+  font-weight: 500;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.nextgen-editor-shell .cdx-button:hover,
+.nextgen-editor-shell .editor-latex-mode-btn:hover,
+.nextgen-editor-shell .excalidraw-btn:hover {
+  background: var(--ng-accent);
+  color: var(--ng-accent-foreground);
+}
+
+.nextgen-editor-shell .excalidraw-btn.is-active {
+  background: var(--ng-primary);
+  color: var(--ng-primary-foreground);
+  border-color: var(--ng-primary);
+}
+
+.nextgen-editor-shell .editor-latex-tool,
+.nextgen-editor-shell .excalidraw-tool {
+  background: var(--ng-card);
+  border: 1px solid var(--ng-border);
+  border-radius: var(--ng-radius);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+.nextgen-editor-shell .editor-latex-preview,
+.nextgen-editor-shell .excalidraw-canvas {
+  background: var(--ng-muted);
+  border: 1px solid var(--ng-border);
+  border-radius: calc(var(--ng-radius) - 2px);
+}
+
+/* ── Form Builder & Rendered Form (shadcn/ui) ───────────────────── */
+.editor-form-builder,
+.editor-form-block {
+  background: var(--ng-card);
+  color: var(--ng-card-foreground);
+  border: 1px solid var(--ng-border);
+  border-radius: var(--ng-radius);
+  padding: 18px;
+  margin: 14px 0;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+.editor-form-builder-header {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.editor-form-title-input {
+  font-weight: 600;
+  font-size: 15px !important;
+}
+
+.editor-form-fields-list {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.editor-form-field-row {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr 1.4fr auto auto;
+  gap: 6px;
+  align-items: center;
+}
+
+.editor-form-input,
+.editor-form-select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px 10px !important;
+}
+
+.editor-form-req-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--ng-muted-foreground);
+  white-space: nowrap;
+}
+
+.editor-form-remove {
+  padding: 4px 8px !important;
+}
+
+.editor-form-builder-footer {
+  display: grid;
+  grid-template-columns: auto 1fr 1.2fr;
+  gap: 8px;
+  align-items: center;
+}
+
+.editor-form-title {
+  margin: 0 0 4px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.editor-form-desc {
+  margin: 0 0 16px;
+  font-size: 13.5px;
+  color: var(--ng-muted-foreground);
+}
+
+.editor-form-field {
+  margin-bottom: 12px;
+}
+
+.editor-form-label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ng-foreground);
+}
+
+.editor-form-req {
+  color: #ef4444;
+}
+
+.editor-form-control {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  background: var(--ng-background);
+  color: var(--ng-foreground);
+  border: 1px solid var(--ng-input);
+  border-radius: calc(var(--ng-radius) - 2px);
+  font-size: 13.5px;
+  font-family: inherit;
+}
+
+.editor-form-control:focus {
+  outline: none;
+  border-color: var(--ng-ring);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--ng-ring) 20%, transparent);
+}
+
+.editor-form-checkbox label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  cursor: pointer;
+}
+
+.editor-form-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.editor-form-submit {
+  background: var(--ng-primary);
+  color: var(--ng-primary-foreground);
+  border: 1px solid var(--ng-primary);
+  border-radius: calc(var(--ng-radius) - 2px);
+  padding: 8px 16px;
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.editor-form-submit:hover {
+  opacity: 0.9;
+}
+
+.editor-form-status {
+  font-size: 12.5px;
+  color: var(--ng-muted-foreground);
+}
+
+/* ── Embedded Audio Player Card (shadcn/ui) ─────────────────────── */
+.editor-audio-builder,
+.editor-audio-card {
+  background: var(--ng-card);
+  color: var(--ng-card-foreground);
+  border: 1px solid var(--ng-border);
+  border-radius: var(--ng-radius);
+  padding: 14px;
+  margin: 12px 0;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+.editor-audio-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.editor-audio-preview {
+  padding-top: 4px;
+}
+
+.editor-audio-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.editor-audio-cover {
+  width: 64px;
+  height: 64px;
+  border-radius: calc(var(--ng-radius) - 2px);
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid var(--ng-border);
+}
+
+.editor-audio-cover-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ng-muted);
+  color: var(--ng-muted-foreground);
+  font-size: 22px;
+}
+
+.editor-audio-body {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.editor-audio-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ng-foreground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.editor-audio-artist {
+  font-size: 12.5px;
+  color: var(--ng-muted-foreground);
+}
+
+.editor-audio-element {
+  width: 100%;
+  height: 36px;
+  margin-top: 4px;
+}
+
+/* ── Audio Audio Card & Music Carousel ──────────────────── */
+.editor-audio-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  margin: 12px 0;
+  border-radius: 16px;
+  background: var(--ng-card);
+  color: var(--ng-card-foreground);
+  border: 1px solid var(--ng-border);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  transition: border-color 150ms ease, transform 150ms ease;
+}
+
+.editor-audio-card.is-playing {
+  border-color: #1db954;
+}
+
+.editor-audio-cover {
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid var(--ng-border);
+}
+
+.editor-audio-cover-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ng-muted);
+  color: var(--ng-muted-foreground);
+  font-size: 24px;
+}
+
+.editor-audio-main {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.editor-audio-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.editor-audio-meta {
+  min-width: 0;
+}
+
+.editor-audio-title {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--ng-foreground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.editor-audio-artist {
+  font-size: 12.5px;
+  color: var(--ng-muted-foreground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.editor-audio-play {
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: none;
+  background: #1db954;
+  color: #09090b;
+  font-size: 13px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 120ms ease, opacity 120ms ease;
+}
+
+.editor-audio-play:hover {
+  transform: scale(1.06);
+}
+
+.editor-audio-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.editor-audio-time {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ng-muted-foreground);
+  min-width: 30px;
+}
+
+.editor-audio-progress {
+  flex: 1;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--ng-muted);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.editor-audio-progress-fill {
+  width: 0%;
+  height: 100%;
+  border-radius: 999px;
+  background: #1db954;
+  transition: width 100ms linear;
+}
+
+.editor-audio-audio {
+  display: none;
+}
+
+.editor-music-carousel {
+  margin: 16px 0;
+}
+
+.editor-music-carousel-head {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ng-foreground);
+  margin-bottom: 10px;
+}
+
+.editor-music-carousel-track {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 8px;
+}
+
+.editor-audio-card.is-compact {
+  flex: 0 0 290px;
+  margin: 0;
+  scroll-snap-align: start;
+}
+
+.editor-music-track-row {
+  display: grid;
+  grid-template-columns: 1fr 0.9fr 1.3fr 1fr auto;
+  gap: 6px;
+  align-items: center;
+}
+
+/* ── To-Do List & Eisenhower Matrix (shadcn/ui) ─────────────────── */
+.editor-todo-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.editor-todo-card,
+.editor-eisenhower-builder,
+.editor-eisenhower-block {
+  background: var(--ng-card);
+  color: var(--ng-card-foreground);
+  border: 1px solid var(--ng-border);
+  border-radius: var(--ng-radius);
+  padding: 16px;
+  margin: 14px 0;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+.editor-todo-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.editor-todo-progress {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--ng-muted);
+  color: var(--ng-muted-foreground);
+}
+
+.editor-todo-items {
+  display: grid;
+  gap: 8px;
+}
+
+.editor-todo-item,
+.editor-eisenhower-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  cursor: pointer;
+}
+
+.editor-todo-item.is-done span:first-of-type,
+.editor-eisenhower-check.is-done span {
+  text-decoration: line-through;
+  color: var(--ng-muted-foreground);
+}
+
+.editor-todo-prio {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--ng-muted);
+  color: var(--ng-muted-foreground);
+  text-transform: capitalize;
+}
+
+.editor-todo-prio.is-high {
+  background: rgba(239, 68, 68, 0.14);
+  color: #ef4444;
+}
+
+.editor-todo-prio.is-medium {
+  background: rgba(234, 179, 8, 0.14);
+  color: #ca8a04;
+}
+
+.editor-eisenhower-title {
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.editor-eisenhower-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 640px) {
+  .editor-eisenhower-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.editor-eisenhower-card {
+  border: 1px solid var(--ng-border);
+  border-radius: calc(var(--ng-radius) - 2px);
+  padding: 12px;
+  background: var(--ng-background);
+}
+
+.editor-eisenhower-card.is-doFirst {
+  border-top: 3px solid #ef4444;
+}
+
+.editor-eisenhower-card.is-schedule {
+  border-top: 3px solid #3b82f6;
+}
+
+.editor-eisenhower-card.is-delegate {
+  border-top: 3px solid #eab308;
+}
+
+.editor-eisenhower-card.is-eliminate {
+  border-top: 3px solid #71717a;
+}
+
+.editor-eisenhower-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.editor-eisenhower-head strong {
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.editor-eisenhower-head span {
+  font-size: 11px;
+  color: var(--ng-muted-foreground);
+}
+
+.editor-eisenhower-list,
+.editor-eisenhower-items {
+  display: grid;
+  gap: 6px;
+}
+
+.editor-eisenhower-item-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 6px;
+  align-items: center;
+}
+
+.editor-eisenhower-empty {
+  font-size: 12px;
+  color: var(--ng-muted-foreground);
+}
+
+/* ── Interactive Poll & FAQ Accordion (shadcn/ui) ───────────────── */
+.editor-poll-idx {
+  font-size: 12px;
+  color: var(--ng-muted-foreground);
+  min-width: 18px;
+}
+
+.editor-poll-card,
+.editor-faq-card {
+  background: var(--ng-card);
+  color: var(--ng-card-foreground);
+  border: 1px solid var(--ng-border);
+  border-radius: var(--ng-radius);
+  padding: 16px;
+  margin: 14px 0;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+.editor-poll-question,
+.editor-faq-title {
+  margin: 0 0 12px;
+  font-size: 15.5px;
+  font-weight: 600;
+}
+
+.editor-poll-options {
+  display: grid;
+  gap: 8px;
+}
+
+.editor-poll-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: calc(var(--ng-radius) - 2px);
+  border: 1px solid var(--ng-border);
+  background: var(--ng-background);
+  color: var(--ng-foreground);
+  font-size: 13.5px;
+  cursor: pointer;
+  overflow: hidden;
+  text-align: left;
+}
+
+.editor-poll-option.is-selected {
+  border-color: var(--ng-ring);
+}
+
+.editor-poll-bar {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--ng-muted);
+  transition: width 220ms ease;
+  z-index: 0;
+}
+
+.editor-poll-label,
+.editor-poll-stat {
+  position: relative;
+  z-index: 1;
+}
+
+.editor-poll-stat {
+  font-size: 12px;
+  color: var(--ng-muted-foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+.editor-poll-total {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--ng-muted-foreground);
+}
+
+.editor-faq-editor-item {
+  display: grid;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid var(--ng-border);
+  border-radius: calc(var(--ng-radius) - 2px);
+  background: var(--ng-background);
+}
+
+.editor-faq-item {
+  border-bottom: 1px solid var(--ng-border);
+  padding: 10px 0;
+}
+
+.editor-faq-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.editor-faq-summary {
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  list-style: none;
+}
+
+.editor-faq-answer {
+  margin-top: 8px;
+  font-size: 13.5px;
+  color: var(--ng-muted-foreground);
+  line-height: 1.55;
+}
+
+/* ── Interactive Quiz Card (shadcn/ui + Green/Red Feedback) ─────── */
+.editor-quiz-card {
+  background: var(--ng-card);
+  color: var(--ng-card-foreground);
+  border: 1px solid var(--ng-border);
+  border-radius: var(--ng-radius);
+  padding: 16px;
+  margin: 14px 0;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+.editor-quiz-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.editor-quiz-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.editor-quiz-score {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--ng-muted);
+  color: var(--ng-muted-foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+.editor-quiz-reset {
+  font-size: 12px;
+  padding: 3px 9px;
+  border-radius: calc(var(--ng-radius) - 2px);
+  border: 1px solid var(--ng-border);
+  background: var(--ng-secondary);
+  color: var(--ng-secondary-foreground);
+  cursor: pointer;
+}
+
+.editor-quiz-list {
+  display: grid;
+  gap: 16px;
+}
+
+.editor-quiz-q-text {
+  font-size: 14.5px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.editor-quiz-options {
+  display: grid;
+  gap: 6px;
+}
+
+.editor-quiz-option {
+  width: 100%;
+  text-align: left;
+  padding: 9px 12px;
+  border-radius: calc(var(--ng-radius) - 2px);
+  border: 1px solid var(--ng-border);
+  background: var(--ng-background);
+  color: var(--ng-foreground);
+  font-size: 13.5px;
+  cursor: pointer;
+  transition: border-color 120ms ease, background-color 120ms ease;
+}
+
+.editor-quiz-option:hover {
+  background: var(--ng-accent);
+}
+
+.editor-quiz-option.is-correct {
+  border-color: #22c55e;
+  background: rgba(34, 197, 94, 0.14);
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.editor-quiz-option.is-wrong {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.14);
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.editor-quiz-feedback {
+  margin-top: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.editor-quiz-feedback.is-correct {
+  color: #16a34a;
+}
+
+.editor-quiz-feedback.is-wrong {
+  color: #dc2626;
+}
+
+.editor-quiz-explanation {
+  margin-top: 4px;
+  font-size: 12.5px;
+  color: var(--ng-muted-foreground);
+}
+
+/* ── Kanban Board & Focus Timer (shadcn/ui) ─────────────────────── */
+.editor-kanban-topbar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.editor-kanban-board-edit,
+.editor-kanban-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.editor-kanban-col,
+.editor-kanban-column {
+  background: var(--ng-muted);
+  border: 1px solid var(--ng-border);
+  border-radius: var(--ng-radius);
+  padding: 10px;
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+
+.editor-kanban-col-head,
+.editor-kanban-column-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.editor-kanban-count {
+  font-size: 11px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--ng-background);
+  color: var(--ng-muted-foreground);
+  border: 1px solid var(--ng-border);
+}
+
+.editor-kanban-cards,
+.editor-kanban-column-body {
+  display: grid;
+  gap: 6px;
+}
+
+.editor-kanban-card-edit {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 4px;
+  align-items: center;
+}
+
+.editor-kanban-card {
+  background: var(--ng-card);
+  color: var(--ng-card-foreground);
+  border: 1px solid var(--ng-border);
+  border-radius: calc(var(--ng-radius) - 2px);
+  padding: 8px 10px;
+  font-size: 13px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.editor-kanban-block {
+  margin: 14px 0;
+}
+
+.editor-kanban-title {
+  margin: 0 0 10px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.editor-timer-edit-row {
+  display: grid;
+  grid-template-columns: 1fr 90px auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.editor-timer-card {
+  background: var(--ng-card);
+  color: var(--ng-card-foreground);
+  border: 1px solid var(--ng-border);
+  border-radius: var(--ng-radius);
+  padding: 16px;
+  margin: 14px 0;
+  display: grid;
+  gap: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.editor-timer-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.editor-timer-label {
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+.editor-timer-display {
+  font-size: 28px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.editor-timer-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.editor-timer-bar {
+  height: 5px;
+  border-radius: 999px;
+  background: var(--ng-muted);
+  overflow: hidden;
+}
+
+.editor-timer-bar-fill {
+  width: 0%;
+  height: 100%;
+  background: var(--ng-primary);
+  transition: width 300ms linear;
+}
+
+/* ── Smart Code Block, Syntax Highlighting & Table of Contents ──── */
+.editor-code-tool,
+.editor-code-block,
+.editor-toc-card {
+  background: var(--ng-card);
+  color: var(--ng-card-foreground);
+  border: 1px solid var(--ng-border);
+  border-radius: var(--ng-radius);
+  margin: 14px 0;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.editor-code-header,
+.editor-code-block-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--ng-muted);
+  border-bottom: 1px solid var(--ng-border);
+}
+
+.editor-code-badge {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ng-muted-foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.editor-code-select {
+  width: auto !important;
+  padding: 3px 8px !important;
+  font-size: 12px !important;
+}
+
+.editor-code-copy {
+  font-size: 11.5px;
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: calc(var(--ng-radius) - 2px);
+  border: 1px solid var(--ng-border);
+  background: var(--ng-background);
+  color: var(--ng-foreground);
+  cursor: pointer;
+}
+
+.editor-code-stage {
+  position: relative;
+  min-height: 96px;
+  background: var(--ng-background);
+}
+
+.editor-code-highlight,
+.editor-code-textarea {
+  margin: 0;
+  padding: 12px 14px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.55;
+  tab-size: 2;
+  white-space: pre;
+  overflow-x: auto;
+  box-sizing: border-box;
+  width: 100%;
+  border: none;
+}
+
+.editor-code-highlight {
+  pointer-events: none;
+  color: var(--ng-foreground);
+}
+
+.editor-code-textarea {
+  position: absolute;
+  inset: 0;
+  resize: none;
+  background: transparent;
+  color: transparent;
+  caret-color: var(--ng-foreground);
+  outline: none;
+}
+
+.editor-code-block pre {
+  margin: 0;
+  padding: 12px 14px;
+  overflow-x: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.55;
+  background: var(--ng-background);
+}
+
+/* Syntax Token Colors (Light & Dark) */
+.hl-keyword { color: #9333ea; font-weight: 500; }
+.hl-string { color: #16a34a; }
+.hl-comment { color: #71717a; font-style: italic; }
+.hl-number { color: #d97706; }
+.hl-func { color: #2563eb; }
+.hl-type { color: #0891b2; }
+.hl-tag { color: #dc2626; }
+
+.dark .hl-keyword, [data-theme='dark'] .hl-keyword { color: #c084fc; }
+.dark .hl-string, [data-theme='dark'] .hl-string { color: #4ade80; }
+.dark .hl-comment, [data-theme='dark'] .hl-comment { color: #71717a; }
+.dark .hl-number, [data-theme='dark'] .hl-number { color: #fbbf24; }
+.dark .hl-func, [data-theme='dark'] .hl-func { color: #60a5fa; }
+.dark .hl-type, [data-theme='dark'] .hl-type { color: #22d3ee; }
+.dark .hl-tag, [data-theme='dark'] .hl-tag { color: #f87171; }
+
+/* Table of Contents */
+.editor-toc-card {
+  padding: 14px 16px;
+}
+
+.editor-toc-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.editor-toc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 5px;
+}
+
+.editor-toc-item a {
+  font-size: 13.5px;
+  color: var(--ng-muted-foreground);
+  text-decoration: none;
+}
+
+.editor-toc-item a:hover {
+  color: var(--ng-foreground);
+  text-decoration: underline;
+}
+
+.editor-toc-item.level-2 { padding-left: 10px; }
+.editor-toc-item.level-3 { padding-left: 22px; }
+.editor-toc-item.level-4 { padding-left: 34px; }
+
+.editor-toc-empty {
+  font-size: 12.5px;
+  color: var(--ng-muted-foreground);
+}
+
+/* ── Data Chart & Footnotes (shadcn/ui) ─────────────────────────── */
+.editor-chart-row {
+  display: grid;
+  grid-template-columns: 1.4fr 0.8fr auto;
+  gap: 6px;
+  align-items: center;
+}
+
+.editor-footnote-row {
+  display: grid;
+  grid-template-columns: auto 1.4fr 1.2fr auto;
+  gap: 6px;
+  align-items: center;
+}
+
+.editor-chart-card,
+.editor-footnotes-card,
+.editor-chart-preview {
+  background: var(--ng-card);
+  color: var(--ng-card-foreground);
+  border: 1px solid var(--ng-border);
+  border-radius: var(--ng-radius);
+  padding: 16px;
+  margin: 14px 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.editor-chart-preview {
+  margin: 0;
+  background: var(--ng-background);
+}
+
+.editor-chart-title,
+.editor-footnotes-title {
+  font-size: 14.5px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.editor-chart-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.editor-footnotes-list {
+  margin: 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--ng-muted-foreground);
+}
+
+.editor-footnotes-list a {
+  color: var(--ng-foreground);
+  text-decoration: underline;
+  word-break: break-all;
+}
+
+/* ── Page Cover & Header (shadcn/ui) ────────────────────────────── */
+.editor-cover-builder,
+.editor-cover-card {
+  background: var(--ng-card);
+  color: var(--ng-card-foreground);
+  border: 1px solid var(--ng-border);
+  border-radius: var(--ng-radius);
+  overflow: hidden;
+  margin: 0 0 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.editor-cover-banner {
+  width: 100%;
+  height: 150px;
+  background: linear-gradient(135deg, #27272a 0%, #52525b 100%);
+}
+
+.editor-cover-icon {
+  width: 56px;
+  height: 56px;
+  margin: -28px 0 0 20px;
+  border-radius: 12px;
+  background: var(--ng-card);
+  border: 1px solid var(--ng-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  position: relative;
+  z-index: 1;
+}
+
+.editor-cover-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px 0;
+}
+
+.editor-cover-controls .editor-form-input {
+  flex: 1;
+  min-width: 160px;
+}
+
+.editor-cover-presets {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.editor-cover-meta {
+  padding: 12px 20px 18px;
+}
+
+.editor-cover-title,
+.editor-cover-title-input {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--ng-foreground);
+}
+
+.editor-cover-title-input,
+.editor-cover-sub-input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  display: block;
+}
+
+.editor-cover-subtitle,
+.editor-cover-sub-input {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: var(--ng-muted-foreground);
+}
+
+/* ── Flashcards & Live Stats Bar (shadcn/ui) ────────────────────── */
+.editor-flashcard-edit-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 6px;
+  align-items: center;
+}
+
+.editor-flashcard-deck {
+  background: var(--ng-card);
+  color: var(--ng-card-foreground);
+  border: 1px solid var(--ng-border);
+  border-radius: var(--ng-radius);
+  padding: 16px;
+  margin: 14px 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.editor-flashcard-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.editor-flashcard-stage {
+  width: 100%;
+  min-height: 120px;
+  padding: 20px;
+  border-radius: calc(var(--ng-radius) - 2px);
+  border: 1px solid var(--ng-border);
+  background: var(--ng-muted);
+  color: var(--ng-foreground);
+  display: grid;
+  gap: 8px;
+  place-items: center;
+  text-align: center;
+  cursor: pointer;
+}
+
+.editor-flashcard-stage.is-flipped {
+  background: var(--ng-background);
+  border-color: var(--ng-ring);
+}
+
+.editor-flashcard-side {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ng-muted-foreground);
+}
+
+.editor-flashcard-text {
+  font-size: 15.5px;
+  font-weight: 500;
+}
+
+.editor-flashcard-nav {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.nextgen-editor-stats {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--ng-border);
+  font-size: 12px;
+  color: var(--ng-muted-foreground);
+  font-variant-numeric: tabular-nums;
+}

@@ -1,0 +1,69 @@
+{
+  "name": "nextgen-block-editor",
+  "version": "0.1.0",
+  "description": "A modular, block-based React + TypeScript rich text editor built on Editor.js with Bento grids, Carousels, Before/After sliders, Lightbox galleries, Slides, Tabs, Accordions, Toggle headings, Alerts, and more.",
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./styles.css": "./dist/styles.css"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --clean && node scripts/copy-css.mjs",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "dependencies": {
+    "@editorjs/checklist": "^1.6.0",
+    "@editorjs/code": "^2.9.4",
+    "@editorjs/editorjs": "^2.31.7",
+    "@editorjs/header": "^2.8.9",
+    "@editorjs/inline-code": "^1.5.2",
+    "@editorjs/link": "^2.6.2",
+    "@editorjs/list": "^2.0.9",
+    "@editorjs/nested-list": "^1.4.3",
+    "@editorjs/quote": "^2.7.6",
+    "@editorjs/simple-image": "^1.6.0",
+    "@editorjs/table": "^2.4.6",
+    "@editorjs/underline": "^1.2.1",
+    "@sotaproject/strikethrough": "^1.0.1",
+    "editorjs-drag-drop": "^1.1.16",
+    "editorjs-undo": "^2.0.28",
+    "katex": "^0.19.1"
+  },
+  "devDependencies": {
+    "@types/katex": "^0.16.8",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.0"
+  },
+  "keywords": [
+    "react",
+    "typescript",
+    "editorjs",
+    "rich-text-editor",
+    "block-editor",
+    "nextjs"
+  ],
+  "license": "MIT"
+}
