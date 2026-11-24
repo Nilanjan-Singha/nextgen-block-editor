@@ -1858,7 +1858,7 @@
 
 /* ── Tighter Toolbar & Plus/Settings Positioning ────────────────── */
 .nextgen-editor-shell #editorjs {
-  padding-left: 60px;
+  padding-left: 72px;
 }
 
 .nextgen-editor-shell .ce-block__content,
@@ -1876,7 +1876,8 @@
   gap: 2px;
 }
 
-.nextgen-editor-shell .ce-toolbox {
+.nextgen-editor-shell .ce-toolbox,
+.nextgen-editor-shell .ce-settings {
   position: absolute;
   left: calc(100% + 6px);
   top: calc(100% + 4px);
@@ -1884,19 +1885,32 @@
   height: 0;
 }
 
-.nextgen-editor-shell .ce-toolbox .ce-popover {
+.nextgen-editor-shell .ce-toolbox .ce-popover,
+.nextgen-editor-shell .ce-settings .ce-popover {
   min-width: 0 !important;
   border: none !important;
   box-shadow: none !important;
   background: transparent !important;
 }
 
-.nextgen-editor-shell .ce-toolbox .ce-popover__container {
+.nextgen-editor-shell .ce-toolbox .ce-popover__container,
+.nextgen-editor-shell .ce-settings .ce-popover__container {
   left: 0 !important;
   right: auto !important;
   top: 0 !important;
   --popover-left: 0px !important;
   min-width: 240px;
+}
+
+.nextgen-editor-shell .ce-inline-toolbar {
+  max-width: calc(100% - 16px);
+  min-width: 0;
+}
+
+.nextgen-editor-shell .ce-inline-toolbar .ce-popover__container {
+  left: 0 !important;
+  right: auto !important;
+  --popover-left: 0px !important;
 }
 
 .nextgen-editor-shell .ce-toolbar__plus,
