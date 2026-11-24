@@ -1736,6 +1736,31 @@
 }
 
 /* Built-in Theme Presets via Settings Modal */
+html[data-ng-theme],
+html[data-ng-theme] body {
+  background: var(--ng-background);
+  color: var(--ng-foreground);
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
+.nextgen-editor-shell[data-ng-theme],
+.nextgen-editor-article[data-ng-theme] {
+  background: var(--ng-card);
+  color: var(--ng-foreground);
+  --bg: var(--ng-background);
+  --surface: var(--ng-card);
+  --ink: var(--ng-foreground);
+  --soft: var(--ng-muted-foreground);
+  --line: var(--ng-border);
+  --tint: var(--ng-muted);
+}
+
+.nextgen-editor-article[data-ng-theme] {
+  padding: 20px 24px;
+  border-radius: calc(var(--ng-radius) + 2px);
+  border: 1px solid var(--ng-border);
+}
+
 [data-ng-theme='light'] {
   --ng-background: #ffffff;
   --ng-foreground: #09090b;

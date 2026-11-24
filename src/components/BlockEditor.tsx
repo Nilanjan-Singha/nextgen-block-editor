@@ -34,6 +34,7 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
       className,
       onReady,
       onChange,
+      onThemeChange,
     },
     ref
   ) => {
@@ -50,7 +51,15 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
     >(async () => {});
 
     const [settingsOpen, setSettingsOpen] = useState(false);
-    const [theme, setTheme] = useState<EditorThemePreset>('inherit');
+    const [theme, setTheme] = useState<EditorThemePreset>(() => {
+      try {
+        const saved = localStorage.getItem('ng-editor-theme');
+        if (saved) return saved as EditorThemePreset;
+      } catch {
+        // ignore
+      }
+      return 'inherit';
+    });
     const [editorMode, setEditorMode] = useState<EditorMode>('block');
     const [simpleFont, setSimpleFont] = useState<'sans' | 'serif' | 'mono'>('sans');
     const [selectedTools, setSelectedTools] = useState<string[]>(() => {
@@ -100,6 +109,20 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
     useEffect(() => {
       setStatsVisible(showStats);
     }, [showStats]);
+
+    useEffect(() => {
+      try {
+        localStorage.setItem('ng-editor-theme', theme);
+      } catch {
+        // ignore
+      }
+      if (theme === 'inherit') {
+        document.documentElement.removeAttribute('data-ng-theme');
+      } else {
+        document.documentElement.setAttribute('data-ng-theme', theme);
+      }
+      onThemeChange?.(theme);
+    }, [theme, onThemeChange]);
 
     useEffect(() => {
       const shell = shellRef.current;

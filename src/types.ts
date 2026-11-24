@@ -31,9 +31,11 @@ export interface BlockEditorProps {
   className?: string;
   onReady?: () => void;
   onChange?: (data: EditorJSData) => void;
+  onThemeChange?: (theme: string) => void;
 }
 
 export interface BlockRendererProps {
   data: EditorJSData | null | undefined;
+  theme?: string;
   className?: string;
 }
