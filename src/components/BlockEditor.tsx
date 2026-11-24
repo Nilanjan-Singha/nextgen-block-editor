@@ -28,7 +28,7 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
       placeholder,
       enabledTools,
       showStats = true,
-      showAiBar = true,
+      showAiBar = false,
       onAiRequest,
       className,
       onReady,
@@ -44,6 +44,9 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
     const latestDocRef = useRef<EditorJSData>(initialData || { blocks: [] });
     const onChangeRef = useRef(onChange);
     const onReadyRef = useRef(onReady);
+    const runAiRef = useRef<
+      (mode: 'continue' | 'ask', prompt?: string) => Promise<void>
+    >(async () => {});
 
     const [settingsOpen, setSettingsOpen] = useState(false);
     const [theme, setTheme] = useState<EditorThemePreset>('inherit');
@@ -73,8 +76,16 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
       const shell = shellRef.current;
       if (!shell) return;
       const onOpenSettings = () => setSettingsOpen(true);
+      const onAiContinue = () => void runAiRef.current?.('continue');
+      const onAiAsk = () => setAskOpen(true);
       shell.addEventListener('nextgen-open-settings', onOpenSettings);
-      return () => shell.removeEventListener('nextgen-open-settings', onOpenSettings);
+      shell.addEventListener('nextgen-ai-continue', onAiContinue);
+      shell.addEventListener('nextgen-ai-ask', onAiAsk);
+      return () => {
+        shell.removeEventListener('nextgen-open-settings', onOpenSettings);
+        shell.removeEventListener('nextgen-ai-continue', onAiContinue);
+        shell.removeEventListener('nextgen-ai-ask', onAiAsk);
+      };
     }, []);
 
     useEffect(() => {
@@ -96,24 +107,34 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
         await lifecycleRef.current;
         if (cancelled) return;
 
+        const sanitizedInitial = {
+          ...(latestDocRef.current || { blocks: [] }),
+          blocks: ((latestDocRef.current?.blocks || []) as EditorJSData['blocks']).filter(
+            (b) => !['settings', 'continueWriting', 'askAi'].includes(b.type)
+          ),
+        };
+        latestDocRef.current = sanitizedInitial;
+
         holder.innerHTML = '';
         const instance = new EditorJS({
           holder,
-          data: (latestDocRef.current || { blocks: [] }) as OutputData,
+          data: sanitizedInitial as OutputData,
           placeholder:
             placeholder || 'Write your story, or press / to insert blocks...',
           tools: getEditorTools(true, effectiveTools),
           onChange: async () => {
             try {
               const saved = await instance.save();
-              const typed = saved as unknown as EditorJSData;
+              const filteredBlocks = (saved.blocks || []).filter(
+                (b) => !['settings', 'continueWriting', 'askAi'].includes(b.type)
+              );
+              const typed = { ...saved, blocks: filteredBlocks } as unknown as EditorJSData;
               latestDocRef.current = typed;
-              const blocks = saved.blocks || [];
               const words = (holder.innerText || '')
                 .trim()
                 .split(/\s+/)
                 .filter(Boolean).length;
-              setStats({ words, blocks: blocks.length });
+              setStats({ words, blocks: filteredBlocks.length });
               onChangeRef.current?.(typed);
             } catch {
               // ignore transient save errors while editing
@@ -172,7 +193,10 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
         if (!editorRef.current) return null;
         await editorRef.current.isReady;
         const saved = await editorRef.current.save();
-        const typed = saved as unknown as EditorJSData;
+        const filteredBlocks = (saved.blocks || []).filter(
+          (b) => !['settings', 'continueWriting', 'askAi'].includes(b.type)
+        );
+        const typed = { ...saved, blocks: filteredBlocks } as unknown as EditorJSData;
         latestDocRef.current = typed;
         return typed;
       },
@@ -241,6 +265,8 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
         setAiBusy(false);
       }
     };
+
+    runAiRef.current = runAi;
 
     const handleModeSwitch = async (nextMode: EditorMode) => {
       if (nextMode === editorMode) return;

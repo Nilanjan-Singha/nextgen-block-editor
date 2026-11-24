@@ -87,6 +87,10 @@ export const TOOL_CATEGORIES: ToolCategoryGroup[] = [
     ],
   },
   {
+    label: 'AI',
+    tools: ['continueWriting', 'askAi'],
+  },
+  {
     label: 'Settings',
     tools: ['settings'],
   },
@@ -102,6 +106,8 @@ export const SIMPLE_MODE_TOOLS = [
   'code',
   'image',
   'delimiter',
+  'continueWriting',
+  'askAi',
   'settings',
 ];
 

@@ -20,9 +20,11 @@ import {
   MasonryTool,
 } from './blocks/mediaBlocks';
 import {
+  AskAiTool,
   AudioPlayerTool,
   CalloutTool,
   ChartTool,
+  ContinueWritingTool,
   DialogueTool,
   EisenhowerMatrixTool,
   EmojiTool,
@@ -1737,6 +1739,8 @@ export function getEditorTools(
     nestedlist: NestedList as unknown as ToolConstructable,
     simpleImage: SimpleImage as unknown as ToolConstructable,
     comment: CommentTool as unknown as ToolConstructable,
+    continueWriting: ContinueWritingTool as unknown as ToolConstructable,
+    askAi: AskAiTool as unknown as ToolConstructable,
     settings: SettingsTriggerTool as unknown as ToolConstructable,
 
     // Inline toolbar tools
