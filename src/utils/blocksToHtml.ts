@@ -945,7 +945,7 @@ export function blocksToHtml(data: EditorJSData | null | undefined): string {
           ? `<figure class="editor-whiteboard-figure">${img}<figcaption>${escHtml(d.caption)}</figcaption></figure>`
           : img;
       }
-      return d.text ? `<p>${escHtml(d.text)}</p>` : '';
+      return d.text ? `<p>${sanitizeInlineHtml(d.text)}</p>` : '';
     })
     .join('');
 }

@@ -1810,3 +1810,47 @@
     padding-left: 36px;
   }
 }
+
+/* ── Inline Text Formatting (Editor & Preview) ──────────────────── */
+.nextgen-editor-shell mark,
+.nextgen-editor-article mark {
+  background: #fef08a;
+  color: #18181b;
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.nextgen-editor-shell b,
+.nextgen-editor-shell strong,
+.nextgen-editor-article b,
+.nextgen-editor-article strong {
+  font-weight: 700;
+  color: var(--ng-foreground);
+}
+
+.nextgen-editor-shell i,
+.nextgen-editor-shell em,
+.nextgen-editor-article i,
+.nextgen-editor-article em {
+  font-style: italic;
+}
+
+.nextgen-editor-shell u,
+.nextgen-editor-article u {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.nextgen-editor-shell s,
+.nextgen-editor-article s {
+  text-decoration: line-through;
+}
+
+.nextgen-editor-article code:not(pre code) {
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: var(--ng-muted);
+  border: 1px solid var(--ng-border);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.875em;
+}

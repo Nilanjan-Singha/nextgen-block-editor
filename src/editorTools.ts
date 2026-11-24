@@ -1211,11 +1211,18 @@ export class LinkPreviewTool {
 }
 
 export class MarkerInline {
+  private button: HTMLButtonElement | null = null;
+
   static get isInline() {
     return true;
   }
   static get title() {
     return 'Marker';
+  }
+  static get sanitize() {
+    return {
+      mark: true,
+    };
   }
   render() {
     const button = document.createElement('button');
@@ -1223,18 +1230,43 @@ export class MarkerInline {
     button.className = 'ce-inline-tool';
     button.innerHTML =
       '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>';
+    this.button = button;
     return button;
   }
   surround(range: Range) {
-    const mark = document.createElement('mark');
-    try {
-      range.surroundContents(mark);
-    } catch {
-      // ignore cross-node selection
+    if (!range) return;
+    const existingMark = (
+      range.commonAncestorContainer.nodeType === Node.ELEMENT_NODE
+        ? (range.commonAncestorContainer as HTMLElement)
+        : range.commonAncestorContainer.parentElement
+    )?.closest('mark');
+
+    if (existingMark) {
+      const parent = existingMark.parentNode;
+      if (parent) {
+        while (existingMark.firstChild) {
+          parent.insertBefore(existingMark.firstChild, existingMark);
+        }
+        parent.removeChild(existingMark);
+      }
+      return;
     }
+
+    const mark = document.createElement('mark');
+    const frag = range.extractContents();
+    mark.appendChild(frag);
+    range.insertNode(mark);
   }
   checkState() {
-    return false;
+    const sel = window.getSelection();
+    const node = sel?.anchorNode;
+    const el =
+      node?.nodeType === Node.ELEMENT_NODE
+        ? (node as HTMLElement)
+        : node?.parentElement;
+    const active = Boolean(el?.closest('mark'));
+    this.button?.classList.toggle('ce-inline-tool--active', active);
+    return active;
   }
 }
 
