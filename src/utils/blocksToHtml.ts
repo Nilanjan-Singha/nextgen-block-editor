@@ -49,7 +49,7 @@ export function sanitizeInlineHtml(value: unknown): string {
   }
   const template = document.createElement('template');
   template.innerHTML = String(value == null ? '' : value);
-  const allowed = ['A', 'MARK', 'SPAN', 'U', 'S', 'STRIKE', 'CODE', 'B', 'STRONG', 'I', 'EM'];
+  const allowed = ['A', 'MARK', 'SPAN', 'U', 'S', 'STRIKE', 'CODE', 'B', 'STRONG', 'I', 'EM', 'SUP', 'SUB'];
   template.content.querySelectorAll('*').forEach((element) => {
     if (!allowed.includes(element.tagName)) {
       element.replaceWith(document.createTextNode(element.textContent || ''));

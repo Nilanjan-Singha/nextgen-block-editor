@@ -15,6 +15,7 @@ import {
   attachPopoverCategoryHeaders,
 } from '../utils/popoverCategories';
 import { attachEmojiSidePicker } from '../utils/emojiSidePicker';
+import { ClassicToolbar } from './ClassicToolbar';
 import {
   SettingsModal,
   type EditorMode,
@@ -51,6 +52,7 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
     const [settingsOpen, setSettingsOpen] = useState(false);
     const [theme, setTheme] = useState<EditorThemePreset>('inherit');
     const [editorMode, setEditorMode] = useState<EditorMode>('block');
+    const [simpleFont, setSimpleFont] = useState<'sans' | 'serif' | 'mono'>('sans');
     const [statsVisible, setStatsVisible] = useState(showStats);
     const [aiConfig, setAiConfig] = useState<AiConfig>(loadAiConfig);
     const [askOpen, setAskOpen] = useState(false);
@@ -121,7 +123,10 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
           data: sanitizedInitial as OutputData,
           placeholder:
             placeholder || 'Write your story, or press / to insert blocks...',
-          tools: getEditorTools(true, effectiveTools),
+          tools: getEditorTools(
+            true,
+            editorMode === 'simple' ? enabledTools : effectiveTools
+          ),
           onChange: async () => {
             try {
               const saved = await instance.save();
@@ -288,6 +293,7 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
       <div
         ref={shellRef}
         data-ng-theme={theme === 'inherit' ? undefined : theme}
+        data-ng-font={editorMode === 'simple' ? simpleFont : undefined}
         className={className ? `nextgen-editor-shell ${className}` : 'nextgen-editor-shell'}
       >
         {showAiBar && (
@@ -343,6 +349,17 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
         )}
 
         {aiError && <div className="ng-ai-error">{aiError}</div>}
+
+        {editorMode === 'simple' && (
+          <ClassicToolbar
+            editorRef={editorRef}
+            onUndo={() => undoRef.current?.undo?.()}
+            onRedo={() => undoRef.current?.redo?.()}
+            fontFamily={simpleFont}
+            onChangeFontFamily={setSimpleFont}
+            onOpenSettings={() => setSettingsOpen(true)}
+          />
+        )}
 
         <div id="editorjs" ref={holderRef} />
 
