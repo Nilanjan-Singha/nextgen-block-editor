@@ -1679,7 +1679,6 @@ export function getEditorTools(
       },
     },
     delimiter: DelimiterTool as unknown as ToolConstructable,
-    checklist: Checklist as unknown as ToolConstructable,
     table: Table as unknown as ToolConstructable,
     callout: CalloutTool as unknown as ToolConstructable,
     hotkey: HotkeyTool as unknown as ToolConstructable,

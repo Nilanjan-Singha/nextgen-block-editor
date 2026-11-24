@@ -17,7 +17,6 @@ export const TOOL_CATEGORIES: ToolCategoryGroup[] = [
       'paragraph',
       'list',
       'nestedlist',
-      'checklist',
       'quote',
       'pullquote',
       'delimiter',
@@ -120,9 +119,8 @@ export const TOOL_LABELS: Record<string, string> = {
   h2: 'Heading 2',
   h3: 'Heading 3',
   paragraph: 'Paragraph',
-  list: 'List',
+  list: 'List (Ordered / Unordered / Checklist)',
   nestedlist: 'Nested List',
-  checklist: 'Checklist',
   quote: 'Quote',
   pullquote: 'Pull Quote',
   delimiter: 'Delimiter',
@@ -202,7 +200,7 @@ export function attachPopoverCategoryHeaders(container: HTMLElement): () => void
       );
       if (itemEls.length < 3) return;
 
-      const byName = new Map<string, HTMLElement>();
+      const byName = new Map<string, HTMLElement[]>();
       const uncategorized: HTMLElement[] = [];
 
       itemEls.forEach((el) => {
@@ -213,8 +211,13 @@ export function attachPopoverCategoryHeaders(container: HTMLElement): () => void
             titleEl.textContent = 'Paragraph';
           }
         }
-        if (name) byName.set(name, el);
-        else uncategorized.push(el);
+        if (name) {
+          const arr = byName.get(name) || [];
+          arr.push(el);
+          byName.set(name, arr);
+        } else {
+          uncategorized.push(el);
+        }
       });
 
       const frag = document.createDocumentFragment();
@@ -223,10 +226,12 @@ export function attachPopoverCategoryHeaders(container: HTMLElement): () => void
       for (const group of TOOL_CATEGORIES) {
         const matched: HTMLElement[] = [];
         for (const toolName of group.tools) {
-          const el = byName.get(toolName);
-          if (el && !placed.has(el)) {
-            matched.push(el);
-            placed.add(el);
+          const els = byName.get(toolName) || [];
+          for (const el of els) {
+            if (!placed.has(el)) {
+              matched.push(el);
+              placed.add(el);
+            }
           }
         }
         if (matched.length > 0) {

@@ -198,7 +198,7 @@ export const ClassicToolbar: React.FC<ClassicToolbarProps> = ({
       <button type="button" className="ng-ct-btn" onMouseDown={keepSelection} onClick={() => insertBlock('list', { style: 'ordered', items: [] })} title="Numbered List">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
       </button>
-      <button type="button" className="ng-ct-btn" onMouseDown={keepSelection} onClick={() => insertBlock('checklist', { items: [] })} title="Checklist">
+      <button type="button" className="ng-ct-btn" onMouseDown={keepSelection} onClick={() => insertBlock('list', { style: 'checklist', items: [] })} title="Checklist">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="5" width="6" height="6" rx="1"/><path d="m3 17 2 2 4-4"/><path d="M13 6h8"/><path d="M13 12h8"/><path d="M13 18h8"/></svg>
       </button>
       <button type="button" className="ng-ct-btn" onMouseDown={keepSelection} onClick={() => exec('outdent')} title="Decrease Indent">
