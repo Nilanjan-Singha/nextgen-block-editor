@@ -2885,3 +2885,122 @@ export class CalloutTool {
     };
   }
 }
+
+export interface HotkeyData {
+  keys: string;
+  label?: string;
+}
+
+export class HotkeyTool {
+  private data: HotkeyData;
+  private previewEl: HTMLElement | null = null;
+
+  static get toolbox() {
+    return {
+      title: 'Hotkey',
+      icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h2M10 10h2M14 10h4M7 14h10"/></svg>',
+    };
+  }
+
+  constructor({ data }: { data?: Partial<HotkeyData> }) {
+    this.data = {
+      keys: data?.keys ?? 'Ctrl + K',
+      label: data?.label ?? 'Open command menu',
+    };
+  }
+
+  private renderPreview() {
+    const el = this.previewEl;
+    if (!el) return;
+    el.innerHTML = '';
+    const parts = this.data.keys
+      .split('+')
+      .map((k) => k.trim())
+      .filter(Boolean);
+    parts.forEach((part, idx) => {
+      if (idx > 0) {
+        const plus = document.createElement('span');
+        plus.className = 'editor-hotkey-plus';
+        plus.textContent = '+';
+        el.appendChild(plus);
+      }
+      const kbd = document.createElement('kbd');
+      kbd.className = 'editor-kbd';
+      kbd.textContent = part;
+      el.appendChild(kbd);
+    });
+  }
+
+  render(): HTMLElement {
+    const wrap = document.createElement('div');
+    wrap.className = 'editor-form-builder';
+
+    const row = document.createElement('div');
+    row.className = 'editor-hotkey-edit-row';
+
+    const keysIn = document.createElement('input');
+    keysIn.type = 'text';
+    keysIn.className = 'cdx-input editor-form-input';
+    keysIn.placeholder = 'e.g. Ctrl + Shift + P';
+    keysIn.value = this.data.keys;
+    keysIn.addEventListener('input', () => {
+      this.data.keys = keysIn.value;
+      this.renderPreview();
+    });
+
+    const recordBtn = document.createElement('button');
+    recordBtn.type = 'button';
+    recordBtn.className = 'excalidraw-btn';
+    recordBtn.textContent = 'Record';
+    recordBtn.addEventListener('click', () => {
+      recordBtn.textContent = 'Press keys…';
+      recordBtn.classList.add('is-active');
+      const onKey = (e: KeyboardEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const mods: string[] = [];
+        if (e.ctrlKey) mods.push('Ctrl');
+        if (e.metaKey) mods.push('Cmd');
+        if (e.altKey) mods.push('Alt');
+        if (e.shiftKey) mods.push('Shift');
+        const key = e.key;
+        if (!['Control', 'Meta', 'Alt', 'Shift'].includes(key)) {
+          mods.push(key.length === 1 ? key.toUpperCase() : key);
+          this.data.keys = mods.join(' + ');
+          keysIn.value = this.data.keys;
+          this.renderPreview();
+          window.removeEventListener('keydown', onKey, true);
+          recordBtn.textContent = 'Record';
+          recordBtn.classList.remove('is-active');
+        }
+      };
+      window.addEventListener('keydown', onKey, true);
+    });
+
+    const labelIn = document.createElement('input');
+    labelIn.type = 'text';
+    labelIn.className = 'cdx-input editor-form-input';
+    labelIn.placeholder = 'Action description (optional)';
+    labelIn.value = this.data.label || '';
+    labelIn.addEventListener('input', () => {
+      this.data.label = labelIn.value;
+    });
+
+    row.append(keysIn, recordBtn, labelIn);
+
+    const preview = document.createElement('div');
+    preview.className = 'editor-hotkey-preview';
+    this.previewEl = preview;
+    this.renderPreview();
+
+    wrap.append(row, preview);
+    return wrap;
+  }
+
+  save(): HotkeyData {
+    return {
+      keys: this.data.keys.trim() || 'Ctrl + K',
+      label: this.data.label?.trim() || '',
+    };
+  }
+}

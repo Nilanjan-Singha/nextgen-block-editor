@@ -29,6 +29,7 @@ import {
   FocusTimerTool,
   FootnotesTool,
   FormBuilderTool,
+  HotkeyTool,
   KanbanTool,
   LatexTool,
   MusicCarouselTool,
@@ -1377,6 +1378,7 @@ export function getEditorTools(
     checklist: Checklist as unknown as ToolConstructable,
     table: Table as unknown as ToolConstructable,
     callout: CalloutTool as unknown as ToolConstructable,
+    hotkey: HotkeyTool as unknown as ToolConstructable,
     alert: AlertTool as unknown as ToolConstructable,
 
     // 2. Common rich media & layout

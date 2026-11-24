@@ -665,6 +665,20 @@ export function blocksToHtml(data: EditorJSData | null | undefined): string {
       if (block.type === 'comment') {
         return '';
       }
+      if (block.type === 'hotkey') {
+        const parts = String(d.keys || '')
+          .split('+')
+          .map((k) => k.trim())
+          .filter(Boolean);
+        if (!parts.length) return '';
+        const keysHtml = parts
+          .map((k) => `<kbd class="editor-kbd">${escHtml(k)}</kbd>`)
+          .join('<span class="editor-hotkey-plus">+</span>');
+        const label = d.label
+          ? `<span class="editor-hotkey-label">${escHtml(d.label)}</span>`
+          : '';
+        return `<div class="editor-hotkey-card"><div class="editor-hotkey-keys">${keysHtml}</div>${label}</div>`;
+      }
       if (block.type === 'callout') {
         const tone = ['neutral', 'info', 'success', 'warning', 'danger'].includes(
           String(d.tone)
