@@ -42,6 +42,7 @@ export const TOOL_CATEGORIES: ToolCategoryGroup[] = [
   {
     label: 'Media',
     tools: [
+      'upload',
       'image',
       'simpleImage',
       'gif',

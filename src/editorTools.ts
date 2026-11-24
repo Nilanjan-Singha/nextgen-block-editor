@@ -38,6 +38,7 @@ import {
   SmartCodeTool,
   TableOfContentsTool,
   TaskChecklistTool,
+  UploadTool,
 } from './blocks/richBlocks';
 import {
   AccordionTool,
@@ -1377,6 +1378,7 @@ export function getEditorTools(
     alert: AlertTool as unknown as ToolConstructable,
 
     // 2. Common rich media & layout
+    upload: UploadTool as unknown as ToolConstructable,
     audio: AudioPlayerTool as unknown as ToolConstructable,
     musicCarousel: MusicCarouselTool as unknown as ToolConstructable,
     embed: CustomEmbedTool as unknown as ToolConstructable,

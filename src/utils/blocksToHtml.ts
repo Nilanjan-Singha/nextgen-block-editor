@@ -665,6 +665,18 @@ export function blocksToHtml(data: EditorJSData | null | undefined): string {
       if (block.type === 'comment') {
         return '';
       }
+      if (block.type === 'upload') {
+        const url = String(d.url || '').trim();
+        if (!url) return '';
+        const name = escHtml(d.name || 'Download file');
+        const mime = String(d.mime || '');
+        if (mime.startsWith('image/')) {
+          return `<figure class="editor-upload-figure"><img src="${escHtml(url)}" alt="${name}"><figcaption>${name}</figcaption></figure>`;
+        }
+        return `<a class="editor-upload-card" href="${escHtml(
+          url
+        )}" download="${name}" target="_blank" rel="noopener noreferrer"><span class="editor-upload-badge">FILE</span><span class="editor-upload-name">${name}</span><span class="editor-upload-dl">Download</span></a>`;
+      }
       if (block.type === 'flashcards') {
         const cards = (d.cards || []) as Array<{ front?: string; back?: string }>;
         if (!cards.length) return '';

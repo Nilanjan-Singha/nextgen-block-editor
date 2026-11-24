@@ -2627,3 +2627,169 @@ export class SettingsTriggerTool {
     return {};
   }
 }
+
+export interface UploadBlockData {
+  url: string;
+  name: string;
+  size: number;
+  mime?: string;
+}
+
+export class UploadTool {
+  private data: UploadBlockData;
+  private statusEl: HTMLElement | null = null;
+  private previewEl: HTMLElement | null = null;
+
+  static get toolbox() {
+    return {
+      title: 'Upload',
+      icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>',
+    };
+  }
+
+  constructor({ data }: { data?: Partial<UploadBlockData> }) {
+    this.data = {
+      url: data?.url ?? '',
+      name: data?.name ?? '',
+      size: typeof data?.size === 'number' ? data.size : 0,
+      mime: data?.mime ?? '',
+    };
+  }
+
+  private formatBytes(bytes: number): string {
+    if (!bytes) return '';
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  }
+
+  private updatePreview() {
+    if (!this.previewEl) return;
+    this.previewEl.innerHTML = '';
+    if (!this.data.url) return;
+
+    const card = document.createElement('div');
+    card.className = 'editor-upload-file-row';
+
+    const meta = document.createElement('div');
+    meta.className = 'editor-upload-meta';
+    const title = document.createElement('strong');
+    title.textContent = this.data.name || 'Uploaded file';
+    const sub = document.createElement('span');
+    sub.textContent = [this.data.mime, this.formatBytes(this.data.size)]
+      .filter(Boolean)
+      .join(' • ');
+    meta.append(title, sub);
+
+    const clearBtn = document.createElement('button');
+    clearBtn.type = 'button';
+    clearBtn.className = 'excalidraw-btn';
+    clearBtn.textContent = 'Remove';
+    clearBtn.addEventListener('click', () => {
+      this.data = { url: '', name: '', size: 0, mime: '' };
+      this.updatePreview();
+    });
+
+    card.append(meta, clearBtn);
+    this.previewEl.appendChild(card);
+
+    if (this.data.mime?.startsWith('image/')) {
+      const img = document.createElement('img');
+      img.src = this.data.url;
+      img.alt = this.data.name;
+      img.className = 'editor-upload-img-preview';
+      this.previewEl.appendChild(img);
+    }
+  }
+
+  private async handleFile(file: File) {
+    if (this.statusEl) this.statusEl.textContent = `Uploading ${file.name}…`;
+    let resolvedUrl: string | null = null;
+
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      const res = await fetch('/api/upload', { method: 'POST', body: form });
+      if (res.ok) {
+        const json = (await res.json()) as { url?: string };
+        resolvedUrl = json.url || null;
+      }
+    } catch {
+      // fall back to local data URL when no upload endpoint is present
+    }
+
+    if (!resolvedUrl) {
+      resolvedUrl = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ''));
+        reader.onerror = () => resolve('');
+        reader.readAsDataURL(file);
+      });
+    }
+
+    this.data = {
+      url: resolvedUrl,
+      name: file.name,
+      size: file.size,
+      mime: file.type,
+    };
+    if (this.statusEl) this.statusEl.textContent = 'Ready';
+    this.updatePreview();
+  }
+
+  render(): HTMLElement {
+    const wrap = document.createElement('div');
+    wrap.className = 'editor-upload-tool';
+
+    const drop = document.createElement('label');
+    drop.className = 'editor-upload-dropzone';
+
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.style.display = 'none';
+    input.addEventListener('change', () => {
+      const file = input.files?.[0];
+      if (file) void this.handleFile(file);
+    });
+
+    const label = document.createElement('span');
+    label.textContent = 'Click to choose a file or drag & drop here';
+
+    const status = document.createElement('small');
+    status.className = 'editor-upload-status';
+    this.statusEl = status;
+
+    drop.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      drop.classList.add('is-dragover');
+    });
+    drop.addEventListener('dragleave', () => {
+      drop.classList.remove('is-dragover');
+    });
+    drop.addEventListener('drop', (e) => {
+      e.preventDefault();
+      drop.classList.remove('is-dragover');
+      const file = e.dataTransfer?.files?.[0];
+      if (file) void this.handleFile(file);
+    });
+
+    drop.append(input, label, status);
+
+    const preview = document.createElement('div');
+    preview.className = 'editor-upload-preview';
+    this.previewEl = preview;
+    this.updatePreview();
+
+    wrap.append(drop, preview);
+    return wrap;
+  }
+
+  save(): UploadBlockData {
+    return {
+      url: this.data.url,
+      name: this.data.name,
+      size: this.data.size,
+      mime: this.data.mime,
+    };
+  }
+}
