@@ -328,7 +328,7 @@ export function blocksToHtml(data: EditorJSData | null | undefined): string {
         );
       }
       if (block.type === 'bento') {
-        const preset = ['hero-left', 'hero-top', 'equal'].includes(d.preset)
+        const preset = ['hero-left', 'hero-top', 'equal', '2x2', 'spotlight'].includes(d.preset)
           ? d.preset
           : 'hero-left';
         const tiles = (d.tiles || []) as Array<{
@@ -336,15 +336,23 @@ export function blocksToHtml(data: EditorJSData | null | undefined): string {
           url?: string;
           title?: string;
           text?: string;
+          badge?: string;
+          accent?: string;
         }>;
         if (!tiles.length) return '';
         return (
           `<div class="editor-bento preset-${escHtml(preset)}">` +
           tiles
             .map((t, idx) => {
-              const cls = `editor-bento-tile${idx === 0 ? ' hero' : ''}`;
+              const accent = ['indigo', 'emerald', 'amber', 'rose'].includes(t.accent || '')
+                ? ` accent-${escHtml(t.accent || '')}`
+                : '';
+              const badgeHtml = t.badge
+                ? `<span class="editor-bento-badge">${escHtml(t.badge)}</span>`
+                : '';
+              const cls = `editor-bento-tile${idx === 0 ? ' hero' : ''}${accent}`;
               if (t.kind === 'image' && t.url) {
-                return `<figure class="${cls} is-image"><img src="${escHtml(
+                return `<figure class="${cls} is-image">${badgeHtml}<img src="${escHtml(
                   t.url
                 )}" alt="${escHtml(t.title || '')}" loading="lazy">${
                   t.title
@@ -352,7 +360,12 @@ export function blocksToHtml(data: EditorJSData | null | undefined): string {
                     : ''
                 }</figure>`;
               }
-              return `<div class="${cls} is-text">${
+              if (t.kind === 'stat') {
+                return `<div class="${cls} is-stat">${badgeHtml}${
+                  t.title ? `<strong class="editor-bento-stat-value">${escHtml(t.title)}</strong>` : ''
+                }${t.text ? `<p>${escHtml(t.text)}</p>` : ''}</div>`;
+              }
+              return `<div class="${cls} is-text">${badgeHtml}${
                 t.title ? `<strong>${escHtml(t.title)}</strong>` : ''
               }${t.text ? `<p>${escHtml(t.text)}</p>` : ''}</div>`;
             })

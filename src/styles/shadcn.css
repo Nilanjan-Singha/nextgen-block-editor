@@ -2185,3 +2185,207 @@
   border: 1px solid var(--ng-border);
   background: var(--ng-background);
 }
+
+/* ── Bento Grid + Mini Sidebar (/bento) ─────────────────────────── */
+.editor-bento-shell {
+  margin: 12px 0;
+  border: 1px solid var(--ng-border);
+  border-radius: var(--ng-radius);
+  background: var(--ng-card);
+  overflow: hidden;
+}
+
+.editor-bento-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--ng-border);
+  background: var(--ng-background);
+}
+
+.editor-bento-header-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ng-foreground);
+}
+
+.editor-bento-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.editor-bento-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 236px;
+  align-items: start;
+}
+
+.editor-bento-workspace.is-sidebar-collapsed {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.editor-bento-workspace.is-sidebar-collapsed .editor-bento-sidebar {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  .editor-bento-workspace {
+    grid-template-columns: 1fr;
+  }
+  .editor-bento-sidebar {
+    border-left: none !important;
+    border-top: 1px solid var(--ng-border);
+  }
+}
+
+.editor-bento-canvas {
+  padding: 14px;
+}
+
+.editor-bento-canvas .editor-bento {
+  margin: 0;
+}
+
+.editor-bento-canvas .editor-bento-tile {
+  cursor: pointer;
+}
+
+.editor-bento-canvas .editor-bento-tile:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+}
+
+.editor-bento-canvas .editor-bento-tile.is-selected {
+  outline: 2px solid var(--ng-primary, #6366f1);
+  outline-offset: 1px;
+}
+
+.editor-bento-empty {
+  height: 100%;
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--ng-muted-foreground);
+}
+
+.editor-bento-sidebar {
+  border-left: 1px solid var(--ng-border);
+  background: var(--ng-background);
+  padding: 12px;
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+.editor-bento-sb-section {
+  display: grid;
+  gap: 7px;
+}
+
+.editor-bento-sb-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.editor-bento-sb-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ng-muted-foreground);
+}
+
+.editor-bento-sb-mini-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.editor-bento-preset-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.editor-bento-preset-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--ng-border);
+  background: var(--ng-card);
+  color: var(--ng-foreground);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.editor-bento-preset-btn:hover {
+  border-color: var(--ng-primary, #6366f1);
+}
+
+.editor-bento-preset-btn.is-active {
+  border-color: var(--ng-primary, #6366f1);
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--ng-primary, #6366f1);
+}
+
+.editor-bento-card-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.editor-bento-card-pill {
+  min-width: 26px;
+  height: 26px;
+  padding: 0 7px;
+  border-radius: 7px;
+  border: 1px solid var(--ng-border);
+  background: var(--ng-card);
+  color: var(--ng-foreground);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.editor-bento-card-pill.is-active {
+  border-color: var(--ng-primary, #6366f1);
+  background: var(--ng-primary, #6366f1);
+  color: #fff;
+}
+
+.editor-bento-file-in {
+  font-size: 11px;
+  width: 100%;
+}
+
+.editor-bento-accent-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding-top: 2px;
+}
+
+.editor-bento-accent-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+.editor-bento-accent-dot.is-active {
+  outline: 2px solid var(--ng-foreground);
+  outline-offset: 2px;
+}
