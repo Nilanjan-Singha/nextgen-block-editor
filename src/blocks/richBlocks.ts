@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { Excalidraw, exportToCanvas } from '@excalidraw/excalidraw';
+import Chart, { type ChartConfiguration } from 'chart.js/auto';
 import katex from 'katex';
 
 export interface LatexData {
@@ -1865,7 +1866,14 @@ export class TableOfContentsTool {
   }
 }
 
-export type ChartType = 'bar' | 'line' | 'pie';
+export type ChartType =
+  | 'bar'
+  | 'line'
+  | 'area'
+  | 'pie'
+  | 'doughnut'
+  | 'radar'
+  | 'polarArea';
 
 export interface ChartPoint {
   label: string;
@@ -1878,7 +1886,102 @@ export interface ChartData {
   points: ChartPoint[];
 }
 
-const CHART_PALETTE = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4'];
+const CHART_PALETTE = [
+  '#3b82f6',
+  '#10b981',
+  '#f59e0b',
+  '#8b5cf6',
+  '#ef4444',
+  '#06b6d4',
+  '#ec4899',
+  '#6366f1',
+];
+
+const CHART_TYPES: Array<{ id: ChartType; label: string }> = [
+  { id: 'bar', label: 'Bar' },
+  { id: 'line', label: 'Line' },
+  { id: 'area', label: 'Area' },
+  { id: 'pie', label: 'Pie' },
+  { id: 'doughnut', label: 'Doughnut' },
+  { id: 'radar', label: 'Radar' },
+  { id: 'polarArea', label: 'Polar Area' },
+];
+
+export function buildChartJsConfig(data: {
+  title?: string;
+  chartType?: string;
+  points?: Array<{ label?: string; value?: number }>;
+}): ChartConfiguration {
+  const rawType = (data.chartType || 'bar') as ChartType;
+  const points = (data.points || []).map((p) => ({
+    label: String(p.label || ''),
+    value: Number(p.value) || 0,
+  }));
+  const labels = points.map((p) => p.label);
+  const values = points.map((p) => p.value);
+  const colors = points.map((_, i) => CHART_PALETTE[i % CHART_PALETTE.length]);
+
+  const isArea = rawType === 'area';
+  const jsType = isArea ? 'line' : rawType;
+  const isRadial =
+    jsType === 'pie' ||
+    jsType === 'doughnut' ||
+    jsType === 'polarArea' ||
+    jsType === 'radar';
+
+  return {
+    type: jsType as ChartConfiguration['type'],
+    data: {
+      labels,
+      datasets: [
+        {
+          label: data.title?.trim() || 'Series 1',
+          data: values,
+          backgroundColor:
+            jsType === 'line'
+              ? isArea
+                ? 'rgba(59, 130, 246, 0.2)'
+                : '#3b82f6'
+              : jsType === 'radar'
+              ? 'rgba(99, 102, 241, 0.22)'
+              : colors,
+          borderColor:
+            jsType === 'line'
+              ? '#3b82f6'
+              : jsType === 'radar'
+              ? '#6366f1'
+              : colors,
+          borderWidth: jsType === 'line' || jsType === 'radar' ? 2.5 : 1.5,
+          fill: isArea || jsType === 'radar',
+          tension: jsType === 'line' ? 0.35 : 0,
+          borderRadius: jsType === 'bar' ? 6 : 0,
+          pointRadius: jsType === 'line' || jsType === 'radar' ? 4 : 0,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: isRadial,
+          position: 'bottom',
+        },
+      },
+      scales: isRadial
+        ? undefined
+        : {
+            y: {
+              beginAtZero: true,
+              grid: { color: 'rgba(148, 163, 184, 0.16)' },
+            },
+            x: {
+              grid: { display: false },
+            },
+          },
+    },
+  };
+}
 
 export function renderChartSvg(data: {
   chartType?: string;
@@ -2008,7 +2111,8 @@ export function renderChartSvg(data: {
 export class ChartTool {
   private data: ChartData;
   private listEl: HTMLElement | null = null;
-  private previewEl: HTMLElement | null = null;
+  private canvasEl: HTMLCanvasElement | null = null;
+  private chartInstance: Chart | null = null;
 
   static get toolbox() {
     return {
@@ -2034,8 +2138,19 @@ export class ChartTool {
   }
 
   private updatePreview() {
-    if (!this.previewEl) return;
-    this.previewEl.innerHTML = renderChartSvg(this.data);
+    if (!this.canvasEl) return;
+    if (this.chartInstance) {
+      this.chartInstance.destroy();
+      this.chartInstance = null;
+    }
+    this.chartInstance = new Chart(this.canvasEl, buildChartJsConfig(this.data));
+  }
+
+  destroy() {
+    if (this.chartInstance) {
+      this.chartInstance.destroy();
+      this.chartInstance = null;
+    }
   }
 
   private renderRows() {
@@ -2100,11 +2215,11 @@ export class ChartTool {
 
     const typeSel = document.createElement('select');
     typeSel.className = 'cdx-input editor-form-select';
-    (['bar', 'line', 'pie'] as ChartType[]).forEach((t) => {
+    CHART_TYPES.forEach((t) => {
       const o = document.createElement('option');
-      o.value = t;
-      o.textContent = t.toUpperCase();
-      if (this.data.chartType === t) o.selected = true;
+      o.value = t.id;
+      o.textContent = t.label;
+      if (this.data.chartType === t.id) o.selected = true;
       typeSel.appendChild(o);
     });
     typeSel.addEventListener('change', () => {
@@ -2132,8 +2247,15 @@ export class ChartTool {
 
     const previewEl = document.createElement('div');
     previewEl.className = 'editor-chart-preview';
-    this.previewEl = previewEl;
-    this.updatePreview();
+    const canvasWrap = document.createElement('div');
+    canvasWrap.className = 'editor-chart-canvas-wrap';
+    const canvasEl = document.createElement('canvas');
+    canvasEl.className = 'editor-chart-canvas';
+    this.canvasEl = canvasEl;
+    canvasWrap.appendChild(canvasEl);
+    previewEl.appendChild(canvasWrap);
+
+    queueMicrotask(() => this.updatePreview());
 
     wrap.append(top, listEl, addBtn, previewEl);
     return wrap;

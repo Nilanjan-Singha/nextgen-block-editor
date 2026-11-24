@@ -1347,6 +1347,17 @@
   display: block;
 }
 
+.editor-chart-canvas-wrap {
+  position: relative;
+  width: 100%;
+  height: 280px;
+}
+
+.editor-chart-canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
 .editor-footnotes-list {
   margin: 0;
   padding-left: 20px;

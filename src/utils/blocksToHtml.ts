@@ -1,5 +1,4 @@
 import katex from 'katex';
-import { renderChartSvg } from '../blocks/richBlocks';
 import type { EditorJSData } from '../types';
 import {
   SUPPORTED_LANGUAGES,
@@ -763,15 +762,19 @@ export function blocksToHtml(data: EditorJSData | null | undefined): string {
         return `<header class="editor-cover-card"><div class="editor-cover-banner" style="background:${bg}"></div>${icon}<div class="editor-cover-meta">${title}${subtitle}</div></header>`;
       }
       if (block.type === 'chart') {
-        const svg = renderChartSvg({
-          chartType: String(d.chartType || 'bar'),
-          points: (d.points || []) as Array<{ label?: string; value?: number }>,
-        });
-        if (!svg) return '';
+        const points = (d.points || []) as Array<{ label?: string; value?: number }>;
+        if (!points.length) return '';
+        const payload = escHtml(
+          JSON.stringify({
+            title: d.title || '',
+            chartType: String(d.chartType || 'bar'),
+            points,
+          })
+        );
         const titleHtml = d.title
           ? `<div class="editor-chart-title">${escHtml(d.title)}</div>`
           : '';
-        return `<figure class="editor-chart-card">${titleHtml}${svg}</figure>`;
+        return `<figure class="editor-chart-card" data-chart-config="${payload}">${titleHtml}<div class="editor-chart-canvas-wrap"><canvas class="editor-chart-canvas"></canvas></div></figure>`;
       }
       if (block.type === 'footnotes') {
         const items = (d.items || []) as Array<{ text?: string; url?: string }>;

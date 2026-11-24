@@ -1,4 +1,6 @@
+import Chart from 'chart.js/auto';
 import { useEffect } from 'react';
+import { buildChartJsConfig } from '../blocks/richBlocks';
 
 export function useInteractiveArticle(
   containerRef: React.RefObject<HTMLElement | null>,
@@ -700,6 +702,24 @@ export function useInteractiveArticle(
         prevBtn?.removeEventListener('click', onPrev);
         nextBtn?.removeEventListener('click', onNext);
       });
+    });
+
+    // 14. Chart.js interactive charts
+    root.querySelectorAll<HTMLElement>('[data-chart-config]').forEach((card) => {
+      const raw = card.dataset.chartConfig;
+      const canvas = card.querySelector<HTMLCanvasElement>('.editor-chart-canvas');
+      if (!raw || !canvas) return;
+      try {
+        const parsed = JSON.parse(raw) as {
+          title?: string;
+          chartType?: string;
+          points?: Array<{ label?: string; value?: number }>;
+        };
+        const instance = new Chart(canvas, buildChartJsConfig(parsed));
+        cleanups.push(() => instance.destroy());
+      } catch {
+        // Ignore malformed chart config
+      }
     });
 
     return () => {
