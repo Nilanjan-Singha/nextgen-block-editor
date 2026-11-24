@@ -1603,6 +1603,74 @@
   overflow: hidden;
 }
 
+.ng-modal.ng-modal-wide {
+  max-width: 760px;
+}
+
+.ng-modal-layout {
+  display: grid;
+  grid-template-columns: 186px minmax(0, 1fr);
+  min-height: 400px;
+  max-height: 75vh;
+}
+
+.ng-modal-sidebar {
+  border-right: 1px solid var(--ng-border);
+  background: var(--ng-background);
+  padding: 12px 10px;
+  display: grid;
+  gap: 4px;
+  align-content: start;
+}
+
+.ng-modal-tab {
+  width: 100%;
+  text-align: left;
+  padding: 8px 11px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--ng-muted-foreground);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.ng-modal-tab:hover {
+  background: var(--ng-accent);
+  color: var(--ng-accent-foreground);
+}
+
+.ng-modal-tab.is-active {
+  background: var(--ng-accent);
+  color: var(--ng-foreground);
+  font-weight: 600;
+}
+
+.ng-modal-main {
+  padding: 18px 20px;
+  overflow-y: auto;
+}
+
+.ng-modal-panel {
+  display: grid;
+  gap: 14px;
+}
+
+@media (max-width: 620px) {
+  .ng-modal-layout {
+    grid-template-columns: 1fr;
+  }
+  .ng-modal-sidebar {
+    border-right: none;
+    border-bottom: 1px solid var(--ng-border);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .ng-modal-tab {
+    text-align: center;
+  }
+}
+
 .ng-modal-head {
   display: flex;
   align-items: flex-start;
@@ -2873,7 +2941,7 @@
 .ng-tools-groups {
   display: grid;
   gap: 10px;
-  max-height: 220px;
+  max-height: 310px;
   overflow-y: auto;
   padding-right: 4px;
 }
