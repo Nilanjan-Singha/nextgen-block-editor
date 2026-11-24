@@ -1,3 +1,29 @@
+# `nextgen-block-editor` v0.3.0 Release Notes
+
+> **Package:** `nextgen-block-editor` (`0.2.0` → `0.3.0`)  
+> **Commits:** `ca70183` → `v0.3.0`  
+> **Repository:** `Nilanjan-Singha/nextgen-block-editor`
+
+---
+
+## What's New in v0.3.0
+
+### 1. Classic Floating Toolbar for Simple Mode (`ClassicToolbar.tsx`)
+- **Exclusive to Simple Mode (`editorMode === 'simple'`):** Added a sticky, floating pill-shaped formatting bar above the editor (`src/components/ClassicToolbar.tsx`, `src/styles/shadcn.css`).
+- **Controls included:**
+  - **History:** Undo / Redo buttons wired to `editorjs-undo`.
+  - **Block & Font Selectors:** Paragraph / Heading 1–3 / Quote / Code selector, plus **Sans**, **Serif**, and **Mono** font family switching (`[data-ng-font]`).
+  - **Inline Formatting:** Bold, Italic, Underline, Strikethrough, Inline Code (`<>`), Highlight (`A`), Link, Superscript (`x²`), Subscript (`x₂`), and Clear Formatting (`Tₓ`), with `<sup>` / `<sub>` preserved in `sanitizeInlineHtml` (`src/utils/blocksToHtml.ts`).
+  - **Lists, Indentation & Alignment:** Bullet list, Numbered list, Checklist, Outdent, Indent, and Left / Center / Right / Justify alignment.
+  - **`+ Insert ▾` Menu:** Direct insertion dropdown for all custom blocks (`Bento Grid`, `Masonry Grid`, `Excalidraw`, `Data Chart`, `Callout`, `Spoiler`, `Dialogue Box`, `Scratchpad`, `Hotkey`, `Image`, `File Upload`, `Table`, `LaTeX Math`, `Tabs`, `Accordion`, `Quiz`, `Poll`, `Kanban Board`, `Delimiter`, and `Settings`).
+
+### 2. Registered Components Manager in Settings (`SettingsModal.tsx`)
+- **Searchable Component Toggles:** Added a **Registered Components** section in `SettingsModal` (`src/components/SettingsModal.tsx`, `src/utils/popoverCategories.ts`) grouped by category with `TOOL_LABELS`.
+- **Quick Presets:** One-click **All** and **Minimal** buttons plus a live search filter.
+- **Persistence & Live Sync:** Selected tools persist in `localStorage` (`ng-enabled-tools`), remount Editor.js with only the enabled components (always keeping `settings` accessible), and filter the Simple Mode `+ Insert ▾` menu to match (`src/components/BlockEditor.tsx`).
+
+---
+
 # `nextgen-block-editor` v0.2.0 Release Notes
 
 > **Package:** `nextgen-block-editor` (`0.1.0` → `0.2.0`)  
