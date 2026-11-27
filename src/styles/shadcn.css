@@ -2278,6 +2278,22 @@ html[data-ng-theme] body {
   font-weight: 500;
 }
 
+.ng-dev-access-bar {
+  background: var(--ng-muted);
+  color: var(--ng-foreground);
+  border: 1px solid var(--ng-border);
+  border-radius: var(--ng-radius);
+  padding: 10px 12px;
+  font-size: 12px;
+  line-height: 1.45;
+  margin-bottom: 10px;
+}
+
+.ng-tool-chip.is-locked {
+  opacity: 0.85;
+  cursor: default;
+}
+
 /* ── Embed Alignment & Size Controls ────────────────────────────── */
 .custom-embed-preview,
 .editor-embed-wrap {

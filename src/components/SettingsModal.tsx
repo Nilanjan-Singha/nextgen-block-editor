@@ -26,6 +26,10 @@ interface SettingsModalProps {
   showStats: boolean;
   aiConfig: AiConfig;
   selectedTools: string[];
+  allowedTools?: string[];
+  canConfigureTools: boolean;
+  developerRestricted: boolean;
+  accessNoticeText?: string;
   onChangeTheme: (theme: EditorThemePreset) => void;
   onChangeDocWidth: (width: EditorWidthPreset) => void;
   onChangeMode: (mode: EditorMode) => void;
@@ -43,6 +47,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   showStats,
   aiConfig,
   selectedTools,
+  allowedTools,
+  canConfigureTools,
+  developerRestricted,
+  accessNoticeText,
   onChangeTheme,
   onChangeDocWidth,
   onChangeMode,
@@ -250,26 +258,55 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
             {activeTab === 'components' && (
               <div className="ng-tools-manager">
+                {(developerRestricted || !canConfigureTools) && (
+                  <div className="ng-dev-access-bar" role="status">
+                    <strong>Access Managed by Developer:</strong>{' '}
+                    {accessNoticeText ||
+                      'Some commands are not enabled for this workspace and are hidden.'}
+                  </div>
+                )}
+
                 <div className="ng-tools-header">
                   <div>
-                    <label>Registered Components ({selectedSet.size}/{ALL_TOOL_NAMES.length})</label>
+                    <label>
+                      Registered Components ({selectedSet.size}/
+                      {developerRestricted && allowedTools
+                        ? allowedTools.length
+                        : ALL_TOOL_NAMES.length}
+                      )
+                    </label>
                   </div>
-                  <div className="ng-tools-actions">
-                    <button
-                      type="button"
-                      className="excalidraw-btn"
-                      onClick={() => onChangeSelectedTools([...ALL_TOOL_NAMES])}
-                    >
-                      All
-                    </button>
-                    <button
-                      type="button"
-                      className="excalidraw-btn"
-                      onClick={() => onChangeSelectedTools([...SIMPLE_MODE_TOOLS])}
-                    >
-                      Minimal
-                    </button>
-                  </div>
+                  {canConfigureTools && (
+                    <div className="ng-tools-actions">
+                      <button
+                        type="button"
+                        className="excalidraw-btn"
+                        onClick={() =>
+                          onChangeSelectedTools(
+                            developerRestricted && allowedTools
+                              ? [...allowedTools]
+                              : [...ALL_TOOL_NAMES]
+                          )
+                        }
+                      >
+                        All
+                      </button>
+                      <button
+                        type="button"
+                        className="excalidraw-btn"
+                        onClick={() => {
+                          const base = new Set(SIMPLE_MODE_TOOLS);
+                          const minimal =
+                            developerRestricted && allowedTools
+                              ? allowedTools.filter((t) => base.has(t))
+                              : [...SIMPLE_MODE_TOOLS];
+                          onChangeSelectedTools(minimal);
+                        }}
+                      >
+                        Minimal
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 <input
@@ -283,7 +320,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <div className="ng-tools-groups">
                   {TOOL_CATEGORIES.filter((g) => g.label !== 'Settings').map((group) => {
                     const q = toolFilter.trim().toLowerCase();
+                    const allowedSet =
+                      developerRestricted && allowedTools ? new Set(allowedTools) : null;
                     const visible = group.tools.filter((t) => {
+                      if (allowedSet && !allowedSet.has(t)) return false;
                       const label = (TOOL_LABELS[t] || t).toLowerCase();
                       return !q || label.includes(q) || t.toLowerCase().includes(q);
                     });
@@ -297,12 +337,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                             return (
                               <label
                                 key={tool}
-                                className={`ng-tool-chip${checked ? ' is-checked' : ''}`}
+                                className={`ng-tool-chip${checked ? ' is-checked' : ''}${
+                                  !canConfigureTools ? ' is-locked' : ''
+                                }`}
                               >
                                 <input
                                   type="checkbox"
                                   checked={checked}
-                                  onChange={() => toggleTool(tool)}
+                                  disabled={!canConfigureTools}
+                                  onChange={() => {
+                                    if (canConfigureTools) toggleTool(tool);
+                                  }}
                                 />
                                 <span>{TOOL_LABELS[tool] || tool}</span>
                               </label>

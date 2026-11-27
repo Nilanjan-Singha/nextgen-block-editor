@@ -21,6 +21,13 @@ export interface BlockEditorProps {
   placeholder?: string;
   linkEndpoint?: string;
   enabledTools?: string[];
+  /**
+   * When false (or when enabledTools is provided without allowToolConfiguration=true),
+   * restricts commands to enabledTools and hides ungranted commands in Settings.
+   */
+  allowToolConfiguration?: boolean;
+  /** Optional notice shown in Settings -> Components when command access is restricted. */
+  accessNoticeText?: string;
   showStats?: boolean;
   showAiBar?: boolean;
   onAiRequest?: (params: {

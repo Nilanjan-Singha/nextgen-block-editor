@@ -30,6 +30,8 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
       initialData,
       placeholder,
       enabledTools,
+      allowToolConfiguration,
+      accessNoticeText,
       showStats = true,
       showAiBar = false,
       onAiRequest,
@@ -88,6 +90,13 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
       return ALL_TOOL_NAMES;
     });
     const [statsVisible, setStatsVisible] = useState(showStats);
+    const developerRestricted = Boolean(
+      enabledTools && enabledTools.length > 0 && allowToolConfiguration !== true
+    );
+    const canConfigureTools = allowToolConfiguration ?? !developerRestricted;
+    const effectiveSelectedTools = developerRestricted && enabledTools
+      ? enabledTools
+      : selectedTools;
     const [aiConfig, setAiConfig] = useState<AiConfig>(loadAiConfig);
     const [aiPopover, setAiPopover] = useState<{
       mode: 'ask' | 'continue';
@@ -198,7 +207,7 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
       const detachCategories = attachPopoverCategoryHeaders(holder);
       const detachEmoji = attachEmojiSidePicker(holder);
 
-      const effectiveTools = Array.from(new Set([...selectedTools, 'settings']));
+      const effectiveTools = Array.from(new Set([...effectiveSelectedTools, 'settings']));
 
       const mount = async () => {
         await lifecycleRef.current;
@@ -283,7 +292,7 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
         }
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [editorMode, selectedTools]);
+    }, [editorMode, effectiveSelectedTools]);
 
     useImperativeHandle(ref, () => ({
       save: async () => {
@@ -431,7 +440,7 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
             onRedo={() => undoRef.current?.redo?.()}
             fontFamily={simpleFont}
             onChangeFontFamily={setSimpleFont}
-            enabledTools={selectedTools}
+            enabledTools={effectiveSelectedTools}
             onOpenSettings={() => setSettingsOpen(true)}
           />
         )}
@@ -455,7 +464,11 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
           mode={editorMode}
           showStats={statsVisible}
           aiConfig={aiConfig}
-          selectedTools={selectedTools}
+          selectedTools={effectiveSelectedTools}
+          allowedTools={enabledTools}
+          canConfigureTools={canConfigureTools}
+          developerRestricted={developerRestricted}
+          accessNoticeText={accessNoticeText}
           onChangeTheme={setTheme}
           onChangeDocWidth={(w) => {
             setDocWidth(w);
