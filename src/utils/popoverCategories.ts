@@ -71,6 +71,7 @@ export const TOOL_CATEGORIES: ToolCategoryGroup[] = [
     tools: [
       'code',
       'latex',
+      'mermaid',
       'chart',
       'table',
       'stats',
@@ -160,6 +161,7 @@ export const TOOL_LABELS: Record<string, string> = {
   excalidraw: 'Excalidraw',
   code: 'Code Block',
   latex: 'LaTeX Math',
+  mermaid: 'Mermaid Diagram',
   chart: 'Data Chart',
   table: 'Table',
   stats: 'Stats',

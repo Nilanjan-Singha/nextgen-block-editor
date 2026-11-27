@@ -1843,6 +1843,96 @@ html[data-ng-theme] body {
   transition: width 80ms linear;
 }
 
+/* ── Mermaid Diagram Block ──────────────────────────────────────── */
+.editor-mermaid-tool,
+.editor-mermaid-block {
+  background: var(--ng-card);
+  color: var(--ng-card-foreground);
+  border: 1px solid var(--ng-border);
+  border-radius: var(--ng-radius);
+  padding: 12px;
+  margin: 12px 0;
+}
+
+.editor-mermaid-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.editor-mermaid-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ng-muted-foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.editor-mermaid-presets {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.editor-mermaid-preset-btn {
+  padding: 2px 8px;
+  font-size: 11px;
+  border-radius: 6px;
+  border: 1px solid var(--ng-border);
+  background: var(--ng-background);
+  color: var(--ng-foreground);
+  cursor: pointer;
+}
+
+.editor-mermaid-preset-btn:hover {
+  background: var(--ng-accent);
+}
+
+.editor-mermaid-input {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  padding: 8px;
+  border: 1px solid var(--ng-border);
+  border-radius: 6px;
+  background: var(--ng-background);
+  color: var(--ng-foreground);
+  resize: vertical;
+  margin-bottom: 10px;
+}
+
+.editor-mermaid-preview,
+.editor-mermaid-diagram {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-x: auto;
+  padding: 8px 0;
+}
+
+.editor-mermaid-preview svg,
+.editor-mermaid-diagram svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.editor-mermaid-error {
+  font-size: 12px;
+  color: #dc2626;
+  white-space: pre-wrap;
+  margin: 0;
+}
+
+.editor-mermaid-block figcaption {
+  text-align: center;
+  font-size: 12px;
+  color: var(--ng-muted-foreground);
+  margin-top: 6px;
+}
+
 /* ── Glassmorphism Inline Toolbar ───────────────────────────────── */
 .nextgen-editor-shell .ce-inline-toolbar {
   background: color-mix(in srgb, var(--ng-popover) 85%, transparent);

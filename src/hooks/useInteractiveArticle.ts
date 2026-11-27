@@ -1,6 +1,7 @@
 import Chart from 'chart.js/auto';
 import { useEffect } from 'react';
 import { buildChartJsConfig } from '../blocks/richBlocks';
+import { renderMermaidInto } from '../blocks/mermaidBlock';
 
 export function useInteractiveArticle(
   containerRef: React.RefObject<HTMLElement | null>,
@@ -801,6 +802,14 @@ export function useInteractiveArticle(
         btn.addEventListener('click', onOpen);
         cleanups.push(() => btn.removeEventListener('click', onOpen));
       });
+
+    // Hydrate Mermaid diagrams
+    root.querySelectorAll<HTMLElement>('[data-mermaid]').forEach((el) => {
+      const code = el.getAttribute('data-mermaid') || '';
+      if (code.trim()) {
+        void renderMermaidInto(el, code);
+      }
+    });
 
     return () => {
       cleanups.forEach((fn) => fn());

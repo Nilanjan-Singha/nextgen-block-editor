@@ -62,6 +62,7 @@ import {
   TagsTool,
   TimelineTool,
 } from './blocks/structuredBlocks';
+import { MermaidTool } from './blocks/mermaidBlock';
 
 interface ToolConstructorOptions<T = Record<string, any>> {
   data?: T;
@@ -1717,6 +1718,7 @@ export function getEditorTools(
     eisenhower: EisenhowerMatrixTool as unknown as ToolConstructable,
     form: FormBuilderTool as unknown as ToolConstructable,
     latex: LatexTool as unknown as ToolConstructable,
+    mermaid: MermaidTool as unknown as ToolConstructable,
     excalidraw: ExcalidrawTool as unknown as ToolConstructable,
     pullquote: PullQuoteTool as unknown as ToolConstructable,
     timeline: TimelineTool as unknown as ToolConstructable,

@@ -657,6 +657,13 @@ export function blocksToHtml(data: EditorJSData | null | undefined): string {
           d.text || ''
         )}</div></div>${overlay}</div>`;
       }
+      if (block.type === 'mermaid') {
+        const code = String(d.code || '');
+        const caption = d.caption ? `<figcaption>${escHtml(d.caption)}</figcaption>` : '';
+        return `<figure class="editor-mermaid-block"><div class="editor-mermaid-diagram" data-mermaid="${escHtml(
+          code
+        )}"><pre class="editor-mermaid-fallback">${escHtml(code)}</pre></div>${caption}</figure>`;
+      }
       if (block.type === 'alert') {
         const variant = ['info', 'tip', 'warning', 'danger'].includes(d.variant)
           ? d.variant
