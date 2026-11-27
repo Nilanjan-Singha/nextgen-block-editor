@@ -11,14 +11,9 @@ import {
   type AiProviderId,
 } from '../utils/aiClient';
 
-export type EditorThemePreset =
-  | 'inherit'
-  | 'light'
-  | 'dark'
-  | 'catppuccin-mocha'
-  | 'catppuccin-macchiato'
-  | 'catppuccin-frappe'
-  | 'catppuccin-latte';
+export type EditorThemePreset = 'inherit' | 'light' | 'dark';
+
+export type EditorWidthPreset = 'narrow' | 'standard' | 'full';
 
 export type EditorMode = 'block' | 'simple';
 type SettingsTab = 'appearance' | 'ai' | 'components';
@@ -26,11 +21,13 @@ type SettingsTab = 'appearance' | 'ai' | 'components';
 interface SettingsModalProps {
   open: boolean;
   theme: EditorThemePreset;
+  docWidth: EditorWidthPreset;
   mode: EditorMode;
   showStats: boolean;
   aiConfig: AiConfig;
   selectedTools: string[];
   onChangeTheme: (theme: EditorThemePreset) => void;
+  onChangeDocWidth: (width: EditorWidthPreset) => void;
   onChangeMode: (mode: EditorMode) => void;
   onChangeShowStats: (show: boolean) => void;
   onChangeAiConfig: (config: AiConfig) => void;
@@ -41,11 +38,13 @@ interface SettingsModalProps {
 export const SettingsModal: React.FC<SettingsModalProps> = ({
   open,
   theme,
+  docWidth,
   mode,
   showStats,
   aiConfig,
   selectedTools,
   onChangeTheme,
+  onChangeDocWidth,
   onChangeMode,
   onChangeShowStats,
   onChangeAiConfig,
@@ -116,20 +115,38 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             {activeTab === 'appearance' && (
               <div className="ng-modal-panel">
                 <div className="ng-field">
-                  <label>Theme</label>
+                  <label>Appearance</label>
                   <select
                     className="cdx-input editor-form-select"
                     value={theme}
                     onChange={(e) => onChangeTheme(e.target.value as EditorThemePreset)}
                   >
                     <option value="inherit">Inherit from Host App</option>
-                    <option value="light">shadcn Light</option>
-                    <option value="dark">shadcn Dark</option>
-                    <option value="catppuccin-mocha">Catppuccin Mocha</option>
-                    <option value="catppuccin-macchiato">Catppuccin Macchiato</option>
-                    <option value="catppuccin-frappe">Catppuccin Frappé</option>
-                    <option value="catppuccin-latte">Catppuccin Latte</option>
+                    <option value="light">Light (White)</option>
+                    <option value="dark">Dark (Black)</option>
                   </select>
+                </div>
+
+                <div className="ng-field">
+                  <label>Document Width</label>
+                  <div className="ng-segmented">
+                    {(
+                      [
+                        { id: 'narrow', label: 'Narrow' },
+                        { id: 'standard', label: 'Standard' },
+                        { id: 'full', label: 'Full-Width' },
+                      ] as Array<{ id: EditorWidthPreset; label: string }>
+                    ).map((w) => (
+                      <button
+                        key={w.id}
+                        type="button"
+                        className={`excalidraw-btn${docWidth === w.id ? ' is-active' : ''}`}
+                        onClick={() => onChangeDocWidth(w.id)}
+                      >
+                        {w.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 <div className="ng-field">

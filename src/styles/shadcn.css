@@ -624,6 +624,12 @@
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   padding-bottom: 8px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.editor-music-carousel-track::-webkit-scrollbar {
+  display: none;
 }
 
 .editor-audio-card.is-compact {
@@ -1801,84 +1807,47 @@ html[data-ng-theme] body {
   --ng-ring: #d4d4d8;
 }
 
-[data-ng-theme='catppuccin-mocha'] {
-  --ng-background: #1e1e2e;
-  --ng-foreground: #cdd6f4;
-  --ng-card: #181825;
-  --ng-card-foreground: #cdd6f4;
-  --ng-popover: #181825;
-  --ng-popover-foreground: #cdd6f4;
-  --ng-primary: #cba6f7;
-  --ng-primary-foreground: #11111b;
-  --ng-secondary: #313244;
-  --ng-secondary-foreground: #cdd6f4;
-  --ng-muted: #313244;
-  --ng-muted-foreground: #a6adc8;
-  --ng-accent: #313244;
-  --ng-accent-foreground: #cdd6f4;
-  --ng-border: #45475a;
-  --ng-input: #45475a;
-  --ng-ring: #cba6f7;
+/* ── Document Width Presets ─────────────────────────────────────── */
+.nextgen-editor-shell[data-ng-width='narrow'] #editorjs {
+  max-width: 680px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-[data-ng-theme='catppuccin-macchiato'] {
-  --ng-background: #24273a;
-  --ng-foreground: #cad3f5;
-  --ng-card: #1e2030;
-  --ng-card-foreground: #cad3f5;
-  --ng-popover: #1e2030;
-  --ng-popover-foreground: #cad3f5;
-  --ng-primary: #c6a0f6;
-  --ng-primary-foreground: #181926;
-  --ng-secondary: #363a4f;
-  --ng-secondary-foreground: #cad3f5;
-  --ng-muted: #363a4f;
-  --ng-muted-foreground: #a5adcb;
-  --ng-accent: #363a4f;
-  --ng-accent-foreground: #cad3f5;
-  --ng-border: #494d64;
-  --ng-input: #494d64;
-  --ng-ring: #c6a0f6;
+.nextgen-editor-shell[data-ng-width='standard'] #editorjs {
+  max-width: 920px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-[data-ng-theme='catppuccin-frappe'] {
-  --ng-background: #303446;
-  --ng-foreground: #c6d0f5;
-  --ng-card: #292c3c;
-  --ng-card-foreground: #c6d0f5;
-  --ng-popover: #292c3c;
-  --ng-popover-foreground: #c6d0f5;
-  --ng-primary: #ca9ee6;
-  --ng-primary-foreground: #232634;
-  --ng-secondary: #414559;
-  --ng-secondary-foreground: #c6d0f5;
-  --ng-muted: #414559;
-  --ng-muted-foreground: #a5adce;
-  --ng-accent: #414559;
-  --ng-accent-foreground: #c6d0f5;
-  --ng-border: #51576d;
-  --ng-input: #51576d;
-  --ng-ring: #ca9ee6;
+.nextgen-editor-shell[data-ng-width='full'] #editorjs {
+  max-width: none;
 }
 
-[data-ng-theme='catppuccin-latte'] {
-  --ng-background: #eff1f5;
-  --ng-foreground: #4c4f69;
-  --ng-card: #e6e9ef;
-  --ng-card-foreground: #4c4f69;
-  --ng-popover: #e6e9ef;
-  --ng-popover-foreground: #4c4f69;
-  --ng-primary: #8839ef;
-  --ng-primary-foreground: #eff1f5;
-  --ng-secondary: #ccd0da;
-  --ng-secondary-foreground: #4c4f69;
-  --ng-muted: #ccd0da;
-  --ng-muted-foreground: #6c6f85;
-  --ng-accent: #ccd0da;
-  --ng-accent-foreground: #4c4f69;
-  --ng-border: #bcc0cc;
-  --ng-input: #bcc0cc;
-  --ng-ring: #8839ef;
+/* ── Reading Progress Bar ───────────────────────────────────────── */
+.ng-reading-progress {
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: transparent;
+  z-index: 40;
+  pointer-events: none;
+}
+
+.ng-reading-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--ng-foreground);
+  transition: width 80ms linear;
+}
+
+/* ── Glassmorphism Inline Toolbar ───────────────────────────────── */
+.nextgen-editor-shell .ce-inline-toolbar {
+  background: color-mix(in srgb, var(--ng-popover) 85%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 /* ── Tighter Toolbar & Plus/Settings Positioning ────────────────── */

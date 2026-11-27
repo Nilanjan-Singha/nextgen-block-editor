@@ -20,6 +20,7 @@ import {
   SettingsModal,
   type EditorMode,
   type EditorThemePreset,
+  type EditorWidthPreset,
 } from './SettingsModal';
 
 export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>(
@@ -54,11 +55,20 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
     const [theme, setTheme] = useState<EditorThemePreset>(() => {
       try {
         const saved = localStorage.getItem('ng-editor-theme');
-        if (saved) return saved as EditorThemePreset;
+        if (saved === 'light' || saved === 'dark' || saved === 'inherit') return saved;
       } catch {
         // ignore
       }
       return 'inherit';
+    });
+    const [docWidth, setDocWidth] = useState<EditorWidthPreset>(() => {
+      try {
+        const saved = localStorage.getItem('ng-editor-width');
+        if (saved === 'narrow' || saved === 'standard' || saved === 'full') return saved;
+      } catch {
+        // ignore
+      }
+      return 'full';
     });
     const [editorMode, setEditorMode] = useState<EditorMode>('block');
     const [simpleFont, setSimpleFont] = useState<'sans' | 'serif' | 'mono'>('sans');
@@ -351,6 +361,7 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
       <div
         ref={shellRef}
         data-ng-theme={theme === 'inherit' ? undefined : theme}
+        data-ng-width={docWidth}
         data-ng-font={editorMode === 'simple' ? simpleFont : undefined}
         className={className ? `nextgen-editor-shell ${className}` : 'nextgen-editor-shell'}
       >
@@ -416,11 +427,20 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
         <SettingsModal
           open={settingsOpen}
           theme={theme}
+          docWidth={docWidth}
           mode={editorMode}
           showStats={statsVisible}
           aiConfig={aiConfig}
           selectedTools={selectedTools}
           onChangeTheme={setTheme}
+          onChangeDocWidth={(w) => {
+            setDocWidth(w);
+            try {
+              localStorage.setItem('ng-editor-width', w);
+            } catch {
+              // ignore
+            }
+          }}
           onChangeMode={(m) => void handleModeSwitch(m)}
           onChangeShowStats={setStatsVisible}
           onChangeAiConfig={(cfg) => {

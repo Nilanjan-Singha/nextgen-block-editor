@@ -48,7 +48,8 @@
     "chart.js": "^4.6.2",
     "editorjs-drag-drop": "^1.1.16",
     "editorjs-undo": "^2.0.28",
-    "katex": "^0.19.1"
+    "katex": "^0.19.1",
+    "mermaid": "^12.4.0"
   },
   "devDependencies": {
     "@types/katex": "^0.16.8",
