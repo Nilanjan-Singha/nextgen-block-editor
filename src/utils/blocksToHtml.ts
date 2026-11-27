@@ -1,5 +1,7 @@
 import katex from 'katex';
 import type { EditorJSData } from '../types';
+import { renderFrameMarkup } from '../blocks/frameBlock';
+import { renderSocialMarkup } from '../blocks/extraBlocks';
 import {
   SUPPORTED_LANGUAGES,
   detectCodeLanguage,
@@ -446,8 +448,13 @@ export function blocksToHtml(data: EditorJSData | null | undefined): string {
               return `<p>${escHtml(t)}</p>`;
             })
             .join('');
+        const slideBg = ['default', 'white', 'zinc', 'dark', 'gradient'].includes(d.background)
+          ? d.background
+          : 'default';
+        const slideAlign = ['left', 'center', 'right'].includes(d.align) ? d.align : 'left';
+        const slideText = ['auto', 'light', 'dark'].includes(d.textTone) ? d.textTone : 'auto';
         return (
-          '<div class="editor-slides" data-slides>' +
+          `<div class="editor-slides" data-slides data-slide-bg="${slideBg}" data-slide-align="${slideAlign}" data-slide-text="${slideText}">` +
           '<div class="editor-slides-bar">' +
           `<span class="editor-slides-count">1 / ${rawSlides.length}</span>` +
           '<div class="editor-slides-controls">' +
@@ -751,6 +758,9 @@ export function blocksToHtml(data: EditorJSData | null | undefined): string {
           d.caption ? `<figcaption>${escHtml(d.caption)}</figcaption>` : ''
         }</figure>`;
       }
+      if (block.type === 'frame') {
+        return renderFrameMarkup(d);
+      }
       if (block.type === 'changelog') {
         const items = Array.isArray(d.items) ? d.items : [];
         return `<section class="editor-changelog-block"><div class="editor-changelog-head"><span class="editor-changelog-version">${escHtml(
@@ -774,17 +784,7 @@ export function blocksToHtml(data: EditorJSData | null | undefined): string {
         )}</span></div>`;
       }
       if (block.type === 'social') {
-        return `<blockquote class="editor-social-card"><div class="editor-social-head"><strong>${escHtml(
-          d.author || ''
-        )}</strong><span>${escHtml(d.handle || '')}</span>${
-          d.date ? `<span>· ${escHtml(d.date)}</span>` : ''
-        }</div><p class="editor-social-text">${escHtml(d.text || '')}</p>${
-          d.url
-            ? `<a class="editor-social-link" href="${escHtml(
-                d.url
-              )}" target="_blank" rel="noopener noreferrer">View original post →</a>`
-            : ''
-        }</blockquote>`;
+        return renderSocialMarkup(d);
       }
       if (block.type === 'alert') {
         const variant = ['info', 'tip', 'warning', 'danger'].includes(d.variant)

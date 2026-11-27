@@ -77,6 +77,7 @@ import {
   ExportTriggerTool,
   TodayTool,
 } from './blocks/inlineExtensions';
+import { FrameTool } from './blocks/frameBlock';
 
 interface ToolConstructorOptions<T = Record<string, any>> {
   data?: T;
@@ -1893,6 +1894,7 @@ export function getEditorTools(
     steps: StepsTool as unknown as ToolConstructable,
     diff: DiffTool as unknown as ToolConstructable,
     video: VideoTool as unknown as ToolConstructable,
+    frame: FrameTool as unknown as ToolConstructable,
     changelog: ChangelogTool as unknown as ToolConstructable,
     social: SocialTool as unknown as ToolConstructable,
     excalidraw: ExcalidrawTool as unknown as ToolConstructable,

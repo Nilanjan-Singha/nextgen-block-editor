@@ -2495,6 +2495,12 @@ html[data-ng-theme] body {
   border-radius: 3px;
 }
 
+.nextgen-editor-shell ::selection,
+.nextgen-editor-article ::selection {
+  background: var(--ng-foreground);
+  color: var(--ng-background);
+}
+
 .nextgen-editor-shell b,
 .nextgen-editor-shell strong,
 .nextgen-editor-article b,
@@ -3667,4 +3673,374 @@ html[data-ng-theme] body {
   grid-template-columns: 1fr auto;
   gap: 6px;
   align-items: center;
+}
+
+/* ── Floating Pinned Components ─────────────────────────────────── */
+.ng-pinnable {
+  position: relative;
+}
+
+.ng-pin-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 999px;
+  border: 1px solid var(--ng-border);
+  background: color-mix(in srgb, var(--ng-background) 88%, transparent);
+  color: var(--ng-foreground);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 140ms ease;
+}
+
+.ng-pinnable:hover .ng-pin-btn,
+.ng-pinnable.is-pinned-floating .ng-pin-btn {
+  opacity: 1;
+}
+
+.ng-pinnable.is-pinned-floating {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 380px;
+  max-width: calc(100vw - 32px);
+  max-height: 68vh;
+  overflow: auto;
+  z-index: 70;
+  margin: 0;
+  background: var(--ng-card);
+  border: 1px solid var(--ng-border);
+  border-radius: var(--ng-radius);
+  padding: 12px;
+  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.35);
+}
+
+/* ── /frame Device Mockups ──────────────────────────────────────── */
+.editor-frame-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.editor-frame-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 16px 0;
+}
+
+.editor-frame-shell {
+  position: relative;
+  background: #09090b;
+  border: 2px solid #27272a;
+  overflow: hidden;
+  box-shadow: 0 18px 36px -14px rgba(0, 0, 0, 0.35);
+}
+
+.editor-frame-shell.is-iphone {
+  width: 280px;
+  border-radius: 38px;
+  padding: 14px 10px 12px;
+}
+
+.editor-frame-island {
+  width: 78px;
+  height: 18px;
+  background: #000;
+  border-radius: 999px;
+  margin: 0 auto 10px;
+}
+
+.editor-frame-shell.is-samsung {
+  width: 280px;
+  border-radius: 24px;
+  padding: 10px 8px;
+}
+
+.editor-frame-punch {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #27272a;
+  margin: 0 auto 8px;
+}
+
+.editor-frame-shell.is-macbook,
+.editor-frame-shell.is-laptop {
+  width: min(640px, 100%);
+  border-radius: 14px 14px 4px 4px;
+  padding: 16px 12px 12px;
+}
+
+.editor-frame-cam {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #3f3f46;
+  margin: -8px auto 8px;
+}
+
+.editor-frame-base {
+  width: min(700px, 104%);
+  height: 12px;
+  background: linear-gradient(180deg, #d4d4d8, #a1a1aa);
+  border-radius: 0 0 10px 10px;
+}
+
+.editor-frame-shell.is-browser {
+  width: min(680px, 100%);
+  border-radius: 10px;
+  background: var(--ng-card);
+  border: 1px solid var(--ng-border);
+}
+
+.editor-frame-browser-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--ng-muted);
+  border-bottom: 1px solid var(--ng-border);
+}
+
+.editor-frame-dots {
+  display: inline-flex;
+  gap: 5px;
+}
+
+.editor-frame-dots i {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: var(--ng-muted-foreground);
+  opacity: 0.45;
+  display: inline-block;
+}
+
+.editor-frame-addr {
+  font-size: 11px;
+  color: var(--ng-muted-foreground);
+  background: var(--ng-background);
+  border: 1px solid var(--ng-border);
+  border-radius: 6px;
+  padding: 2px 10px;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.editor-frame-screen {
+  background: var(--ng-background);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.editor-frame-shell.is-browser .editor-frame-screen {
+  border-radius: 0;
+}
+
+.editor-frame-screen img {
+  width: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.editor-frame-screen iframe {
+  width: 100%;
+  height: 360px;
+  border: 0;
+  display: block;
+}
+
+.editor-frame-empty {
+  padding: 40px 16px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--ng-muted-foreground);
+}
+
+.editor-frame-caption {
+  font-size: 12px;
+  color: var(--ng-muted-foreground);
+  margin-top: 8px;
+}
+
+/* ── Customizable Slides Background, Text Tone & Alignment ──────── */
+.editor-slides[data-slide-bg='white'] .editor-slides-stage,
+.editor-slides-tool-card[data-slide-bg='white'] textarea {
+  background: #ffffff;
+}
+
+.editor-slides[data-slide-bg='zinc'] .editor-slides-stage,
+.editor-slides-tool-card[data-slide-bg='zinc'] textarea {
+  background: #f4f4f5;
+}
+
+.editor-slides[data-slide-bg='dark'] .editor-slides-stage,
+.editor-slides-tool-card[data-slide-bg='dark'] textarea {
+  background: #09090b;
+}
+
+.editor-slides[data-slide-bg='gradient'] .editor-slides-stage,
+.editor-slides-tool-card[data-slide-bg='gradient'] textarea {
+  background: linear-gradient(135deg, #18181b 0%, #3f3f46 100%);
+}
+
+.editor-slides[data-slide-text='light'] .editor-slide-panel,
+.editor-slides[data-slide-text='light'] .editor-slide-panel h3,
+.editor-slides[data-slide-text='light'] .editor-slide-panel h4,
+.editor-slides[data-slide-text='light'] .editor-slide-panel p,
+.editor-slides-tool-card[data-slide-text='light'] textarea {
+  color: #fafafa;
+}
+
+.editor-slides[data-slide-text='dark'] .editor-slide-panel,
+.editor-slides[data-slide-text='dark'] .editor-slide-panel h3,
+.editor-slides[data-slide-text='dark'] .editor-slide-panel h4,
+.editor-slides[data-slide-text='dark'] .editor-slide-panel p,
+.editor-slides-tool-card[data-slide-text='dark'] textarea {
+  color: #18181b;
+}
+
+.editor-slides[data-slide-align='center'] .editor-slide-panel,
+.editor-slides-tool-card[data-slide-align='center'] textarea {
+  text-align: center;
+}
+
+.editor-slides[data-slide-align='right'] .editor-slide-panel,
+.editor-slides-tool-card[data-slide-align='right'] textarea {
+  text-align: right;
+}
+
+/* ── Social Media Post Formats & Alignment ──────────────────────── */
+.editor-social-wrap {
+  display: flex;
+  width: 100%;
+  margin: 12px 0;
+}
+
+.editor-social-wrap[data-align='left'] {
+  justify-content: flex-start;
+}
+
+.editor-social-wrap[data-align='center'] {
+  justify-content: center;
+}
+
+.editor-social-wrap[data-align='right'] {
+  justify-content: flex-end;
+}
+
+.editor-social-card {
+  width: min(520px, 100%);
+  margin: 0;
+}
+
+.editor-social-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.editor-social-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: var(--ng-foreground);
+  color: var(--ng-background);
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.editor-social-meta {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.editor-social-meta strong {
+  font-size: 13px;
+}
+
+.editor-social-meta span {
+  font-size: 11px;
+  color: var(--ng-muted-foreground);
+}
+
+.editor-social-platform {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--ng-border);
+  background: var(--ng-background);
+}
+
+.editor-social-media {
+  width: 100%;
+  max-height: 320px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.editor-social-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--ng-muted-foreground);
+  padding-top: 6px;
+  border-top: 1px solid var(--ng-border);
+}
+
+/* ── Upgraded /export Modal Cards ───────────────────────────────── */
+.ng-export-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+}
+
+.ng-export-card {
+  background: var(--ng-card);
+  border: 1px solid var(--ng-border);
+  border-radius: var(--ng-radius);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ng-export-card-title {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ng-export-card-desc {
+  font-size: 11px;
+  color: var(--ng-muted-foreground);
+  margin: 0;
+  flex: 1;
+}
+
+.ng-export-preview {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  background: var(--ng-muted);
+  border: 1px solid var(--ng-border);
+  border-radius: var(--ng-radius);
+  padding: 10px;
+  max-height: 200px;
+  overflow: auto;
+  margin: 0;
+  white-space: pre-wrap;
 }

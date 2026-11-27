@@ -2,14 +2,32 @@ interface ToolOptions<T = Record<string, any>> {
   data?: T;
 }
 
+export type SlideBgPreset = 'default' | 'white' | 'zinc' | 'dark' | 'gradient';
+export type SlideAlign = 'left' | 'center' | 'right';
+export type SlideTextTone = 'auto' | 'light' | 'dark';
+
 export class SlidesTool {
   private content: string;
+  private background: SlideBgPreset;
+  private align: SlideAlign;
+  private textTone: SlideTextTone;
   private textarea?: HTMLTextAreaElement;
+  private rootEl?: HTMLDivElement;
 
-  constructor(options: ToolOptions<{ content?: string }>) {
+  constructor(
+    options: ToolOptions<{
+      content?: string;
+      background?: SlideBgPreset;
+      align?: SlideAlign;
+      textTone?: SlideTextTone;
+    }>
+  ) {
     this.content =
       options.data?.content ||
       '# Slide 1\nIntroduce the big idea.\n\n---\n\n# Slide 2\nKey takeaways or code.';
+    this.background = options.data?.background ?? 'default';
+    this.align = options.data?.align ?? 'left';
+    this.textTone = options.data?.textTone ?? 'auto';
   }
 
   static get toolbox() {
@@ -19,13 +37,23 @@ export class SlidesTool {
     };
   }
 
+  private applyVisualAttrs() {
+    if (!this.rootEl) return;
+    this.rootEl.dataset.slideBg = this.background;
+    this.rootEl.dataset.slideAlign = this.align;
+    this.rootEl.dataset.slideText = this.textTone;
+  }
+
   render() {
     const root = document.createElement('div');
-    root.className = 'block-card';
+    root.className = 'block-card editor-slides-tool-card';
+    this.rootEl = root;
+    this.applyVisualAttrs();
 
     const hint = document.createElement('div');
     hint.className = 'block-hint';
-    hint.textContent = 'Separate slides with --- on its own line. Readers get arrow controls + Present mode.';
+    hint.textContent =
+      'Separate slides with --- on its own line. Use the block menu (⋮) to customize background, text tone & alignment.';
 
     const ta = document.createElement('textarea');
     ta.rows = 7;
@@ -40,9 +68,124 @@ export class SlidesTool {
     return root;
   }
 
+  renderSettings() {
+    const tunes: Array<{
+      label: string;
+      icon: string;
+      isActive: boolean;
+      onActivate: () => void;
+    }> = [
+      {
+        label: 'Align Left',
+        icon: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/></svg>',
+        isActive: this.align === 'left',
+        onActivate: () => {
+          this.align = 'left';
+          this.applyVisualAttrs();
+        },
+      },
+      {
+        label: 'Align Center',
+        icon: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>',
+        isActive: this.align === 'center',
+        onActivate: () => {
+          this.align = 'center';
+          this.applyVisualAttrs();
+        },
+      },
+      {
+        label: 'Align Right',
+        icon: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="6" y1="18" x2="21" y2="18"/></svg>',
+        isActive: this.align === 'right',
+        onActivate: () => {
+          this.align = 'right';
+          this.applyVisualAttrs();
+        },
+      },
+      {
+        label: 'BG: Default',
+        icon: '<span style="font-size:11px;font-weight:700;">D</span>',
+        isActive: this.background === 'default',
+        onActivate: () => {
+          this.background = 'default';
+          this.applyVisualAttrs();
+        },
+      },
+      {
+        label: 'BG: White',
+        icon: '<span style="display:inline-block;width:12px;height:12px;border-radius:99px;background:#fff;border:1px solid #999;"></span>',
+        isActive: this.background === 'white',
+        onActivate: () => {
+          this.background = 'white';
+          this.textTone = 'dark';
+          this.applyVisualAttrs();
+        },
+      },
+      {
+        label: 'BG: Soft Zinc',
+        icon: '<span style="display:inline-block;width:12px;height:12px;border-radius:99px;background:#e4e4e7;border:1px solid #999;"></span>',
+        isActive: this.background === 'zinc',
+        onActivate: () => {
+          this.background = 'zinc';
+          this.textTone = 'dark';
+          this.applyVisualAttrs();
+        },
+      },
+      {
+        label: 'BG: Dark',
+        icon: '<span style="display:inline-block;width:12px;height:12px;border-radius:99px;background:#09090b;border:1px solid #666;"></span>',
+        isActive: this.background === 'dark',
+        onActivate: () => {
+          this.background = 'dark';
+          this.textTone = 'light';
+          this.applyVisualAttrs();
+        },
+      },
+      {
+        label: 'BG: Gradient',
+        icon: '<span style="display:inline-block;width:12px;height:12px;border-radius:99px;background:linear-gradient(135deg,#18181b,#52525b);"></span>',
+        isActive: this.background === 'gradient',
+        onActivate: () => {
+          this.background = 'gradient';
+          this.textTone = 'light';
+          this.applyVisualAttrs();
+        },
+      },
+      {
+        label: 'Text: Dark',
+        icon: '<span style="font-size:11px;font-weight:700;">T</span>',
+        isActive: this.textTone === 'dark',
+        onActivate: () => {
+          this.textTone = 'dark';
+          this.applyVisualAttrs();
+        },
+      },
+      {
+        label: 'Text: Light',
+        icon: '<span style="font-size:11px;font-weight:700;opacity:0.65;">T</span>',
+        isActive: this.textTone === 'light',
+        onActivate: () => {
+          this.textTone = 'light';
+          this.applyVisualAttrs();
+        },
+      },
+    ];
+
+    return tunes.map((t) => ({
+      icon: t.icon,
+      label: t.label,
+      isActive: t.isActive,
+      closeOnActivate: true,
+      onActivate: t.onActivate,
+    }));
+  }
+
   save() {
     return {
       content: this.textarea?.value ?? this.content,
+      background: this.background,
+      align: this.align,
+      textTone: this.textTone,
     };
   }
 }

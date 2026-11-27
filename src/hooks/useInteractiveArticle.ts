@@ -811,6 +811,48 @@ export function useInteractiveArticle(
       }
     });
 
+    // Floating Pin toggle on rich components (video, embed, chart, mermaid, audio, code, diff, frame)
+    const pinnableSelectors = [
+      '.editor-video-block',
+      '.editor-embed-wrap',
+      '.editor-chart-block',
+      '.editor-mermaid-block',
+      '.editor-audio-card',
+      '.editor-code-block',
+      '.editor-diff-block',
+      '.editor-frame-block',
+    ].join(',');
+    root.querySelectorAll<HTMLElement>(pinnableSelectors).forEach((blockEl) => {
+      if (blockEl.querySelector('.ng-pin-btn')) return;
+      blockEl.classList.add('ng-pinnable');
+      const pinBtn = document.createElement('button');
+      pinBtn.type = 'button';
+      pinBtn.className = 'ng-pin-btn';
+      pinBtn.textContent = '📌 Pin';
+      pinBtn.title = 'Pin as floating window while scrolling';
+      const onPin = (e: Event) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const isPinned = blockEl.classList.contains('is-pinned-floating');
+        root.querySelectorAll<HTMLElement>('.is-pinned-floating').forEach((other) => {
+          other.classList.remove('is-pinned-floating');
+          const b = other.querySelector<HTMLButtonElement>('.ng-pin-btn');
+          if (b) b.textContent = '📌 Pin';
+        });
+        if (!isPinned) {
+          blockEl.classList.add('is-pinned-floating');
+          pinBtn.textContent = '✕ Unpin';
+        }
+      };
+      pinBtn.addEventListener('click', onPin);
+      blockEl.appendChild(pinBtn);
+      cleanups.push(() => {
+        pinBtn.removeEventListener('click', onPin);
+        pinBtn.remove();
+        blockEl.classList.remove('ng-pinnable', 'is-pinned-floating');
+      });
+    });
+
     return () => {
       cleanups.forEach((fn) => fn());
     };

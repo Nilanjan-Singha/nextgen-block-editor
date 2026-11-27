@@ -532,32 +532,96 @@ export class ChangelogTool {
 }
 
 /* ── 6. Social Post Quote Card (/social) ───────────────────────── */
+export type SocialPlatform = 'x' | 'linkedin' | 'instagram';
+export type SocialAlign = 'left' | 'center' | 'right';
+
 export interface SocialData {
+  platform: SocialPlatform;
+  align: SocialAlign;
   author: string;
   handle: string;
+  role?: string;
   date?: string;
   text: string;
+  imageUrl?: string;
   url?: string;
+}
+
+export function renderSocialMarkup(d: Partial<SocialData>): string {
+  const platform: SocialPlatform =
+    d.platform && ['x', 'linkedin', 'instagram'].includes(d.platform) ? d.platform : 'x';
+  const align: SocialAlign =
+    d.align && ['left', 'center', 'right'].includes(d.align) ? d.align : 'center';
+  const badge =
+    platform === 'linkedin' ? 'in LinkedIn' : platform === 'instagram' ? '◎ Instagram' : '𝕏 Post';
+  const initials = String(d.author || 'A')
+    .trim()
+    .slice(0, 2)
+    .toUpperCase();
+
+  return `<div class="editor-social-wrap" data-align="${align}"><blockquote class="editor-social-card is-${platform}">
+    <div class="editor-social-top">
+      <div class="editor-social-avatar" aria-hidden="true">${escHtml(initials)}</div>
+      <div class="editor-social-meta">
+        <strong>${escHtml(d.author || 'Alex Rivera')}</strong>
+        <span>${escHtml(platform === 'linkedin' ? d.role || d.handle || 'Product Engineer' : d.handle || '@alexrivera')}${d.date ? ` · ${escHtml(d.date)}` : ''}</span>
+      </div>
+      <span class="editor-social-platform">${badge}</span>
+    </div>
+    ${
+      platform === 'instagram' && d.imageUrl
+        ? `<img class="editor-social-media" src="${escHtml(d.imageUrl)}" alt="" loading="lazy" />`
+        : ''
+    }
+    <p class="editor-social-text">${escHtml(d.text || '')}</p>
+    <div class="editor-social-foot">
+      <span>${
+        platform === 'linkedin'
+          ? '👍 Like · 💬 Comment · ↗ Share'
+          : platform === 'instagram'
+          ? '♡ Like · 💬 Comment · 🔖 Save'
+          : '💬 Reply · ↻ Repost · ♡ Like'
+      }</span>
+      ${
+        d.url
+          ? `<a class="editor-social-link" href="${escHtml(
+              d.url
+            )}" target="_blank" rel="noopener noreferrer">View post →</a>`
+          : ''
+      }
+    </div>
+  </blockquote></div>`;
 }
 
 export class SocialTool {
   private data: SocialData;
+  private previewEl?: HTMLDivElement;
 
   static get toolbox() {
     return {
-      title: 'Social Post',
+      title: 'Social Media Post',
       icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
     };
   }
 
   constructor({ data }: { data?: Partial<SocialData> }) {
     this.data = {
+      platform: data?.platform ?? 'x',
+      align: data?.align ?? 'center',
       author: data?.author ?? 'Alex Rivera',
       handle: data?.handle ?? '@alexrivera',
+      role: data?.role ?? 'Staff Engineer',
       date: data?.date ?? new Date().toISOString().slice(0, 10),
-      text: data?.text ?? '',
+      text: data?.text ?? 'Shipping clean, modular blocks with nextgen-block-editor.',
+      imageUrl: data?.imageUrl ?? '',
       url: data?.url ?? '',
     };
+  }
+
+  private refreshPreview() {
+    if (this.previewEl) {
+      this.previewEl.innerHTML = renderSocialMarkup(this.data);
+    }
   }
 
   render(): HTMLElement {
@@ -566,44 +630,164 @@ export class SocialTool {
 
     const head = document.createElement('div');
     head.className = 'editor-extra-head';
-    head.textContent = 'Social Post Quote Card';
+    head.textContent = 'Social Media Post Card';
+
+    const topControls = document.createElement('div');
+    topControls.className = 'editor-diff-inputs';
+
+    const platformSelect = document.createElement('select');
+    platformSelect.className = 'cdx-input editor-form-select';
+    [
+      { id: 'x', label: 'Twitter / X Format' },
+      { id: 'linkedin', label: 'LinkedIn Format' },
+      { id: 'instagram', label: 'Instagram Format' },
+    ].forEach((p) => {
+      const opt = document.createElement('option');
+      opt.value = p.id;
+      opt.textContent = p.label;
+      if (this.data.platform === p.id) opt.selected = true;
+      platformSelect.appendChild(opt);
+    });
+    platformSelect.addEventListener('change', () => {
+      this.data.platform = platformSelect.value as SocialPlatform;
+      this.refreshPreview();
+    });
+
+    const alignSelect = document.createElement('select');
+    alignSelect.className = 'cdx-input editor-form-select';
+    [
+      { id: 'left', label: 'Align Left' },
+      { id: 'center', label: 'Align Center' },
+      { id: 'right', label: 'Align Right' },
+    ].forEach((a) => {
+      const opt = document.createElement('option');
+      opt.value = a.id;
+      opt.textContent = a.label;
+      if (this.data.align === a.id) opt.selected = true;
+      alignSelect.appendChild(opt);
+    });
+    alignSelect.addEventListener('change', () => {
+      this.data.align = alignSelect.value as SocialAlign;
+      this.refreshPreview();
+    });
+
+    topControls.append(platformSelect, alignSelect);
 
     const meta = document.createElement('div');
     meta.className = 'editor-diff-inputs';
     meta.append(
       createInput('text', 'cdx-input', 'Author name', this.data.author, (v) => {
         this.data.author = v;
+        this.refreshPreview();
       }),
-      createInput('text', 'cdx-input', '@handle', this.data.handle, (v) => {
+      createInput('text', 'cdx-input', '@handle or Role', this.data.handle, (v) => {
         this.data.handle = v;
+        this.data.role = v;
+        this.refreshPreview();
       })
     );
 
-    const text = createTextarea('cdx-input', 3, 'Quoted post content...', this.data.text, (v) => {
+    const text = createTextarea('cdx-input', 3, 'Post content...', this.data.text, (v) => {
       this.data.text = v;
+      this.refreshPreview();
     });
 
     const extra = document.createElement('div');
     extra.className = 'editor-diff-inputs';
     extra.append(
-      createInput('text', 'cdx-input', 'Date (optional)', this.data.date || '', (v) => {
-        this.data.date = v;
+      createInput('url', 'cdx-input', 'Optional image URL (Instagram)', this.data.imageUrl || '', (v) => {
+        this.data.imageUrl = v;
+        this.refreshPreview();
       }),
       createInput('url', 'cdx-input', 'Original post URL (optional)', this.data.url || '', (v) => {
         this.data.url = v;
+        this.refreshPreview();
       })
     );
 
-    wrap.append(head, meta, text, extra);
+    const preview = document.createElement('div');
+    this.previewEl = preview;
+    this.refreshPreview();
+
+    wrap.append(head, topControls, meta, text, extra, preview);
     return wrap;
+  }
+
+  renderSettings() {
+    return [
+      {
+        icon: '<span style="font-size:11px;font-weight:700;">𝕏</span>',
+        label: 'Twitter / X Format',
+        isActive: this.data.platform === 'x',
+        closeOnActivate: true,
+        onActivate: () => {
+          this.data.platform = 'x';
+          this.refreshPreview();
+        },
+      },
+      {
+        icon: '<span style="font-size:11px;font-weight:700;">in</span>',
+        label: 'LinkedIn Format',
+        isActive: this.data.platform === 'linkedin',
+        closeOnActivate: true,
+        onActivate: () => {
+          this.data.platform = 'linkedin';
+          this.refreshPreview();
+        },
+      },
+      {
+        icon: '<span style="font-size:11px;font-weight:700;">◎</span>',
+        label: 'Instagram Format',
+        isActive: this.data.platform === 'instagram',
+        closeOnActivate: true,
+        onActivate: () => {
+          this.data.platform = 'instagram';
+          this.refreshPreview();
+        },
+      },
+      {
+        icon: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/></svg>',
+        label: 'Align Left',
+        isActive: this.data.align === 'left',
+        closeOnActivate: true,
+        onActivate: () => {
+          this.data.align = 'left';
+          this.refreshPreview();
+        },
+      },
+      {
+        icon: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>',
+        label: 'Align Center',
+        isActive: this.data.align === 'center',
+        closeOnActivate: true,
+        onActivate: () => {
+          this.data.align = 'center';
+          this.refreshPreview();
+        },
+      },
+      {
+        icon: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="6" y1="18" x2="21" y2="18"/></svg>',
+        label: 'Align Right',
+        isActive: this.data.align === 'right',
+        closeOnActivate: true,
+        onActivate: () => {
+          this.data.align = 'right';
+          this.refreshPreview();
+        },
+      },
+    ];
   }
 
   save(): SocialData {
     return {
+      platform: this.data.platform,
+      align: this.data.align,
       author: this.data.author.trim(),
       handle: this.data.handle.trim(),
+      role: this.data.role?.trim() || undefined,
       date: this.data.date?.trim() || undefined,
       text: this.data.text.trim(),
+      imageUrl: this.data.imageUrl?.trim() || undefined,
       url: this.data.url?.trim() || undefined,
     };
   }
