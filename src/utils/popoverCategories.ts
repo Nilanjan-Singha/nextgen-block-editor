@@ -99,7 +99,7 @@ export const TOOL_CATEGORIES: ToolCategoryGroup[] = [
   },
   {
     label: 'Settings',
-    tools: ['settings'],
+    tools: ['export', 'settings'],
   },
 ];
 
@@ -194,6 +194,7 @@ export const TOOL_LABELS: Record<string, string> = {
   slides: 'Slides',
   continueWriting: 'Continue Writing',
   askAi: 'Ask AI',
+  export: 'Export / Import',
   settings: 'Settings',
 };
 

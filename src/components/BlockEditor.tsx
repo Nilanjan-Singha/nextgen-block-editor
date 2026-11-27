@@ -22,6 +22,7 @@ import {
   type EditorThemePreset,
   type EditorWidthPreset,
 } from './SettingsModal';
+import { ExportModal } from './ExportModal';
 
 export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>(
   (
@@ -52,6 +53,7 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
     >(async () => {});
 
     const [settingsOpen, setSettingsOpen] = useState(false);
+    const [exportOpen, setExportOpen] = useState(false);
     const [theme, setTheme] = useState<EditorThemePreset>(() => {
       try {
         const saved = localStorage.getItem('ng-editor-theme');
@@ -151,18 +153,40 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
         setAiPopover({ mode, top, left });
       };
       const onOpenSettings = () => setSettingsOpen(true);
+      const onOpenExport = () => setExportOpen(true);
       const onAiContinue = (e: Event) => openAiNearRect('continue', e);
       const onAiAsk = (e: Event) => openAiNearRect('ask', e);
       const onOpenScratch = () => setScratchOpen(true);
+      const onKeyDown = async (e: KeyboardEvent) => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'd') {
+          e.preventDefault();
+          const ed = editorRef.current;
+          if (!ed) return;
+          try {
+            const idx = ed.blocks.getCurrentBlockIndex();
+            const saved = await ed.save();
+            const blk = saved.blocks?.[idx];
+            if (blk) {
+              ed.blocks.insert(blk.type, blk.data, {}, idx + 1, true);
+            }
+          } catch {
+            // ignore duplicate shortcut errors
+          }
+        }
+      };
       shell.addEventListener('nextgen-open-settings', onOpenSettings);
+      shell.addEventListener('nextgen-open-export', onOpenExport);
       shell.addEventListener('nextgen-ai-continue', onAiContinue);
       shell.addEventListener('nextgen-ai-ask', onAiAsk);
       shell.addEventListener('nextgen-open-scratch', onOpenScratch);
+      shell.addEventListener('keydown', onKeyDown);
       return () => {
         shell.removeEventListener('nextgen-open-settings', onOpenSettings);
+        shell.removeEventListener('nextgen-open-export', onOpenExport);
         shell.removeEventListener('nextgen-ai-continue', onAiContinue);
         shell.removeEventListener('nextgen-ai-ask', onAiAsk);
         shell.removeEventListener('nextgen-open-scratch', onOpenScratch);
+        shell.removeEventListener('keydown', onKeyDown);
       };
     }, []);
 
@@ -457,6 +481,19 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
             }
           }}
           onClose={() => setSettingsOpen(false)}
+        />
+
+        <ExportModal
+          open={exportOpen}
+          data={latestDocRef.current}
+          onImportBlocks={(blocks) => {
+            const ed = editorRef.current;
+            if (!ed) return;
+            blocks.forEach((b) => {
+              ed.blocks.insert(b.type, b.data);
+            });
+          }}
+          onClose={() => setExportOpen(false)}
         />
 
         {aiPopover && (

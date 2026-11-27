@@ -594,11 +594,12 @@ export function blocksToHtml(data: EditorJSData | null | undefined): string {
         );
       }
       if (block.type === 'embed') {
-        return d.embed
-          ? `<iframe src="${escHtml(d.embed)}" title="${escHtml(
-              d.caption
-            )}" loading="lazy"></iframe>`
-          : '';
+        if (!d.embed) return '';
+        const align = ['left', 'center', 'right'].includes(d.align) ? d.align : 'center';
+        const size = ['small', 'medium', 'large', 'full'].includes(d.size) ? d.size : 'medium';
+        return `<div class="editor-embed-wrap" data-align="${align}" data-size="${size}"><iframe src="${escHtml(
+          d.embed
+        )}" title="${escHtml(d.caption)}" loading="lazy" allowfullscreen></iframe></div>`;
       }
       if (block.type === 'attaches') {
         const attachmentUrl =

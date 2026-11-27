@@ -74,6 +74,7 @@ import {
 import {
   AiRewriteInline,
   ColorInline,
+  ExportTriggerTool,
   TodayTool,
 } from './blocks/inlineExtensions';
 
@@ -790,11 +791,21 @@ class BaseToggleHeadingTool {
   }
 }
 
+export type EmbedAlign = 'left' | 'center' | 'right';
+export type EmbedSize = 'small' | 'medium' | 'large' | 'full';
+
 export class CustomEmbedTool {
-  private data: { source?: string; embed?: string; caption?: string };
+  private data: {
+    source?: string;
+    embed?: string;
+    caption?: string;
+    align?: EmbedAlign;
+    size?: EmbedSize;
+  };
   private elements?: {
     url: HTMLInputElement;
     caption: HTMLInputElement;
+    preview: HTMLDivElement;
     embedUrl: string;
   };
 
@@ -803,9 +814,15 @@ export class CustomEmbedTool {
       source?: string;
       embed?: string;
       caption?: string;
+      align?: EmbedAlign;
+      size?: EmbedSize;
     }>
   ) {
-    this.data = options.data || {};
+    this.data = {
+      align: 'center',
+      size: 'medium',
+      ...(options.data || {}),
+    };
   }
 
   static get toolbox() {
@@ -885,10 +902,13 @@ export class CustomEmbedTool {
 
     const preview = document.createElement('div');
     preview.className = 'custom-embed-preview';
+    preview.dataset.align = this.data.align || 'center';
+    preview.dataset.size = this.data.size || 'medium';
 
     const elements = {
       url,
       caption,
+      preview,
       embedUrl: this.data.embed || this.toEmbedUrl(url.value),
     };
     this.elements = elements;
@@ -896,6 +916,8 @@ export class CustomEmbedTool {
     const paint = () => {
       const embedUrl = this.toEmbedUrl(url.value);
       elements.embedUrl = embedUrl;
+      preview.dataset.align = this.data.align || 'center';
+      preview.dataset.size = this.data.size || 'medium';
       preview.innerHTML = embedUrl
         ? `<iframe src="${escHtml(embedUrl)}" title="${escHtml(
             caption.value || 'Embedded content'
@@ -914,6 +936,95 @@ export class CustomEmbedTool {
     return root;
   }
 
+  renderSettings() {
+    const tunes: Array<{
+      name: string;
+      label: string;
+      icon: string;
+      isActive: boolean;
+      onActivate: () => void;
+    }> = [
+      {
+        name: 'align-left',
+        label: 'Align Left',
+        icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/></svg>',
+        isActive: (this.data.align || 'center') === 'left',
+        onActivate: () => {
+          this.data.align = 'left';
+          if (this.elements?.preview) this.elements.preview.dataset.align = 'left';
+        },
+      },
+      {
+        name: 'align-center',
+        label: 'Align Center',
+        icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>',
+        isActive: (this.data.align || 'center') === 'center',
+        onActivate: () => {
+          this.data.align = 'center';
+          if (this.elements?.preview) this.elements.preview.dataset.align = 'center';
+        },
+      },
+      {
+        name: 'align-right',
+        label: 'Align Right',
+        icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="6" y1="18" x2="21" y2="18"/></svg>',
+        isActive: (this.data.align || 'center') === 'right',
+        onActivate: () => {
+          this.data.align = 'right';
+          if (this.elements?.preview) this.elements.preview.dataset.align = 'right';
+        },
+      },
+      {
+        name: 'size-small',
+        label: 'Small',
+        icon: '<span style="font-size:11px;font-weight:700;">S</span>',
+        isActive: (this.data.size || 'medium') === 'small',
+        onActivate: () => {
+          this.data.size = 'small';
+          if (this.elements?.preview) this.elements.preview.dataset.size = 'small';
+        },
+      },
+      {
+        name: 'size-medium',
+        label: 'Medium',
+        icon: '<span style="font-size:11px;font-weight:700;">M</span>',
+        isActive: (this.data.size || 'medium') === 'medium',
+        onActivate: () => {
+          this.data.size = 'medium';
+          if (this.elements?.preview) this.elements.preview.dataset.size = 'medium';
+        },
+      },
+      {
+        name: 'size-large',
+        label: 'Large',
+        icon: '<span style="font-size:11px;font-weight:700;">L</span>',
+        isActive: (this.data.size || 'medium') === 'large',
+        onActivate: () => {
+          this.data.size = 'large';
+          if (this.elements?.preview) this.elements.preview.dataset.size = 'large';
+        },
+      },
+      {
+        name: 'size-full',
+        label: 'Full Page',
+        icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>',
+        isActive: (this.data.size || 'medium') === 'full',
+        onActivate: () => {
+          this.data.size = 'full';
+          if (this.elements?.preview) this.elements.preview.dataset.size = 'full';
+        },
+      },
+    ];
+
+    return tunes.map((t) => ({
+      icon: t.icon,
+      label: t.label,
+      isActive: t.isActive,
+      closeOnActivate: true,
+      onActivate: t.onActivate,
+    }));
+  }
+
   save() {
     const source = this.elements?.url.value.trim() || '';
     const embed = this.toEmbedUrl(source);
@@ -921,6 +1032,8 @@ export class CustomEmbedTool {
       source,
       embed,
       caption: this.elements?.caption.value.trim() || '',
+      align: this.data.align || 'center',
+      size: this.data.size || 'medium',
     };
   }
 }
@@ -1806,6 +1919,7 @@ export function getEditorTools(
     continueWriting: ContinueWritingTool as unknown as ToolConstructable,
     askAi: AskAiTool as unknown as ToolConstructable,
     today: TodayTool as unknown as ToolConstructable,
+    export: ExportTriggerTool as unknown as ToolConstructable,
     settings: SettingsTriggerTool as unknown as ToolConstructable,
 
     // Inline toolbar tools

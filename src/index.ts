@@ -10,6 +10,7 @@ export {
   slugify,
   uploadFileToBucket,
 } from './utils/blocksToHtml';
+export { blocksToMarkdown, markdownToBlocks } from './utils/markdown';
 export type {
   BlockEditorHandle,
   BlockEditorProps,
