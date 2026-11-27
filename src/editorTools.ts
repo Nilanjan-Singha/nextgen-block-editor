@@ -71,6 +71,11 @@ import {
   StepsTool,
   VideoTool,
 } from './blocks/extraBlocks';
+import {
+  AiRewriteInline,
+  ColorInline,
+  TodayTool,
+} from './blocks/inlineExtensions';
 
 interface ToolConstructorOptions<T = Record<string, any>> {
   data?: T;
@@ -1544,6 +1549,9 @@ export class SpoilerInline {
 }
 
 export class MentionInline {
+  private savedRange: Range | null = null;
+  private actionsEl: HTMLElement | null = null;
+
   static get isInline() {
     return true;
   }
@@ -1560,24 +1568,65 @@ export class MentionInline {
     return button;
   }
   surround(range: Range) {
-    const selectedText = range.toString().trim();
-    const url = window.prompt('Enter profile or mention URL (https://...)');
-    if (!url) return;
-    const anchor = document.createElement('a');
-    anchor.className = 'editor-mention';
-    anchor.href = url.trim();
-    anchor.target = '_blank';
-    anchor.rel = 'noopener noreferrer';
-    try {
-      range.surroundContents(anchor);
-      if (selectedText && !selectedText.startsWith('@')) {
-        anchor.textContent = `@${selectedText}`;
-      }
-    } catch {
-      // ignore cross-node selection
+    this.savedRange = range.cloneRange();
+    if (this.actionsEl) {
+      this.actionsEl.hidden = false;
+      const input = this.actionsEl.querySelector<HTMLInputElement>('input');
+      input?.focus();
     }
   }
+  renderActions() {
+    const wrap = document.createElement('div');
+    wrap.className = 'ng-mention-popover';
+    wrap.hidden = true;
+
+    const input = document.createElement('input');
+    input.type = 'url';
+    input.className = 'cdx-input';
+    input.placeholder = 'https://github.com/username';
+
+    const applyBtn = document.createElement('button');
+    applyBtn.type = 'button';
+    applyBtn.className = 'ng-inline-action-btn';
+    applyBtn.textContent = 'Apply';
+
+    const applyMention = (url: string) => {
+      const range = this.savedRange;
+      if (!range || !url.trim()) return;
+      const selectedText = range.toString().trim();
+      const anchor = document.createElement('a');
+      anchor.className = 'editor-mention';
+      anchor.href = url.trim();
+      anchor.target = '_blank';
+      anchor.rel = 'noopener noreferrer';
+      try {
+        range.surroundContents(anchor);
+        if (selectedText && !selectedText.startsWith('@')) {
+          anchor.textContent = `@${selectedText}`;
+        }
+      } catch {
+        // ignore cross-node selection
+      }
+      wrap.hidden = true;
+    };
+
+    applyBtn.addEventListener('click', () => applyMention(input.value));
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        applyMention(input.value);
+      }
+    });
+
+    wrap.append(input, applyBtn);
+    this.actionsEl = wrap;
+    return wrap;
+  }
   checkState() {
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0 && !sel.getRangeAt(0).collapsed) {
+      this.savedRange = sel.getRangeAt(0).cloneRange();
+    }
     return false;
   }
 }
@@ -1756,11 +1805,14 @@ export function getEditorTools(
     comment: CommentTool as unknown as ToolConstructable,
     continueWriting: ContinueWritingTool as unknown as ToolConstructable,
     askAi: AskAiTool as unknown as ToolConstructable,
+    today: TodayTool as unknown as ToolConstructable,
     settings: SettingsTriggerTool as unknown as ToolConstructable,
 
     // Inline toolbar tools
     inlineCode: InlineCode as unknown as ToolConstructable,
     marker: MarkerInline as unknown as ToolConstructable,
+    textColor: ColorInline as unknown as ToolConstructable,
+    aiRewrite: AiRewriteInline as unknown as ToolConstructable,
     spoilerInline: SpoilerInline as unknown as ToolConstructable,
     underline: Underline as unknown as ToolConstructable,
     strikethrough: Strikethrough as unknown as ToolConstructable,

@@ -2178,6 +2178,91 @@ html[data-ng-theme] body {
   text-decoration: underline;
 }
 
+/* ── Inline AI Rewrite, Color Swatches, Smart Mention & /today ─── */
+.ng-inline-ai-actions,
+.ng-inline-color-actions,
+.ng-mention-popover {
+  padding: 8px;
+  border-top: 1px solid var(--ng-border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--ng-popover);
+}
+
+.ng-mention-popover {
+  flex-direction: row;
+  align-items: center;
+}
+
+.ng-inline-ai-row,
+.ng-inline-swatch-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.ng-inline-action-btn {
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 6px;
+  border: 1px solid var(--ng-border);
+  background: var(--ng-background);
+  color: var(--ng-foreground);
+  cursor: pointer;
+}
+
+.ng-inline-action-btn:hover {
+  background: var(--ng-accent);
+}
+
+.ng-inline-ai-status {
+  font-size: 11px;
+  color: var(--ng-muted-foreground);
+}
+
+.ng-inline-swatch-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ng-muted-foreground);
+  width: 28px;
+}
+
+.ng-inline-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 1px solid var(--ng-border);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: var(--ng-foreground);
+  padding: 0;
+}
+
+.editor-today-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+}
+
+.editor-today-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--ng-border);
+  background: var(--ng-card);
+  color: var(--ng-foreground);
+  font-size: 12px;
+  font-weight: 500;
+}
+
 /* ── Glassmorphism Inline Toolbar ───────────────────────────────── */
 .nextgen-editor-shell .ce-inline-toolbar {
   background: color-mix(in srgb, var(--ng-popover) 85%, transparent);

@@ -57,7 +57,8 @@ export function sanitizeInlineHtml(value: unknown): string {
     }
     if (
       element.tagName === 'SPAN' &&
-      !element.classList.contains('editor-inline-spoiler')
+      !element.classList.contains('editor-inline-spoiler') &&
+      !element.classList.contains('ng-inline-color')
     ) {
       element.replaceWith(document.createTextNode(element.textContent || ''));
       return;
@@ -74,7 +75,14 @@ export function sanitizeInlineHtml(value: unknown): string {
       if (
         element.tagName === 'SPAN' &&
         attribute.name === 'class' &&
-        attribute.value === 'editor-inline-spoiler'
+        (attribute.value === 'editor-inline-spoiler' || attribute.value === 'ng-inline-color')
+      ) {
+        return;
+      }
+      if (
+        element.tagName === 'SPAN' &&
+        element.classList.contains('ng-inline-color') &&
+        attribute.name === 'style'
       ) {
         return;
       }
@@ -742,6 +750,11 @@ export function blocksToHtml(data: EditorJSData | null | undefined): string {
               )}</span></li>`
           )
           .join('')}</ul></section>`;
+      }
+      if (block.type === 'today') {
+        return `<div class="editor-today-pill"><span class="editor-today-badge">📅 ${escHtml(
+          d.date || ''
+        )}</span></div>`;
       }
       if (block.type === 'social') {
         return `<blockquote class="editor-social-card"><div class="editor-social-head"><strong>${escHtml(

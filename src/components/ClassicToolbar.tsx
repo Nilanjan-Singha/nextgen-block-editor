@@ -173,6 +173,22 @@ export const ClassicToolbar: React.FC<ClassicToolbarProps> = ({
       <button type="button" className="ng-ct-btn ng-ct-s" onMouseDown={keepSelection} onClick={() => exec('strikeThrough')} title="Strikethrough">S</button>
       <button type="button" className="ng-ct-btn" onMouseDown={keepSelection} onClick={() => toggleInlineTag('code')} title="Inline Code">&lt;&gt;</button>
       <button type="button" className="ng-ct-btn ng-ct-highlight" onMouseDown={keepSelection} onClick={() => toggleInlineTag('mark')} title="Highlight">A</button>
+      <input
+        type="color"
+        className="ng-ct-color"
+        title="Text Color"
+        aria-label="Text Color"
+        defaultValue="#18181b"
+        onChange={(e) => exec('foreColor', e.target.value)}
+      />
+      <input
+        type="color"
+        className="ng-ct-color"
+        title="Highlight Color"
+        aria-label="Highlight Color"
+        defaultValue="#fef08a"
+        onChange={(e) => exec('hiliteColor', e.target.value)}
+      />
       <button
         type="button"
         className="ng-ct-btn"
