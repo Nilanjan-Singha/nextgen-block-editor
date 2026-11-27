@@ -1935,8 +1935,19 @@ export function getEditorTools(
   };
   if (enabledTools && enabledTools.length > 0) {
     const allowed = new Set(enabledTools);
+    const inlineTools = new Set([
+      'inlineCode',
+      'marker',
+      'textColor',
+      'aiRewrite',
+      'spoilerInline',
+      'underline',
+      'strikethrough',
+      'hyperlink',
+      'mention',
+    ]);
     return Object.fromEntries(
-      Object.entries(tools).filter(([key]) => allowed.has(key))
+      Object.entries(tools).filter(([key]) => allowed.has(key) || inlineTools.has(key))
     );
   }
   return tools;

@@ -142,6 +142,20 @@ function renderAudioCard(track: {
 }, compact = false): string {
   const url = String(track.url || '').trim();
   if (!url) return '';
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.replace(/^www\./, '').toLowerCase();
+    if (host === 'open.spotify.com') {
+      const embedUrl = parsed.pathname.startsWith('/embed/')
+        ? url
+        : `https://open.spotify.com/embed${parsed.pathname}`;
+      return `<div class="editor-audio-card editor-spotify-card${compact ? ' is-compact' : ''}"><iframe src="${escHtml(
+        embedUrl
+      )}" title="${escHtml(track.title || 'Spotify track')}" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe></div>`;
+    }
+  } catch {
+    // not an absolute URL, fall through to HTML5 audio
+  }
   const cover = track.coverUrl
     ? `<img class="editor-audio-cover" src="${escHtml(track.coverUrl)}" alt="${escHtml(
         track.title || 'Audio cover'
@@ -668,8 +682,10 @@ export function blocksToHtml(data: EditorJSData | null | undefined): string {
       }
       if (block.type === 'mermaid') {
         const code = String(d.code || '');
+        const align = ['left', 'center', 'right'].includes(d.align) ? d.align : 'center';
+        const size = ['small', 'medium', 'large', 'full'].includes(d.size) ? d.size : 'small';
         const caption = d.caption ? `<figcaption>${escHtml(d.caption)}</figcaption>` : '';
-        return `<figure class="editor-mermaid-block"><div class="editor-mermaid-diagram" data-mermaid="${escHtml(
+        return `<figure class="editor-mermaid-block" data-align="${align}" data-size="${size}"><div class="editor-mermaid-diagram" data-mermaid="${escHtml(
           code
         )}"><pre class="editor-mermaid-fallback">${escHtml(code)}</pre></div>${caption}</figure>`;
       }

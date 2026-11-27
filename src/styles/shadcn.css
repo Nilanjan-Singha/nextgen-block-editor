@@ -1925,13 +1925,66 @@ html[data-ng-theme] body {
   justify-content: center;
   align-items: center;
   overflow-x: auto;
-  padding: 8px 0;
+  padding: 4px 0;
+}
+
+.editor-mermaid-preview[data-align='left'],
+.editor-mermaid-block[data-align='left'] .editor-mermaid-diagram {
+  justify-content: flex-start;
+}
+
+.editor-mermaid-preview[data-align='center'],
+.editor-mermaid-block[data-align='center'] .editor-mermaid-diagram {
+  justify-content: center;
+}
+
+.editor-mermaid-preview[data-align='right'],
+.editor-mermaid-block[data-align='right'] .editor-mermaid-diagram {
+  justify-content: flex-end;
 }
 
 .editor-mermaid-preview svg,
 .editor-mermaid-diagram svg {
   max-width: 100%;
   height: auto;
+}
+
+.editor-mermaid-preview[data-size='small'] svg,
+.editor-mermaid-block[data-size='small'] .editor-mermaid-diagram svg {
+  max-width: 340px;
+  max-height: 220px;
+}
+
+.editor-mermaid-preview[data-size='medium'] svg,
+.editor-mermaid-block[data-size='medium'] .editor-mermaid-diagram svg {
+  max-width: 540px;
+  max-height: 340px;
+}
+
+.editor-mermaid-preview[data-size='large'] svg,
+.editor-mermaid-block[data-size='large'] .editor-mermaid-diagram svg {
+  max-width: 760px;
+  max-height: 480px;
+}
+
+.editor-mermaid-preview[data-size='full'] svg,
+.editor-mermaid-block[data-size='full'] .editor-mermaid-diagram svg {
+  max-width: 100%;
+  max-height: none;
+}
+
+.editor-spotify-card {
+  padding: 0;
+  overflow: hidden;
+  border: none;
+  background: transparent;
+}
+
+.editor-spotify-card iframe {
+  width: 100%;
+  height: 152px;
+  border: 0;
+  border-radius: 12px;
 }
 
 .editor-mermaid-error {

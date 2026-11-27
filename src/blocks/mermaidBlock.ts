@@ -1,8 +1,13 @@
 import mermaid from 'mermaid';
 
+export type MermaidAlign = 'left' | 'center' | 'right';
+export type MermaidSize = 'small' | 'medium' | 'large' | 'full';
+
 export interface MermaidData {
   code: string;
   caption?: string;
+  align?: MermaidAlign;
+  size?: MermaidSize;
 }
 
 const MERMAID_PRESETS: Record<string, string> = {
@@ -58,6 +63,7 @@ export async function renderMermaidInto(container: HTMLElement, code: string): P
 export class MermaidTool {
   private data: MermaidData;
   private renderSeq = 0;
+  private previewEl: HTMLDivElement | null = null;
 
   static get toolbox() {
     return {
@@ -70,6 +76,8 @@ export class MermaidTool {
     this.data = {
       code: data?.code ?? MERMAID_PRESETS.Flowchart,
       caption: data?.caption ?? '',
+      align: data?.align ?? 'center',
+      size: data?.size ?? 'small',
     };
   }
 
@@ -103,12 +111,15 @@ export class MermaidTool {
 
     const textarea = document.createElement('textarea');
     textarea.className = 'editor-mermaid-input';
-    textarea.rows = 5;
+    textarea.rows = 3;
     textarea.placeholder = 'graph TD\n  A --> B';
     textarea.value = this.data.code;
 
     const preview = document.createElement('div');
     preview.className = 'editor-mermaid-preview';
+    preview.dataset.align = this.data.align || 'center';
+    preview.dataset.size = this.data.size || 'small';
+    this.previewEl = preview;
 
     const captionInput = document.createElement('input');
     captionInput.type = 'text';
@@ -136,10 +147,93 @@ export class MermaidTool {
     return wrap;
   }
 
+  renderSettings() {
+    const tunes: Array<{
+      label: string;
+      icon: string;
+      isActive: boolean;
+      onActivate: () => void;
+    }> = [
+      {
+        label: 'Align Left',
+        icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/></svg>',
+        isActive: (this.data.align || 'center') === 'left',
+        onActivate: () => {
+          this.data.align = 'left';
+          if (this.previewEl) this.previewEl.dataset.align = 'left';
+        },
+      },
+      {
+        label: 'Align Center',
+        icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>',
+        isActive: (this.data.align || 'center') === 'center',
+        onActivate: () => {
+          this.data.align = 'center';
+          if (this.previewEl) this.previewEl.dataset.align = 'center';
+        },
+      },
+      {
+        label: 'Align Right',
+        icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="6" y1="18" x2="21" y2="18"/></svg>',
+        isActive: (this.data.align || 'center') === 'right',
+        onActivate: () => {
+          this.data.align = 'right';
+          if (this.previewEl) this.previewEl.dataset.align = 'right';
+        },
+      },
+      {
+        label: 'Small',
+        icon: '<span style="font-size:11px;font-weight:700;">S</span>',
+        isActive: (this.data.size || 'small') === 'small',
+        onActivate: () => {
+          this.data.size = 'small';
+          if (this.previewEl) this.previewEl.dataset.size = 'small';
+        },
+      },
+      {
+        label: 'Medium',
+        icon: '<span style="font-size:11px;font-weight:700;">M</span>',
+        isActive: (this.data.size || 'small') === 'medium',
+        onActivate: () => {
+          this.data.size = 'medium';
+          if (this.previewEl) this.previewEl.dataset.size = 'medium';
+        },
+      },
+      {
+        label: 'Large',
+        icon: '<span style="font-size:11px;font-weight:700;">L</span>',
+        isActive: (this.data.size || 'small') === 'large',
+        onActivate: () => {
+          this.data.size = 'large';
+          if (this.previewEl) this.previewEl.dataset.size = 'large';
+        },
+      },
+      {
+        label: 'Full Page',
+        icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>',
+        isActive: (this.data.size || 'small') === 'full',
+        onActivate: () => {
+          this.data.size = 'full';
+          if (this.previewEl) this.previewEl.dataset.size = 'full';
+        },
+      },
+    ];
+
+    return tunes.map((t) => ({
+      icon: t.icon,
+      label: t.label,
+      isActive: t.isActive,
+      closeOnActivate: true,
+      onActivate: t.onActivate,
+    }));
+  }
+
   save(): MermaidData {
     return {
       code: this.data.code,
       caption: this.data.caption?.trim() || undefined,
+      align: this.data.align || 'center',
+      size: this.data.size || 'small',
     };
   }
 }
