@@ -664,6 +664,98 @@ export function blocksToHtml(data: EditorJSData | null | undefined): string {
           code
         )}"><pre class="editor-mermaid-fallback">${escHtml(code)}</pre></div>${caption}</figure>`;
       }
+      if (block.type === 'bookmark') {
+        const url = String(d.url || '#');
+        let host = url;
+        try {
+          host = new URL(url).hostname;
+        } catch {
+          // keep raw url
+        }
+        return `<a class="editor-bookmark-card" href="${escHtml(
+          url
+        )}" target="_blank" rel="noopener noreferrer"><div class="editor-bookmark-body"><div class="editor-bookmark-title">${escHtml(
+          d.title || host
+        )}</div>${
+          d.description ? `<div class="editor-bookmark-desc">${escHtml(d.description)}</div>` : ''
+        }<div class="editor-bookmark-url">${escHtml(host)}</div></div>${
+          d.image ? `<img class="editor-bookmark-thumb" src="${escHtml(d.image)}" alt="" loading="lazy">` : ''
+        }</a>`;
+      }
+      if (block.type === 'steps') {
+        const items = Array.isArray(d.items) ? d.items : [];
+        return `<ol class="editor-steps-list">${items
+          .map(
+            (item: any, idx: number) =>
+              `<li class="editor-step-item"><div class="editor-step-badge">${
+                idx + 1
+              }</div><div class="editor-step-content"><h4>${escHtml(
+                item.title || `Step ${idx + 1}`
+              )}</h4><p>${escHtml(item.body || '')}</p></div></li>`
+          )
+          .join('')}</ol>`;
+      }
+      if (block.type === 'diff') {
+        const before = String(d.before || '').split('\n');
+        const after = String(d.after || '').split('\n');
+        const max = Math.max(before.length, after.length);
+        const rows: string[] = [];
+        for (let i = 0; i < max; i += 1) {
+          if (before[i] === after[i]) {
+            if (before[i] !== undefined) {
+              rows.push(`<span class="editor-diff-line is-same">  ${escHtml(before[i])}</span>`);
+            }
+          } else {
+            if (before[i] !== undefined) {
+              rows.push(`<span class="editor-diff-line is-del">- ${escHtml(before[i])}</span>`);
+            }
+            if (after[i] !== undefined) {
+              rows.push(`<span class="editor-diff-line is-add">+ ${escHtml(after[i])}</span>`);
+            }
+          }
+        }
+        return `<div class="editor-diff-block">${
+          d.filename ? `<div class="editor-diff-filename">${escHtml(d.filename)}</div>` : ''
+        }<pre class="editor-diff-preview">${rows.join('\n')}</pre></div>`;
+      }
+      if (block.type === 'video') {
+        if (!d.url) return '';
+        return `<figure class="editor-video-block"><video controls preload="metadata" class="editor-video-el"${
+          d.poster ? ` poster="${escHtml(d.poster)}"` : ''
+        }><source src="${escHtml(d.url)}"></video>${
+          d.caption ? `<figcaption>${escHtml(d.caption)}</figcaption>` : ''
+        }</figure>`;
+      }
+      if (block.type === 'changelog') {
+        const items = Array.isArray(d.items) ? d.items : [];
+        return `<section class="editor-changelog-block"><div class="editor-changelog-head"><span class="editor-changelog-version">${escHtml(
+          d.version || 'v1.0.0'
+        )}</span><span class="editor-changelog-date">${escHtml(
+          d.date || ''
+        )}</span></div><ul class="editor-changelog-list">${items
+          .map(
+            (i: any) =>
+              `<li><span class="editor-changelog-badge is-${escHtml(
+                i.kind || 'added'
+              )}">${escHtml((i.kind || 'added').toUpperCase())}</span><span>${escHtml(
+                i.text || ''
+              )}</span></li>`
+          )
+          .join('')}</ul></section>`;
+      }
+      if (block.type === 'social') {
+        return `<blockquote class="editor-social-card"><div class="editor-social-head"><strong>${escHtml(
+          d.author || ''
+        )}</strong><span>${escHtml(d.handle || '')}</span>${
+          d.date ? `<span>· ${escHtml(d.date)}</span>` : ''
+        }</div><p class="editor-social-text">${escHtml(d.text || '')}</p>${
+          d.url
+            ? `<a class="editor-social-link" href="${escHtml(
+                d.url
+              )}" target="_blank" rel="noopener noreferrer">View original post →</a>`
+            : ''
+        }</blockquote>`;
+      }
       if (block.type === 'alert') {
         const variant = ['info', 'tip', 'warning', 'danger'].includes(d.variant)
           ? d.variant

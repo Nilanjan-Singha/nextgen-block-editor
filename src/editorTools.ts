@@ -63,6 +63,14 @@ import {
   TimelineTool,
 } from './blocks/structuredBlocks';
 import { MermaidTool } from './blocks/mermaidBlock';
+import {
+  BookmarkTool,
+  ChangelogTool,
+  DiffTool,
+  SocialTool,
+  StepsTool,
+  VideoTool,
+} from './blocks/extraBlocks';
 
 interface ToolConstructorOptions<T = Record<string, any>> {
   data?: T;
@@ -1719,6 +1727,12 @@ export function getEditorTools(
     form: FormBuilderTool as unknown as ToolConstructable,
     latex: LatexTool as unknown as ToolConstructable,
     mermaid: MermaidTool as unknown as ToolConstructable,
+    bookmark: BookmarkTool as unknown as ToolConstructable,
+    steps: StepsTool as unknown as ToolConstructable,
+    diff: DiffTool as unknown as ToolConstructable,
+    video: VideoTool as unknown as ToolConstructable,
+    changelog: ChangelogTool as unknown as ToolConstructable,
+    social: SocialTool as unknown as ToolConstructable,
     excalidraw: ExcalidrawTool as unknown as ToolConstructable,
     pullquote: PullQuoteTool as unknown as ToolConstructable,
     timeline: TimelineTool as unknown as ToolConstructable,
