@@ -477,7 +477,7 @@ export class ChangelogTool {
         row.className = 'editor-changelog-row';
 
         const select = document.createElement('select');
-        select.className = 'cdx-input editor-form-select';
+        select.className = `cdx-input editor-form-select editor-changelog-select is-${item.kind}`;
         (['added', 'changed', 'fixed'] as const).forEach((k) => {
           const opt = document.createElement('option');
           opt.value = k;
@@ -487,6 +487,7 @@ export class ChangelogTool {
         });
         select.addEventListener('change', () => {
           item.kind = select.value as ChangelogEntry['kind'];
+          select.className = `cdx-input editor-form-select editor-changelog-select is-${item.kind}`;
         });
 
         const text = createInput('text', 'cdx-input', 'Change description', item.text, (v) => {
@@ -552,45 +553,88 @@ export function renderSocialMarkup(d: Partial<SocialData>): string {
     d.platform && ['x', 'linkedin', 'instagram'].includes(d.platform) ? d.platform : 'x';
   const align: SocialAlign =
     d.align && ['left', 'center', 'right'].includes(d.align) ? d.align : 'center';
-  const badge =
-    platform === 'linkedin' ? 'in LinkedIn' : platform === 'instagram' ? '◎ Instagram' : '𝕏 Post';
+  const author = escHtml(d.author || 'Alex Rivera');
+  const handle = escHtml(d.handle || '@alexrivera');
+  const role = escHtml(d.role || d.handle || 'Staff Engineer at NextGen');
+  const date = escHtml(d.date || '2h');
+  const text = escHtml(d.text || '');
   const initials = String(d.author || 'A')
     .trim()
     .slice(0, 2)
     .toUpperCase();
-
-  return `<div class="editor-social-wrap" data-align="${align}"><blockquote class="editor-social-card is-${platform}">
-    <div class="editor-social-top">
-      <div class="editor-social-avatar" aria-hidden="true">${escHtml(initials)}</div>
-      <div class="editor-social-meta">
-        <strong>${escHtml(d.author || 'Alex Rivera')}</strong>
-        <span>${escHtml(platform === 'linkedin' ? d.role || d.handle || 'Product Engineer' : d.handle || '@alexrivera')}${d.date ? ` · ${escHtml(d.date)}` : ''}</span>
-      </div>
-      <span class="editor-social-platform">${badge}</span>
-    </div>
-    ${
-      platform === 'instagram' && d.imageUrl
-        ? `<img class="editor-social-media" src="${escHtml(d.imageUrl)}" alt="" loading="lazy" />`
-        : ''
-    }
-    <p class="editor-social-text">${escHtml(d.text || '')}</p>
-    <div class="editor-social-foot">
-      <span>${
-        platform === 'linkedin'
-          ? '👍 Like · 💬 Comment · ↗ Share'
-          : platform === 'instagram'
-          ? '♡ Like · 💬 Comment · 🔖 Save'
-          : '💬 Reply · ↻ Repost · ♡ Like'
-      }</span>
-      ${
+  const postLink = d.url
+    ? `<a class="editor-social-link" href="${escHtml(
         d.url
-          ? `<a class="editor-social-link" href="${escHtml(
-              d.url
-            )}" target="_blank" rel="noopener noreferrer">View post →</a>`
-          : ''
-      }
-    </div>
-  </blockquote></div>`;
+      )}" target="_blank" rel="noopener noreferrer">Open ↗</a>`
+    : '';
+
+  if (platform === 'linkedin') {
+    return `<div class="editor-social-wrap" data-align="${align}">
+      <blockquote class="editor-social-card is-linkedin">
+        <div class="editor-social-top">
+          <div class="editor-social-avatar is-linkedin" aria-hidden="true">${escHtml(initials)}</div>
+          <div class="editor-social-meta">
+            <div class="editor-social-name-row"><strong>${author}</strong><span class="editor-social-conn">• 1st</span></div>
+            <span class="editor-social-sub">${role}</span>
+            <span class="editor-social-sub">${date} · 🌐</span>
+          </div>
+          <span class="editor-social-li-logo" aria-label="LinkedIn">in</span>
+        </div>
+        <p class="editor-social-text">${text}</p>
+        ${d.imageUrl ? `<img class="editor-social-media" src="${escHtml(d.imageUrl)}" alt="" loading="lazy" />` : ''}
+        <div class="editor-social-li-stats"><span>👍 👏 💡 148</span><span>18 comments · 9 reposts</span></div>
+        <div class="editor-social-foot is-linkedin">
+          <span>👍 Like</span><span>💬 Comment</span><span>↻ Repost</span><span>➤ Send</span>${postLink}
+        </div>
+      </blockquote>
+    </div>`;
+  }
+
+  if (platform === 'instagram') {
+    const mediaHtml = d.imageUrl
+      ? `<img class="editor-social-ig-media" src="${escHtml(d.imageUrl)}" alt="" loading="lazy" />`
+      : `<div class="editor-social-ig-placeholder"><span>◎</span><p>${text}</p></div>`;
+    return `<div class="editor-social-wrap" data-align="${align}">
+      <blockquote class="editor-social-card is-instagram">
+        <div class="editor-social-top is-instagram">
+          <div class="editor-social-ig-ring"><div class="editor-social-avatar is-instagram" aria-hidden="true">${escHtml(initials)}</div></div>
+          <div class="editor-social-meta">
+            <strong>${handle.replace(/^@/, '')}</strong>
+            <span class="editor-social-sub">${date}</span>
+          </div>
+          <span class="editor-social-more">•••</span>
+        </div>
+        ${mediaHtml}
+        <div class="editor-social-ig-actions">
+          <span>♡ &nbsp; 💬 &nbsp; ↗</span>
+          <span>🔖</span>
+        </div>
+        <div class="editor-social-ig-likes">Liked by <strong>1,284 others</strong></div>
+        <p class="editor-social-ig-caption"><strong>${handle.replace(/^@/, '')}</strong> ${text} ${postLink}</p>
+      </blockquote>
+    </div>`;
+  }
+
+  const verifiedSvg =
+    '<svg class="editor-social-verified" width="15" height="15" viewBox="0 0 24 24" fill="#1d9bf0" aria-label="Verified"><path d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.71-3.998-3.818-3.998-.47 0-.92.084-1.336.25C14.818 2.415 13.51 1.5 12 1.5s-2.816.917-3.437 2.25c-.415-.165-.866-.25-1.336-.25-2.11 0-3.818 1.79-3.818 4 0 .494.083.964.237 1.4-1.272.65-2.147 2.018-2.147 3.6 0 1.495.782 2.798 1.942 3.486-.02.17-.032.34-.032.514 0 2.21 1.708 4 3.818 4 .47 0 .92-.086 1.335-.25.62 1.334 1.926 2.25 3.437 2.25 1.512 0 2.818-.916 3.437-2.25.415.163.865.248 1.336.248 2.11 0 3.818-1.79 3.818-4 0-.174-.012-.344-.033-.513 1.158-.687 1.943-1.99 1.943-3.484zm-6.616-3.334l-4.334 6.5c-.145.217-.382.334-.625.334-.143 0-.288-.04-.416-.126l-.115-.094-2.415-2.415c-.293-.293-.293-.768 0-1.06s.768-.294 1.06 0l1.77 1.767 3.825-5.74c.23-.345.696-.436 1.04-.207.346.23.44.696.21 1.04z"/></svg>';
+
+  return `<div class="editor-social-wrap" data-align="${align}">
+    <blockquote class="editor-social-card is-x">
+      <div class="editor-social-top">
+        <div class="editor-social-avatar" aria-hidden="true">${escHtml(initials)}</div>
+        <div class="editor-social-meta">
+          <div class="editor-social-name-row"><strong>${author}</strong>${verifiedSvg}</div>
+          <span class="editor-social-sub">${handle} · ${date}</span>
+        </div>
+        <span class="editor-social-x-logo" aria-label="X">𝕏</span>
+      </div>
+      <p class="editor-social-text">${text}</p>
+      ${d.imageUrl ? `<img class="editor-social-media" src="${escHtml(d.imageUrl)}" alt="" loading="lazy" />` : ''}
+      <div class="editor-social-foot is-x">
+        <span>💬 24</span><span>↻ 86</span><span>♡ 612</span><span>📊 14.2K</span>${postLink}
+      </div>
+    </blockquote>
+  </div>`;
 }
 
 export class SocialTool {

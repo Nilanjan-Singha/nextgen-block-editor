@@ -26,33 +26,53 @@ export function renderFrameMarkup(data: Partial<FrameData>): string {
   const src = String(data.src || '').trim();
   const isIframe = data.contentType === 'url';
   const inner = !src
-    ? '<div class="editor-frame-empty">Add an image or URL to preview inside the device frame</div>'
+    ? `<div class="editor-frame-empty">
+         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="opacity:0.45"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+         <span>Add an image or URL to preview</span>
+       </div>`
     : isIframe
     ? `<iframe src="${escHtml(src)}" title="${escHtml(data.caption || device)}" loading="lazy"></iframe>`
     : `<img src="${escHtml(src)}" alt="${escHtml(data.caption || device)}" loading="lazy" />`;
 
-  let chrome = '';
+  let chromeTop = '';
+  let chromeBottom = '';
   if (device === 'iphone') {
-    chrome = '<div class="editor-frame-island" aria-hidden="true"></div>';
+    chromeTop =
+      '<div class="editor-frame-statusbar"><span>9:41</span><div class="editor-frame-island" aria-hidden="true"><span></span></div><span>5G ▮▮▮</span></div>';
+    chromeBottom = '<div class="editor-frame-homebar" aria-hidden="true"></div>';
   } else if (device === 'samsung') {
-    chrome = '<div class="editor-frame-punch" aria-hidden="true"></div>';
+    chromeTop =
+      '<div class="editor-frame-statusbar"><span>12:45</span><div class="editor-frame-punch" aria-hidden="true"></div><span>5G 100%</span></div>';
+    chromeBottom = '<div class="editor-frame-homebar is-pill" aria-hidden="true"></div>';
   } else if (device === 'browser') {
-    chrome = `<div class="editor-frame-browser-bar"><span class="editor-frame-dots"><i></i><i></i><i></i></span><span class="editor-frame-addr">${escHtml(
-      data.address || src || 'https://example.com'
-    )}</span></div>`;
+    chromeTop = `<div class="editor-frame-browser-bar">
+      <span class="editor-frame-dots"><i></i><i></i><i></i></span>
+      <span class="editor-frame-nav-icons">← → ↻</span>
+      <span class="editor-frame-addr">🔒 ${escHtml(data.address || src || 'https://nextgen-editor.dev')}</span>
+    </div>`;
+  } else if (device === 'macbook') {
+    chromeTop = '<div class="editor-frame-notch" aria-hidden="true"><span></span></div>';
   } else {
-    chrome = '<div class="editor-frame-cam" aria-hidden="true"></div>';
+    chromeTop = '<div class="editor-frame-cam" aria-hidden="true"></div>';
   }
 
   const base =
     device === 'macbook' || device === 'laptop'
-      ? '<div class="editor-frame-base" aria-hidden="true"></div>'
+      ? `<div class="editor-frame-base is-${device}" aria-hidden="true"><div class="editor-frame-hinge"></div></div>`
       : '';
   const caption = data.caption
     ? `<figcaption class="editor-frame-caption">${escHtml(data.caption)}</figcaption>`
     : '';
 
-  return `<figure class="editor-frame-block" data-device="${device}"><div class="editor-frame-shell is-${device}">${chrome}<div class="editor-frame-screen">${inner}</div></div>${base}${caption}</figure>`;
+  return `<figure class="editor-frame-block" data-device="${device}">
+    <div class="editor-frame-shell is-${device}">
+      ${chromeTop}
+      <div class="editor-frame-screen">${inner}</div>
+      ${chromeBottom}
+    </div>
+    ${base}
+    ${caption}
+  </figure>`;
 }
 
 export class FrameTool {

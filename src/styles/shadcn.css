@@ -4037,3 +4037,313 @@ html[data-ng-theme] body {
   margin: 0;
   white-space: pre-wrap;
 }
+
+/* ── Quiz Blue-Tick Toggle ──────────────────────────────────────── */
+.editor-quiz-tick-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  border: 2px solid var(--ng-border);
+  background: var(--ng-background);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  transition: background-color 140ms ease, border-color 140ms ease;
+}
+
+.editor-quiz-tick-btn:hover {
+  border-color: #2563eb;
+}
+
+.editor-quiz-tick-btn.is-selected {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+
+/* ── Changelog Colored Badges & Selects ─────────────────────────── */
+.editor-changelog-badge.is-added,
+.editor-changelog-select.is-added {
+  background: rgba(22, 163, 74, 0.14);
+  color: #15803d;
+  border-color: rgba(22, 163, 74, 0.4);
+}
+
+.editor-changelog-badge.is-changed,
+.editor-changelog-select.is-changed {
+  background: rgba(217, 119, 6, 0.14);
+  color: #b45309;
+  border-color: rgba(217, 119, 6, 0.4);
+}
+
+.editor-changelog-badge.is-fixed,
+.editor-changelog-select.is-fixed {
+  background: rgba(37, 99, 235, 0.14);
+  color: #1d4ed8;
+  border-color: rgba(37, 99, 235, 0.4);
+}
+
+/* ── Uniform Inline Toolbar Icon Ratio ──────────────────────────── */
+.nextgen-editor-shell .ce-inline-tool {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.nextgen-editor-shell .ce-inline-tool svg {
+  width: 15px !important;
+  height: 15px !important;
+}
+
+/* ── Realistic Device Mockup Frames (/frame) ────────────────────── */
+.editor-frame-shell.is-iphone,
+.editor-frame-shell.is-samsung {
+  width: 284px;
+  background: linear-gradient(145deg, #27272a, #09090b);
+  border: 2px solid #3f3f46;
+  box-shadow:
+    inset 0 0 0 2px #18181b,
+    0 24px 48px -14px rgba(0, 0, 0, 0.45);
+}
+
+.editor-frame-shell.is-iphone {
+  border-radius: 44px;
+  padding: 12px;
+}
+
+.editor-frame-shell.is-samsung {
+  border-radius: 28px;
+  padding: 10px;
+}
+
+.editor-frame-statusbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 14px 8px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #e4e4e7;
+}
+
+.editor-frame-island {
+  width: 82px;
+  height: 22px;
+  background: #000000;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 6px;
+}
+
+.editor-frame-island span {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #1e293b;
+}
+
+.editor-frame-homebar {
+  width: 100px;
+  height: 4px;
+  border-radius: 999px;
+  background: #52525b;
+  margin: 10px auto 2px;
+}
+
+.editor-frame-shell.is-iphone .editor-frame-screen,
+.editor-frame-shell.is-samsung .editor-frame-screen {
+  aspect-ratio: 9 / 17.5;
+  min-height: 430px;
+  border-radius: 26px;
+  display: flex;
+  flex-direction: column;
+}
+
+.editor-frame-shell.is-macbook .editor-frame-screen,
+.editor-frame-shell.is-laptop .editor-frame-screen {
+  aspect-ratio: 16 / 10;
+  min-height: 320px;
+}
+
+.editor-frame-notch {
+  width: 96px;
+  height: 16px;
+  background: #09090b;
+  border-radius: 0 0 8px 8px;
+  margin: -16px auto 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.editor-frame-notch span {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #27272a;
+}
+
+.editor-frame-base.is-macbook {
+  width: min(700px, 108%);
+  height: 14px;
+  background: linear-gradient(180deg, #e4e4e7, #a1a1aa);
+  border-radius: 2px 2px 12px 12px;
+  display: flex;
+  justify-content: center;
+}
+
+.editor-frame-hinge {
+  width: 90px;
+  height: 4px;
+  background: #71717a;
+  border-radius: 0 0 4px 4px;
+}
+
+.editor-frame-nav-icons {
+  font-size: 12px;
+  color: var(--ng-muted-foreground);
+  letter-spacing: 3px;
+}
+
+.editor-frame-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 220px;
+}
+
+/* ── Authentic X, LinkedIn, Instagram Cards ─────────────────────── */
+.editor-social-name-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.editor-social-sub {
+  font-size: 11px;
+  color: var(--ng-muted-foreground);
+}
+
+.editor-social-x-logo {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ng-foreground);
+}
+
+.editor-social-avatar.is-linkedin {
+  border-radius: 999px;
+  background: #0a66c2;
+  color: #ffffff;
+}
+
+.editor-social-conn {
+  font-size: 11px;
+  color: var(--ng-muted-foreground);
+}
+
+.editor-social-li-logo {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  background: #0a66c2;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.editor-social-li-stats {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--ng-muted-foreground);
+}
+
+.editor-social-card.is-instagram {
+  padding: 0;
+  overflow: hidden;
+}
+
+.editor-social-top.is-instagram {
+  padding: 10px 12px;
+}
+
+.editor-social-ig-ring {
+  padding: 2px;
+  border-radius: 999px;
+  background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+}
+
+.editor-social-avatar.is-instagram {
+  width: 30px;
+  height: 30px;
+  border: 2px solid var(--ng-card);
+}
+
+.editor-social-more {
+  font-size: 12px;
+  color: var(--ng-muted-foreground);
+}
+
+.editor-social-ig-media {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  display: block;
+}
+
+.editor-social-ig-placeholder {
+  aspect-ratio: 4 / 3;
+  background: linear-gradient(135deg, #27272a, #52525b);
+  color: #fafafa;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+  gap: 8px;
+}
+
+.editor-social-ig-placeholder span {
+  font-size: 28px;
+  opacity: 0.7;
+}
+
+.editor-social-ig-placeholder p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.editor-social-ig-actions {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px 4px;
+  font-size: 16px;
+}
+
+.editor-social-ig-likes {
+  padding: 0 12px 4px;
+  font-size: 12px;
+}
+
+.editor-social-ig-caption {
+  padding: 0 12px 12px;
+  margin: 0;
+  font-size: 13px;
+}

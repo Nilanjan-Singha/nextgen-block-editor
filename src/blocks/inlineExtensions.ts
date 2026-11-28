@@ -69,21 +69,18 @@ export class AiRewriteInline {
     btn.type = 'button';
     btn.className = 'ce-inline-tool';
     btn.title = 'AI Rewrite selection';
-    btn.innerHTML = '<span style="font-size:12px;font-weight:700;">✦ AI</span>';
+    btn.innerHTML =
+      '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2z"/></svg>';
     return btn;
   }
 
   surround(range: Range): void {
     this.savedRange = range.cloneRange();
-    if (this.actionsEl) {
-      this.actionsEl.hidden = false;
-    }
   }
 
   renderActions(): HTMLElement {
     const wrap = document.createElement('div');
     wrap.className = 'ng-inline-ai-actions';
-    wrap.hidden = true;
 
     const status = document.createElement('span');
     status.className = 'ng-inline-ai-status';
@@ -96,6 +93,7 @@ export class AiRewriteInline {
       b.type = 'button';
       b.className = 'ng-inline-action-btn';
       b.textContent = act.label;
+      b.addEventListener('mousedown', (e) => e.preventDefault());
       b.addEventListener('click', async () => {
         const range = this.savedRange;
         const selected = range?.toString().trim() || '';
@@ -167,15 +165,12 @@ export class ColorInline {
     btn.className = 'ce-inline-tool';
     btn.title = 'Text & Highlight Color';
     btn.innerHTML =
-      '<span style="font-weight:700;font-size:12px;border-bottom:2px solid currentColor;">A</span>';
+      '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="m6 16 6-12 6 12"/><path d="M8 12h8"/></svg>';
     return btn;
   }
 
   surround(range: Range): void {
     this.savedRange = range.cloneRange();
-    if (this.actionsEl) {
-      this.actionsEl.hidden = false;
-    }
   }
 
   private applyStyle(prop: 'color' | 'backgroundColor', value: string) {
@@ -205,7 +200,6 @@ export class ColorInline {
   renderActions(): HTMLElement {
     const wrap = document.createElement('div');
     wrap.className = 'ng-inline-color-actions';
-    wrap.hidden = true;
 
     const makeRow = (
       title: string,
@@ -226,7 +220,11 @@ export class ColorInline {
         dot.title = sw.label;
         dot.style.background = sw.value || 'transparent';
         if (!sw.value) dot.textContent = '×';
-        dot.addEventListener('click', () => this.applyStyle(prop, sw.value));
+        dot.addEventListener('mousedown', (e) => e.preventDefault());
+        dot.addEventListener('click', (e) => {
+          e.preventDefault();
+          this.applyStyle(prop, sw.value);
+        });
         row.appendChild(dot);
       });
       return row;

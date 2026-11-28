@@ -1329,13 +1329,18 @@ export class QuizTool {
           const row = document.createElement('div');
           row.className = 'editor-eisenhower-item-row';
 
-          const radio = document.createElement('input');
-          radio.type = 'radio';
-          radio.name = `quiz_correct_${qIdx}_${Math.random().toString(36).slice(2, 6)}`;
-          radio.checked = q.correctIndex === oIdx;
-          radio.title = 'Mark as correct answer';
-          radio.addEventListener('change', () => {
-            if (radio.checked) q.correctIndex = oIdx;
+          const tickBtn = document.createElement('button');
+          tickBtn.type = 'button';
+          tickBtn.className = `editor-quiz-tick-btn${q.correctIndex === oIdx ? ' is-selected' : ''}`;
+          tickBtn.title = q.correctIndex === oIdx ? 'Unmark as correct answer' : 'Mark as correct answer';
+          tickBtn.setAttribute('aria-pressed', String(q.correctIndex === oIdx));
+          tickBtn.innerHTML =
+            q.correctIndex === oIdx
+              ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+              : '';
+          tickBtn.addEventListener('click', () => {
+            q.correctIndex = q.correctIndex === oIdx ? -1 : oIdx;
+            renderOpts();
           });
 
           const optIn = document.createElement('input');
@@ -1359,7 +1364,7 @@ export class QuizTool {
             renderOpts();
           });
 
-          row.append(radio, optIn, rmOpt);
+          row.append(tickBtn, optIn, rmOpt);
           optsWrap.appendChild(row);
         });
       };
