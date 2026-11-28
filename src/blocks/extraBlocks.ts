@@ -61,57 +61,89 @@ export class BookmarkTool {
 
   render(): HTMLElement {
     const wrap = document.createElement('div');
-    wrap.className = 'editor-extra-card';
+    wrap.className = 'editor-extra-card editor-compact-block';
 
-    const head = document.createElement('div');
-    head.className = 'editor-extra-head';
-    head.textContent = 'URL Bookmark Card';
+    const topBar = document.createElement('div');
+    topBar.className = 'editor-compact-bar';
 
-    const preview = document.createElement('div');
-    preview.className = 'editor-bookmark-preview';
-
-    const refreshPreview = () => {
-      const host = (() => {
-        try {
-          return this.data.url ? new URL(this.data.url).hostname : 'example.com';
-        } catch {
-          return this.data.url || 'example.com';
+    const urlIn = createInput('url', 'cdx-input editor-compact-url', 'Paste URL (https://...)', this.data.url, (v) => {
+      this.data.url = v;
+      try {
+        const parsed = new URL(v.trim());
+        const host = parsed.hostname.replace(/^www\./, '');
+        if (!this.data.title || this.data.title === hostEl.textContent) {
+          const slug = parsed.pathname.split('/').filter(Boolean).pop()?.replace(/[-_]/g, ' ');
+          this.data.title = slug ? slug.charAt(0).toUpperCase() + slug.slice(1) : host;
+          titleEl.textContent = this.data.title;
         }
-      })();
-      preview.innerHTML = `
-        <div class="editor-bookmark-card">
-          <div class="editor-bookmark-body">
-            <div class="editor-bookmark-title">${escHtml(this.data.title || host)}</div>
-            ${this.data.description ? `<div class="editor-bookmark-desc">${escHtml(this.data.description)}</div>` : ''}
-            <div class="editor-bookmark-url">${escHtml(host)}</div>
-          </div>
-          ${this.data.image ? `<img class="editor-bookmark-thumb" src="${escHtml(this.data.image)}" alt="" />` : ''}
-        </div>`;
-    };
+        hostEl.textContent = host;
+      } catch {
+        hostEl.textContent = v.trim() || 'example.com';
+      }
+    });
 
-    const grid = document.createElement('div');
-    grid.className = 'editor-extra-grid';
-    grid.append(
-      createInput('url', 'cdx-input', 'https://example.com/article', this.data.url, (v) => {
-        this.data.url = v;
-        refreshPreview();
-      }),
-      createInput('text', 'cdx-input', 'Link title', this.data.title, (v) => {
-        this.data.title = v;
-        refreshPreview();
-      }),
-      createInput('text', 'cdx-input', 'Short description', this.data.description, (v) => {
-        this.data.description = v;
-        refreshPreview();
-      }),
-      createInput('url', 'cdx-input', 'Optional thumbnail URL', this.data.image || '', (v) => {
-        this.data.image = v;
-        refreshPreview();
-      })
-    );
+    const imgToggle = document.createElement('button');
+    imgToggle.type = 'button';
+    imgToggle.className = 'excalidraw-btn';
+    imgToggle.textContent = '+ Image';
 
-    refreshPreview();
-    wrap.append(head, grid, preview);
+    const imgIn = createInput('url', 'cdx-input', 'Optional thumbnail URL', this.data.image || '', (v) => {
+      this.data.image = v;
+      thumbEl.src = v.trim();
+      thumbEl.style.display = v.trim() ? 'block' : 'none';
+    });
+    imgIn.style.display = this.data.image ? 'block' : 'none';
+    imgToggle.addEventListener('click', () => {
+      imgIn.style.display = imgIn.style.display === 'none' ? 'block' : 'none';
+    });
+
+    topBar.append(urlIn, imgToggle);
+
+    const card = document.createElement('div');
+    card.className = 'editor-bookmark-card';
+    card.style.margin = '0';
+
+    const body = document.createElement('div');
+    body.className = 'editor-bookmark-body';
+    body.style.flex = '1';
+
+    const titleEl = document.createElement('div');
+    titleEl.className = 'editor-bookmark-title editor-inline-editable';
+    titleEl.contentEditable = 'true';
+    titleEl.dataset.placeholder = 'Bookmark title (click to edit)';
+    titleEl.textContent = this.data.title || '';
+    titleEl.addEventListener('input', () => {
+      this.data.title = titleEl.textContent || '';
+    });
+
+    const descEl = document.createElement('div');
+    descEl.className = 'editor-bookmark-desc editor-inline-editable';
+    descEl.contentEditable = 'true';
+    descEl.dataset.placeholder = 'Optional short description...';
+    descEl.textContent = this.data.description || '';
+    descEl.addEventListener('input', () => {
+      this.data.description = descEl.textContent || '';
+    });
+
+    const hostEl = document.createElement('div');
+    hostEl.className = 'editor-bookmark-url';
+    try {
+      hostEl.textContent = this.data.url ? new URL(this.data.url).hostname.replace(/^www\./, '') : 'example.com';
+    } catch {
+      hostEl.textContent = this.data.url || 'example.com';
+    }
+
+    const thumbEl = document.createElement('img');
+    thumbEl.className = 'editor-bookmark-thumb';
+    if (this.data.image) {
+      thumbEl.src = this.data.image;
+    } else {
+      thumbEl.style.display = 'none';
+    }
+
+    body.append(titleEl, descEl, hostEl);
+    card.append(body, thumbEl);
+    wrap.append(topBar, imgIn, card);
     return wrap;
   }
 
@@ -159,39 +191,48 @@ export class StepsTool {
 
   render(): HTMLElement {
     const wrap = document.createElement('div');
-    wrap.className = 'editor-extra-card';
-
-    const head = document.createElement('div');
-    head.className = 'editor-extra-head';
-    head.textContent = 'Step-by-Step Walkthrough';
+    wrap.className = 'editor-extra-card editor-compact-block';
 
     const list = document.createElement('div');
-    list.className = 'editor-steps-editor-list';
+    list.className = 'editor-steps-list';
+    list.style.margin = '0';
 
     const renderList = () => {
       list.innerHTML = '';
       this.data.items.forEach((item, idx) => {
         const row = document.createElement('div');
-        row.className = 'editor-step-editor-row';
+        row.className = 'editor-step-item editor-step-inline-row';
 
         const badge = document.createElement('span');
         badge.className = 'editor-step-badge';
         badge.textContent = String(idx + 1);
 
-        const fields = document.createElement('div');
-        fields.className = 'editor-step-editor-fields';
-        fields.append(
-          createInput('text', 'cdx-input', `Step ${idx + 1} title`, item.title, (v) => {
-            item.title = v;
-          }),
-          createTextarea('cdx-input', 2, 'Step details', item.body, (v) => {
-            item.body = v;
-          })
-        );
+        const content = document.createElement('div');
+        content.className = 'editor-step-content';
+
+        const titleEl = document.createElement('h4');
+        titleEl.className = 'editor-inline-editable';
+        titleEl.contentEditable = 'true';
+        titleEl.dataset.placeholder = `Step ${idx + 1} title`;
+        titleEl.textContent = item.title;
+        titleEl.addEventListener('input', () => {
+          item.title = titleEl.textContent || '';
+        });
+
+        const bodyEl = document.createElement('p');
+        bodyEl.className = 'editor-inline-editable';
+        bodyEl.contentEditable = 'true';
+        bodyEl.dataset.placeholder = 'Step details...';
+        bodyEl.textContent = item.body;
+        bodyEl.addEventListener('input', () => {
+          item.body = bodyEl.textContent || '';
+        });
+
+        content.append(titleEl, bodyEl);
 
         const removeBtn = document.createElement('button');
         removeBtn.type = 'button';
-        removeBtn.className = 'excalidraw-btn';
+        removeBtn.className = 'excalidraw-btn editor-step-rm';
         removeBtn.textContent = '×';
         removeBtn.title = 'Remove step';
         removeBtn.addEventListener('click', () => {
@@ -200,7 +241,7 @@ export class StepsTool {
           renderList();
         });
 
-        row.append(badge, fields, removeBtn);
+        row.append(badge, content, removeBtn);
         list.appendChild(row);
       });
     };
@@ -209,13 +250,14 @@ export class StepsTool {
     addBtn.type = 'button';
     addBtn.className = 'excalidraw-btn';
     addBtn.textContent = '+ Add Step';
+    addBtn.style.alignSelf = 'flex-start';
     addBtn.addEventListener('click', () => {
       this.data.items.push({ title: '', body: '' });
       renderList();
     });
 
     renderList();
-    wrap.append(head, list, addBtn);
+    wrap.append(list, addBtn);
     return wrap;
   }
 
@@ -670,21 +712,17 @@ export class SocialTool {
 
   render(): HTMLElement {
     const wrap = document.createElement('div');
-    wrap.className = 'editor-extra-card';
+    wrap.className = 'editor-extra-card editor-compact-block';
 
-    const head = document.createElement('div');
-    head.className = 'editor-extra-head';
-    head.textContent = 'Social Media Post Card';
-
-    const topControls = document.createElement('div');
-    topControls.className = 'editor-diff-inputs';
+    const topBar = document.createElement('div');
+    topBar.className = 'editor-compact-bar';
 
     const platformSelect = document.createElement('select');
     platformSelect.className = 'cdx-input editor-form-select';
     [
-      { id: 'x', label: 'Twitter / X Format' },
-      { id: 'linkedin', label: 'LinkedIn Format' },
-      { id: 'instagram', label: 'Instagram Format' },
+      { id: 'x', label: 'Twitter / X' },
+      { id: 'linkedin', label: 'LinkedIn' },
+      { id: 'instagram', label: 'Instagram' },
     ].forEach((p) => {
       const opt = document.createElement('option');
       opt.value = p.id;
@@ -692,17 +730,13 @@ export class SocialTool {
       if (this.data.platform === p.id) opt.selected = true;
       platformSelect.appendChild(opt);
     });
-    platformSelect.addEventListener('change', () => {
-      this.data.platform = platformSelect.value as SocialPlatform;
-      this.refreshPreview();
-    });
 
     const alignSelect = document.createElement('select');
     alignSelect.className = 'cdx-input editor-form-select';
     [
-      { id: 'left', label: 'Align Left' },
-      { id: 'center', label: 'Align Center' },
-      { id: 'right', label: 'Align Right' },
+      { id: 'left', label: 'Left' },
+      { id: 'center', label: 'Center' },
+      { id: 'right', label: 'Right' },
     ].forEach((a) => {
       const opt = document.createElement('option');
       opt.value = a.id;
@@ -710,36 +744,17 @@ export class SocialTool {
       if (this.data.align === a.id) opt.selected = true;
       alignSelect.appendChild(opt);
     });
-    alignSelect.addEventListener('change', () => {
-      this.data.align = alignSelect.value as SocialAlign;
-      this.refreshPreview();
-    });
 
-    topControls.append(platformSelect, alignSelect);
-
-    const meta = document.createElement('div');
-    meta.className = 'editor-diff-inputs';
-    meta.append(
-      createInput('text', 'cdx-input', 'Author name', this.data.author, (v) => {
-        this.data.author = v;
-        this.refreshPreview();
-      }),
-      createInput('text', 'cdx-input', '@handle or Role', this.data.handle, (v) => {
-        this.data.handle = v;
-        this.data.role = v;
-        this.refreshPreview();
-      })
-    );
-
-    const text = createTextarea('cdx-input', 3, 'Post content...', this.data.text, (v) => {
-      this.data.text = v;
-      this.refreshPreview();
-    });
+    const mediaToggle = document.createElement('button');
+    mediaToggle.type = 'button';
+    mediaToggle.className = 'excalidraw-btn';
+    mediaToggle.textContent = '+ Media / Link';
 
     const extra = document.createElement('div');
     extra.className = 'editor-diff-inputs';
+    extra.style.display = this.data.imageUrl || this.data.url ? 'grid' : 'none';
     extra.append(
-      createInput('url', 'cdx-input', 'Optional image URL (Instagram)', this.data.imageUrl || '', (v) => {
+      createInput('url', 'cdx-input', 'Image URL (optional)', this.data.imageUrl || '', (v) => {
         this.data.imageUrl = v;
         this.refreshPreview();
       }),
@@ -748,12 +763,53 @@ export class SocialTool {
         this.refreshPreview();
       })
     );
+    mediaToggle.addEventListener('click', () => {
+      extra.style.display = extra.style.display === 'none' ? 'grid' : 'none';
+    });
+
+    topBar.append(platformSelect, alignSelect, mediaToggle);
 
     const preview = document.createElement('div');
     this.previewEl = preview;
-    this.refreshPreview();
 
-    wrap.append(head, topControls, meta, text, extra, preview);
+    const bindEditablePreview = () => {
+      preview.innerHTML = renderSocialMarkup(this.data);
+      const nameEl = preview.querySelector<HTMLElement>('.editor-social-name-row strong');
+      const handleEl = preview.querySelector<HTMLElement>('.editor-social-sub');
+      const textEl = preview.querySelector<HTMLElement>('.editor-social-text, .editor-social-ig-caption');
+      if (nameEl) {
+        nameEl.contentEditable = 'true';
+        nameEl.addEventListener('input', () => {
+          this.data.author = nameEl.textContent || '';
+        });
+      }
+      if (handleEl) {
+        handleEl.contentEditable = 'true';
+        handleEl.addEventListener('input', () => {
+          const val = (handleEl.textContent || '').split('·')[0].trim();
+          this.data.handle = val;
+          this.data.role = val;
+        });
+      }
+      if (textEl) {
+        textEl.contentEditable = 'true';
+        textEl.addEventListener('input', () => {
+          this.data.text = textEl.textContent || '';
+        });
+      }
+    };
+
+    platformSelect.addEventListener('change', () => {
+      this.data.platform = platformSelect.value as SocialPlatform;
+      bindEditablePreview();
+    });
+    alignSelect.addEventListener('change', () => {
+      this.data.align = alignSelect.value as SocialAlign;
+      bindEditablePreview();
+    });
+
+    bindEditablePreview();
+    wrap.append(topBar, extra, preview);
     return wrap;
   }
 

@@ -15,6 +15,7 @@ import {
   attachPopoverCategoryHeaders,
 } from '../utils/popoverCategories';
 import { attachEmojiSidePicker } from '../utils/emojiSidePicker';
+import { attachCompactCollapseBars } from '../utils/compactBlocks';
 import { ClassicToolbar } from './ClassicToolbar';
 import {
   SettingsModal,
@@ -205,6 +206,7 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
 
       let cancelled = false;
       const detachCategories = attachPopoverCategoryHeaders(holder);
+      const detachCompact = attachCompactCollapseBars(holder);
       const detachEmoji = attachEmojiSidePicker(holder);
 
       const effectiveTools = Array.from(new Set([...effectiveSelectedTools, 'settings']));
@@ -277,6 +279,7 @@ export const BlockEditor = React.forwardRef<BlockEditorHandle, BlockEditorProps>
       return () => {
         cancelled = true;
         detachCategories();
+        detachCompact();
         detachEmoji();
         const toDestroy = editorRef.current;
         editorRef.current = null;

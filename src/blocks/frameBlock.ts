@@ -97,14 +97,10 @@ export class FrameTool {
 
   render(): HTMLElement {
     const wrap = document.createElement('div');
-    wrap.className = 'editor-extra-card';
+    wrap.className = 'editor-extra-card editor-compact-block';
 
-    const head = document.createElement('div');
-    head.className = 'editor-extra-head';
-    head.textContent = 'Device Mockup Frame';
-
-    const controls = document.createElement('div');
-    controls.className = 'editor-frame-controls';
+    const bar = document.createElement('div');
+    bar.className = 'editor-compact-bar';
 
     const deviceSelect = document.createElement('select');
     deviceSelect.className = 'cdx-input editor-form-select';
@@ -115,6 +111,31 @@ export class FrameTool {
       if (this.data.device === opt.id) o.selected = true;
       deviceSelect.appendChild(o);
     });
+
+    const srcInput = document.createElement('input');
+    srcInput.type = 'url';
+    srcInput.className = 'cdx-input editor-compact-url';
+    srcInput.placeholder = 'Paste image or website URL...';
+    srcInput.value = this.data.src;
+
+    const uploadBtn = document.createElement('label');
+    uploadBtn.className = 'excalidraw-btn';
+    uploadBtn.textContent = 'Upload';
+    uploadBtn.style.cursor = 'pointer';
+    const uploadInput = document.createElement('input');
+    uploadInput.type = 'file';
+    uploadInput.accept = 'image/*';
+    uploadInput.style.display = 'none';
+    uploadBtn.appendChild(uploadInput);
+
+    const detailsToggle = document.createElement('button');
+    detailsToggle.type = 'button';
+    detailsToggle.className = 'excalidraw-btn';
+    detailsToggle.textContent = 'Options';
+
+    const detailsWrap = document.createElement('div');
+    detailsWrap.className = 'editor-diff-inputs';
+    detailsWrap.style.display = 'none';
 
     const typeSelect = document.createElement('select');
     typeSelect.className = 'cdx-input editor-form-select';
@@ -129,28 +150,22 @@ export class FrameTool {
       typeSelect.appendChild(o);
     });
 
-    const srcInput = document.createElement('input');
-    srcInput.type = 'url';
-    srcInput.className = 'cdx-input';
-    srcInput.placeholder = 'Image URL or Website URL (https://...)';
-    srcInput.value = this.data.src;
-
-    const uploadInput = document.createElement('input');
-    uploadInput.type = 'file';
-    uploadInput.accept = 'image/*';
-    uploadInput.className = 'cdx-input';
-
     const addrInput = document.createElement('input');
     addrInput.type = 'text';
     addrInput.className = 'cdx-input';
-    addrInput.placeholder = 'Browser address bar text (optional)';
+    addrInput.placeholder = 'Browser address bar (optional)';
     addrInput.value = this.data.address || '';
 
     const capInput = document.createElement('input');
     capInput.type = 'text';
     capInput.className = 'cdx-input';
-    capInput.placeholder = 'Optional caption';
+    capInput.placeholder = 'Caption (optional)';
     capInput.value = this.data.caption || '';
+
+    detailsWrap.append(typeSelect, addrInput, capInput);
+    detailsToggle.addEventListener('click', () => {
+      detailsWrap.style.display = detailsWrap.style.display === 'none' ? 'grid' : 'none';
+    });
 
     const preview = document.createElement('div');
     const refresh = () => {
@@ -190,9 +205,9 @@ export class FrameTool {
       }
     });
 
-    controls.append(deviceSelect, typeSelect);
+    bar.append(deviceSelect, srcInput, uploadBtn, detailsToggle);
     refresh();
-    wrap.append(head, controls, srcInput, uploadInput, addrInput, capInput, preview);
+    wrap.append(bar, detailsWrap, preview);
     return wrap;
   }
 
