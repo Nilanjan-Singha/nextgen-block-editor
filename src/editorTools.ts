@@ -1937,7 +1937,9 @@ export function getEditorTools(
   };
   if (enabledTools && enabledTools.length > 0) {
     const allowed = new Set(enabledTools);
-    const inlineTools = new Set([
+    const alwaysKeep = new Set([
+      'header',
+      'paragraph',
       'inlineCode',
       'marker',
       'textColor',
@@ -1949,7 +1951,7 @@ export function getEditorTools(
       'mention',
     ]);
     return Object.fromEntries(
-      Object.entries(tools).filter(([key]) => allowed.has(key) || inlineTools.has(key))
+      Object.entries(tools).filter(([key]) => allowed.has(key) || alwaysKeep.has(key))
     );
   }
   return tools;

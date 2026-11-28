@@ -111,7 +111,7 @@ export class MermaidTool {
 
     const textarea = document.createElement('textarea');
     textarea.className = 'editor-mermaid-input';
-    textarea.rows = 3;
+    textarea.rows = 5;
     textarea.placeholder = 'graph TD\n  A --> B';
     textarea.value = this.data.code;
 

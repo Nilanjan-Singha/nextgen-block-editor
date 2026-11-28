@@ -1980,6 +1980,10 @@ html[data-ng-theme] body {
   background: transparent;
 }
 
+.editor-spotify-card.is-compact {
+  flex: 0 0 320px;
+}
+
 .editor-spotify-card iframe {
   width: 100%;
   height: 152px;
@@ -2408,7 +2412,8 @@ html[data-ng-theme] body {
 
 /* ── Tighter Toolbar & Plus/Settings Positioning ────────────────── */
 .nextgen-editor-shell #editorjs {
-  padding-left: 72px;
+  padding-left: 44px;
+  padding-right: 44px;
 }
 
 .nextgen-editor-shell .ce-block__content,
@@ -2435,20 +2440,8 @@ html[data-ng-theme] body {
   height: 0;
 }
 
-.nextgen-editor-shell .ce-toolbox .ce-popover,
-.nextgen-editor-shell .ce-settings .ce-popover {
-  min-width: 0 !important;
-  border: none !important;
-  box-shadow: none !important;
-  background: transparent !important;
-}
-
 .nextgen-editor-shell .ce-toolbox .ce-popover__container,
 .nextgen-editor-shell .ce-settings .ce-popover__container {
-  left: 0 !important;
-  right: auto !important;
-  top: 0 !important;
-  --popover-left: 0px !important;
   min-width: 240px;
 }
 
