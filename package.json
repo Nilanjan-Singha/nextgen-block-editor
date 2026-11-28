@@ -1,6 +1,6 @@
 {
   "name": "nextgen-block-editor",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "A modular, block-based React + TypeScript rich text editor built on Editor.js with Bento grids, Carousels, Before/After sliders, Lightbox galleries, Slides, Tabs, Accordions, Toggle headings, Alerts, and more.",
   "type": "module",
   "sideEffects": [
